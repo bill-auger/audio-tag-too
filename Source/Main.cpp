@@ -1,33 +1,29 @@
 
-#include "AppConstants.h"
-#include "GuiConstants.h"
-#include "MainContent.h"
+#include "Constants/AppConstants.h"
+#include "Constants/GuiConstants.h"
+#include "Views/MainContent.h"
 
 
-class JuceAudioApplication : public JUCEApplication
+class JuceBoilerplateApplication : public JUCEApplication
 {
 public:
 
-  JuceAudioApplication() {}
+  JuceBoilerplateApplication() {}
 
-  void initialise(const String& commandLine) override
+  void initialise(const String& cli_args) override
   {
-    mainWindow.reset(new MainWindow()) ;
+    this->mainWindow.reset(new MainWindow()) ;
 
-    if (! true /*JuceAudio::Init()*/) { setApplicationReturnValue(255) ; quit() ; }
+    if (! true /*JuceBoilerplate::Init()*/) { setApplicationReturnValue(255) ; quit() ; }
   }
 
-  void shutdown() override { mainWindow = nullptr ; }
+  void shutdown() override { this->mainWindow = nullptr ; }
 
-  void systemRequestedQuit() override { quit() ; }
-
-  void anotherInstanceStarted(const String& command_line) override {}
-
-  const String getApplicationName()    override { return ProjectInfo::projectName ; }
-
-  const String getApplicationVersion() override { return ProjectInfo::versionString ; }
-
-  bool moreThanOneInstanceAllowed()    override { return true ; }
+  void systemRequestedQuit()                          override { quit() ; }
+  const String getApplicationName()                   override { return ProjectInfo::projectName ; }
+  const String getApplicationVersion()                override { return ProjectInfo::versionString ; }
+  bool moreThanOneInstanceAllowed()                   override { return true ; }
+  void anotherInstanceStarted(const String& cli_args) override { }
 
 
   class MainWindow : public DocumentWindow
@@ -62,7 +58,7 @@ public:
 
   private:
 
-    std::unique_ptr<MainContent> mainContent ;
+    ScopedPointer<MainContent> mainContent ;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
@@ -75,4 +71,4 @@ private:
 } ;
 
 
-START_JUCE_APPLICATION(JuceAudioApplication)
+START_JUCE_APPLICATION(JuceBoilerplateApplication)
