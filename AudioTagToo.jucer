@@ -4,10 +4,45 @@
               version="0.0.1" bundleIdentifier="free.bill-auger.AudioTagToo"
               includeBinaryInAppConfig="1">
   <MAINGROUP id="iiOCZm" name="AudioTagToo">
+    <GROUP id="{06C763FB-F36A-9659-50AA-012427409460}" name="Assets">
+      <FILE id="Ebmfjk" name="audio-x-generic.png" compile="0" resource="1"
+            file="Assets/audio-x-generic.png"/>
+    </GROUP>
+    <GROUP id="{32AF26B6-CF18-68B4-7459-D9B8142253DB}" name="Headers">
+      <GROUP id="{4FEEE1CF-563A-D8A1-87F6-1211E4D29A2D}" name="Constants">
+        <FILE id="NM7o5M" name="AppConstants.h" compile="0" resource="0" file="Source/AppConstants.h"/>
+        <FILE id="ZoGSCF" name="GuiConstants.h" compile="0" resource="0" file="Source/GuiConstants.h"/>
+        <FILE id="QR0Gqt" name="MediaConstants.h" compile="0" resource="0"
+              file="Source/MediaConstants.h"/>
+      </GROUP>
+      <GROUP id="{55652D33-3B99-E916-4581-01F32D8B02A3}" name="Controllers"/>
+      <GROUP id="{2768B552-4034-9A6D-B8C5-09132B2600A8}" name="Models"/>
+      <GROUP id="{9E64E2B6-E375-E580-7CB9-4BBEE3763656}" name="Views">
+        <FILE id="l8Zpes" name="Background.h" compile="0" resource="0" file="Source/Background.h"/>
+        <FILE id="d76iQn" name="MainContent.h" compile="0" resource="0" file="Source/MainContent.h"/>
+        <FILE id="q1Tywf" name="Statusbar.h" compile="0" resource="0" file="Source/Statusbar.h"/>
+        <FILE id="NtTq3q" name="Waveform.h" compile="0" resource="0" file="Source/Waveform.h"/>
+      </GROUP>
+    </GROUP>
     <GROUP id="{83125242-B25A-290C-4B4B-C3FF04190730}" name="Source">
-      <FILE id="d76iQn" name="MainContent.h" compile="0" resource="0" file="Source/MainContent.h"/>
-      <FILE id="Y76Tzw" name="MainContent.cpp" compile="1" resource="0" file="Source/MainContent.cpp"/>
-      <FILE id="cp26CJ" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <GROUP id="{B7072F38-DF7A-61A1-713D-C261BA28F538}" name="Constants">
+        <FILE id="mWIVp4" name="AppConstants.cpp" compile="1" resource="0"
+              file="Source/AppConstants.cpp"/>
+        <FILE id="TJbbRu" name="GuiConstants.cpp" compile="1" resource="0"
+              file="Source/GuiConstants.cpp"/>
+        <FILE id="rjGxAM" name="MediaConstants.cpp" compile="1" resource="0"
+              file="Source/MediaConstants.cpp"/>
+      </GROUP>
+      <GROUP id="{A8664DA2-7E22-44C8-FB46-7E41D252C2EE}" name="Controllers">
+        <FILE id="cp26CJ" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      </GROUP>
+      <GROUP id="{E9EA4621-DD2E-354B-071C-2A1C46F6694E}" name="Models"/>
+      <GROUP id="{415C92D0-6DB5-561E-5112-51D267588674}" name="Views">
+        <FILE id="l6zsK6" name="Background.cpp" compile="1" resource="0" file="Source/Background.cpp"/>
+        <FILE id="Y76Tzw" name="MainContent.cpp" compile="1" resource="0" file="Source/MainContent.cpp"/>
+        <FILE id="Cxr1BM" name="Statusbar.cpp" compile="1" resource="0" file="Source/Statusbar.cpp"/>
+        <FILE id="M3PK9P" name="Waveform.cpp" compile="1" resource="0" file="Source/Waveform.cpp"/>
+      </GROUP>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
@@ -18,16 +53,16 @@
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../juce/modules"/>
-        <MODULEPATH id="juce_events" path="../juce/modules"/>
-        <MODULEPATH id="juce_graphics" path="../juce/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../juce/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../juce/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../juce/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../juce/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../juce/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../juce/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../juce/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../juce/modules"/>
+        <MODULEPATH id="juce_graphics" path="../juce/modules"/>
+        <MODULEPATH id="juce_events" path="../juce/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../juce/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../juce/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../juce/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../juce/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
   </EXPORTFORMATS>

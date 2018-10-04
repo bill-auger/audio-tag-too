@@ -2,6 +2,8 @@
 !AudioTag.jucer
 !.gitignore
 
+!Assets/
+!Assets/audio-x-generic.png
 
 !Builds/
 !Builds/Makefile/
@@ -13,8 +15,16 @@
 !Source/
 !Source/AppConstants.cpp
 !Source/AppConstants.h
+!Source/Background.cpp
+!Source/Background.h
 !Source/GuiConstants.cpp
 !Source/GuiConstants.h
 !Source/Main.cpp
 !Source/MainContent.cpp
 !Source/MainContent.h
+!Source/MediaConstants.cpp
+!Source/MediaConstants.h
+!Source/Statusbar.cpp
+!Source/Statusbar.h
+!Source/Waveform.cpp
+!Source/Waveform.h

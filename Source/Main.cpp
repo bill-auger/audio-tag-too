@@ -12,12 +12,12 @@ public:
 
   void initialise(const String& commandLine) override
   {
-    mainWindow.reset(new MainWindow()) ;
+    this->mainWindow.reset(new MainWindow()) ;
 
     if (! true /*AudioTagToo::Init()*/) { setApplicationReturnValue(255) ; shutdown() ; quit() ; }
   }
 
-  void shutdown() override { mainWindow = nullptr ; }
+  void shutdown() override { this->mainWindow = nullptr ; }
 
   void systemRequestedQuit() override { quit() ; }
 
@@ -34,7 +34,8 @@ public:
   {
   public:
 
-    MainWindow() : DocumentWindow(APP::APP_NAME , GUI::WINDOW_BG_COLOR , GUI::TITLEBAR_BTNS)
+//     MainWindow() : DocumentWindow(APP::APP_NAME , GUI::WINDOW_BG_COLOR , GUI::TITLEBAR_BTNS)
+    MainWindow() : DocumentWindow(APP::APP_NAME , GUI::WINDOW_BG_COLOR , DocumentWindow::allButtons)
     {
       // main content component
       this->mainContent = new MainContent() ;
@@ -49,7 +50,6 @@ public:
       setTitleBarHeight(GUI::TITLEBAR_H) ;
       centreWithSize(getWidth() , getHeight()) ;
       setResizable(true , false) ;
-      setResizable(true , false) ;
       setVisible(true) ;
     }
 
@@ -63,7 +63,7 @@ public:
 
   private:
 
-    std::unique_ptr<MainContent> mainContent ;
+    ScopedPointer<MainContent> mainContent ;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
