@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="CQ5KH7" name="JuceBoilerplate" projectType="guiapp" jucerVersion="5.3.2"
+              version="0.0.0" bundleIdentifier="free.bill-auger.JuceBoilerplate"
+              includeBinaryInAppConfig="1">
+  <MAINGROUP id="iiOCZm" name="JuceBoilerplate">
+    <GROUP id="{11401A1D-0D8C-D405-F54C-1F32AB73BAA3}" name="Assets">
+      <FILE id="VGR5ti" name="audio-x-generic.png" compile="0" resource="1"
+            file="Assets/audio-x-generic.png"/>
+    </GROUP>
+    <GROUP id="{83125242-B25A-290C-4B4B-C3FF04190730}" name="Source">
+      <GROUP id="{E9EA4621-DD2E-354B-071C-2A1C46F6694E}" name="Constants">
+        <FILE id="ckX5y9" name="AppConstants.cpp" compile="1" resource="0"
+              file="Source/Constants/AppConstants.cpp"/>
+        <FILE id="XuYVhk" name="AppConstants.h" compile="0" resource="0" file="Source/Constants/AppConstants.h"/>
+        <FILE id="KM0bOl" name="GuiConstants.cpp" compile="1" resource="0"
+              file="Source/Constants/GuiConstants.cpp"/>
+        <FILE id="f3C2tI" name="GuiConstants.h" compile="0" resource="0" file="Source/Constants/GuiConstants.h"/>
+      </GROUP>
+      <GROUP id="{415C92D0-6DB5-561E-5112-51D267588674}" name="Controllers">
+        <FILE id="cp26CJ" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      </GROUP>
+      <GROUP id="{A8664DA2-7E22-44C8-FB46-7E41D252C2EE}" name="Models"/>
+      <GROUP id="{CCAC49C8-3550-45CC-F03A-3814FAE7EEF1}" name="Views">
+        <FILE id="vxOpya" name="MainContent.cpp" compile="1" resource="0" file="Source/Views/MainContent.cpp"/>
+        <FILE id="DvOUEV" name="MainContent.h" compile="0" resource="0" file="Source/Views/MainContent.h"/>
+      </GROUP>
+    </GROUP>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <LINUX_MAKE targetFolder="Builds/Makefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="juce-boilerplate-dbg"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="juce-boilerplate"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../juce/modules"/>
+        <MODULEPATH id="juce_events" path="../juce/modules"/>
+        <MODULEPATH id="juce_graphics" path="../juce/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../juce/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../juce/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../juce/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../juce/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../juce/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../juce/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../juce/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../juce/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_utils" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_core" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_data_structures" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_events" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_graphics" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+  </MODULES>
+  <LIVE_SETTINGS>
+    <LINUX/>
+  </LIVE_SETTINGS>
+  <JUCEOPTIONS/>
+</JUCERPROJECT>
