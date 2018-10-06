@@ -1,13 +1,23 @@
+
 *
 !.gitignore
+!COPYING
 !JuceBoilerplate.jucer
+!LICENSES.md
+!README.md
 
 !Assets/
 !Assets/audio-x-generic.png
+!Assets/COPYING_ASSETS
+!Assets/README.md
 
 !Builds/
 !Builds/Makefile/
 !Builds/Makefile/Makefile
+
+!Documentation/
+!Documentation/COPYING_DOCUMENTATION
+!Documentation/README.md
 
 !JuceLibraryCode/
 !JuceLibraryCode/AppConfig.h
