@@ -1,23 +1,44 @@
-/*
+/*\
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
+|*|
+|*|  This file is part of the AudioTagToo program.
+|*|
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
+|*|  it under the terms of the GNU General Public License as published by
+|*|  the Free Software Foundation, either version 3 of the License, or
+|*|  (at your option) any later version.
+|*|
+|*|  AudioTagToo is distributed in the hope that it will be useful,
+|*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
+|*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|*|  GNU General Public License for more details.
+|*|
+|*|  You should have received a copy of the GNU General Public License
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
+\*/
+
+
+//[Headers] You can add your own extra header files here...
+
+/* This class was derived from:
   ==============================================================================
 
-  This is an automatically generated GUI class created by the Projucer!
+   JUCE AudioPlaybackDemo v1.0.0
+   Copyright (c) 2017 - ROLI Ltd.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+   The code included in this file is provided under the terms of the ISC license
+   http://www.isc.org/downloads/software-support-policy/isc-license. Permission
+   To use, copy, modify, and/or distribute this software for any purpose with or
+   without fee is hereby granted provided that the above copyright notice and
+   this permission notice appear in all copies.
 
-  Created with Projucer version: 5.3.2
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+   THE SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES,
+   WHETHER EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR
+   PURPOSE, ARE DISCLAIMED.
 
   ==============================================================================
 */
-
-//[Headers] You can add your own extra header files here...
 
 #include "GuiConstants.h"
 #include "MediaConstants.h"

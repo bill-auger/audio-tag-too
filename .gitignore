@@ -1,13 +1,22 @@
 *
 !AudioTag.jucer
 !.gitignore
+!COPYING
+!LICENSES.md
+!README.md
 
 !Assets/
 !Assets/audio-x-generic.png
+!Assets/COPYING_ASSETS
+!Assets/README.md
 
 !Builds/
 !Builds/Makefile/
 !Builds/Makefile/Makefile
+
+!Documentation/
+!Documentation/COPYING_DOCUMENTATION
+!Documentation/README.md
 
 !JuceLibraryCode/
 !JuceLibraryCode/*
