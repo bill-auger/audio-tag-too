@@ -1,0 +1,30 @@
+# Maintainer: bill-auger <bill-auger@programmer.net>
+
+
+pkgname=juce-boilerplate
+pkgver=0.0.1
+pkgrel=1
+pkgdesc="Clip and stitch audio samples"
+arch=('i686' 'x86_64')
+url=https://github.com/bill-auger/juce-boilerplate/
+license=('GPL3')
+
+depends=()
+makedepends=('libxinerama' 'libxrandr')
+
+_builddir=${pkgname}-${pkgver}/Builds/Makefile
+source=(https://github.com/bill-auger/juce-boilerplate/archive/v${pkgver}.tar.gz)
+sha256sums=('6555c56449d350579dccc75e153dcde672fd7001788ad90642d9de41ba7a71a2')
+
+
+build()
+{
+  cd ${_builddir}
+
+  make CONFIG=Release
+}
+
+package()
+{
+  install -Dm 755 ${_builddir}/build/juce-boilerplate ${pkgdir}/usr/bin/juce-boilerplate
+}

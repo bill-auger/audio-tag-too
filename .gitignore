@@ -14,6 +14,8 @@
 !Builds/
 !Builds/Makefile/
 !Builds/Makefile/Makefile
+!Builds/Packaging/
+!Builds/Packaging/PKGBUILD
 
 !Documentation/
 !Documentation/COPYING_DOCUMENTATION
