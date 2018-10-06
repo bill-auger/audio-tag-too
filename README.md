@@ -1,14 +1,12 @@
 
 ### Building from Source
 
-<!--
 #### Arch, Parabola:
 ```
 ### build and install with makepkg ###
 $ wget https://raw.githubusercontent.com/bill-auger/juce-boilerplate/master/Builds/Packaging/PKGBUILD
 # makepkg -sri ./PKGBUILD
 ```
--->
 
 #### Debian, Ubuntu, Trisquel:
 ```
@@ -31,7 +29,7 @@ $ sudo make install
 $ juce-boilerplate
 ```
 
-#### Fedora >= 23 (plus rpmfusion repositories):
+#### Fedora:
 ```
 ### build dependencies ###
 $ su -c "dnf install freetype-devel gcc-c++ libX11-devel libXcursor-devel \
