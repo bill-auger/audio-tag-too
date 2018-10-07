@@ -22,7 +22,7 @@
 !Documentation/README.md
 
 !JuceLibraryCode/
-!JuceLibraryCode/*
+!JuceLibraryCode/**
 
 !Source/
 !Source/Main.cpp
