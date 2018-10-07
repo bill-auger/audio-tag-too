@@ -22,6 +22,9 @@
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#ifndef CONTROLLER_OWNS_STORAGE
+#include "../Views/MainContent.h"
+#endif // CONTROLLER_OWNS_STORAGE
 
 
 /**
@@ -29,22 +32,31 @@
   It holds the runtime configuration via shared value holders
       and handles persistence via XML or JUCE binary storage.
 */
-class JuceBoilerplateStore : ValueTree::Listener
+class JuceBoilerplateStore : private ChangeListener      ,
+                             private ValueTree::Listener
 {
+  friend class JuceBoilerplate ;
+#ifndef CONTROLLER_OWNS_STORAGE
   friend class MainContent ;
+#else // CONTROLLER_OWNS_STORAGE
+  friend class MainContent ;
+#endif // CONTROLLER_OWNS_STORAGE
 
 
 public:
 
-  ~JuceBoilerplateStore() ;
+  JuceBoilerplateStore(void) ;
+  ~JuceBoilerplateStore(void) ;
+
+
+  // getters/setters
+  bool      setProperty     (ValueTree node        , const Identifier& key , const var value) ;
+  bool      setConfig       (ValueTree config_node , const Identifier& key , const var value) ;
+  var       getConfig       (const Identifier& key) ;
+  ValueTree getChildNodeById(ValueTree root_store , Identifier node_id) ;
 
 
 private:
-
-  // initialization
-  JuceBoilerplateStore() ;
-  bool initialize() ;
-  void teardown() ;
 
   // validations
   void verifyConfig() ;
@@ -65,11 +77,12 @@ private:
   void sanitizeComboProperty(ValueTree store , Identifier key , StringArray options) ;
 
   // persistence
-  void loadConfig () ;
-  bool storeConfig(XmlElement* device_state_xml) ;
+  void loadConfig (void) ;
+  bool storeConfig(XmlElement* device_state_xml = nullptr) ;
 
   // event handlers
   void listen                  (bool should_listen) ;
+  void changeListenerCallback  (ChangeBroadcaster* source) ;
   void valueTreePropertyChanged(ValueTree& node , const Identifier& key) override ;
 
   // unhandled ValueTree::Listener events
@@ -80,9 +93,8 @@ private:
   void valueTreeRedirected       (ValueTree& /*target_node*/                                                 ) override { }
 
   // getters/setters
-  bool isKnownProperty(ValueTree node        , const Identifier& key) ;
-  void setProperty    (ValueTree node        , const Identifier& key , const var value) ;
-  bool setConfig      (ValueTree config_node , const Identifier& key , const var value) ;
+  bool isKnownProperty(ValueTree node , const Identifier& key) ;
+
 
   // configuration/persistence
   File                        storageFile ;

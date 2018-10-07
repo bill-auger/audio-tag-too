@@ -21,10 +21,12 @@
 
 #include "Constants/AppConstants.h"
 #include "Constants/GuiConstants.h"
+#include "Controllers/JuceBoilerplate.h"
+#include "Views/Alert.h"
 #include "Views/MainContent.h"
 
 
-class JuceBoilerplateApplication : public JUCEApplication
+class JuceBoilerplateApplication : public JUCEApplication , private MultiTimer
 {
 public:
 
@@ -32,9 +34,11 @@ public:
 
   void initialise(const String& cli_args) override
   {
+DEBUG_TRACE_INIT_VERSION
+
     this->mainWindow.reset(new MainWindow()) ;
 
-    if (! true /*JuceBoilerplate::Init()*/) { setApplicationReturnValue(255) ; quit() ; }
+    if (JuceBoilerplate::Initialize(this->mainWindow.get() , this->mainWindow->mainContent.get()))
     {
 #ifdef JUCE_LINUX
       // create desktop launch file
@@ -54,11 +58,38 @@ public:
         delete icon_stream ;
       }
 #endif // JUCE_LINUX
+
+      // start main loop timers
+      startTimers() ;
     }
-    else { setApplicationReturnValue(255) ; quit() ; }
+    else if (Alert::AreAnyPending()) { setApplicationReturnValue(255) ; startTimers() ; }
+    else                             { setApplicationReturnValue(255) ; quit() ;        }
   }
 
-  void shutdown() override { this->mainWindow = nullptr ; }
+  void startTimers()
+  {
+DEBUG_QUIT_BEFORE_MAIN_LOOP // NOTE: may call quit()
+
+    for (int timer_n = 0 ; timer_n < APP::N_TIMERS ; ++timer_n)
+      startTimer(APP::TIMER_IDS[timer_n] , APP::TIMER_IVLS[timer_n]) ;
+  }
+
+  void stopTimers()
+  {
+    for (int timer_n = 0 ; timer_n > APP::N_TIMERS ; ++timer_n)
+      stopTimer(APP::TIMER_IDS[timer_n]) ;
+  }
+
+  void shutdown() override
+  {
+DEBUG_TRACE_SHUTDOWN_IN
+
+    stopTimers() ; JuceBoilerplate::Teardown() ;
+
+    this->mainWindow = nullptr ;
+
+DEBUG_TRACE_SHUTDOWN_OUT
+  }
 
   void systemRequestedQuit()                          override { quit() ;                  }
   const String getApplicationName()                   override { return APP::APP_NAME ;    }
@@ -107,6 +138,14 @@ public:
 
 
 private:
+
+  void timerCallback(int timer_id) override
+  {
+DEBUG_QUIT_AFTER_MAIN_LOOP // NOTE: may call quit()
+
+      JuceBoilerplate::HandleTimer(timer_id) ;
+  }
+
 
   std::unique_ptr<MainWindow> mainWindow ;
 } ;

@@ -34,6 +34,7 @@ public:
   static const uint8 PAD ;
   static const uint8 PAD2 ;
   static const uint8 PAD4 ;
+  static const uint8 STROKE_W ;
   static const float FONT_SIZE ;
 
   // MainWindow
@@ -46,10 +47,12 @@ public:
   static const int    TITLEBAR_BTNS ;
 
   // Waveform
+  static const uint16 CACHE_N_THUMBS ;
   static const uint16 BIN_N_SAMPLES ;
   static const uint8  SCROLLBARS_H ;
   static const Colour WAVE_BG_COLOR ;
   static const Colour WAVE_FG_COLOR ;
+  static const Colour WAVE_SELECTED_COLOR ;
   static const Colour CURSOR_COLOR ;
   static const Colour HEAD_COLOR ;
   static const Colour TAIL_COLOR ;
@@ -59,8 +62,12 @@ public:
   static const String LOWER_WAVEFORM_ID ;
   static const String NO_FILE_TEXT ;
 
+  // Alert
+  enum         AlertType { ALERT_TYPE_WARNING , ALERT_TYPE_ERROR } ;
+  static const String    MODAL_WARNING_TITLE ;
+  static const String    MODAL_ERROR_TITLE ;
+
   // user messages
-  static const String DEVICE_ERROR_TITLE ;
   static const String DEVICE_ERROR_MSG ;
   static const String FILESYSTEM_WRITE_ERROR_MSG ;
   static const String STORAGE_WRITE_ERROR_MSG ;

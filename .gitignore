@@ -1,4 +1,3 @@
-
 *
 !.gitignore
 !COPYING
@@ -44,6 +43,8 @@
 !Source/Constants/StorageConstants.h
 
 !Source/Controllers/
+!Source/Controllers/JuceBoilerplate.cpp
+!Source/Controllers/JuceBoilerplate.h
 
 !Source/Models/
 !Source/Models/JuceBoilerplateStore.cpp
@@ -54,10 +55,15 @@
 !Source/Trace/
 !Source/Trace/Trace.cpp
 !Source/Trace/Trace.h
+!Source/Trace/TraceAlert.h
+!Source/Trace/TraceJuceBoilerplate.h
 !Source/Trace/TraceJuceBoilerplateStore.h
+!Source/Trace/TraceMain.h
 !Source/Trace/TraceWaveform.h
 
 !Source/Views/
+!Source/Views/Alert.cpp
+!Source/Views/Alert.h
 !Source/Views/MainContent.cpp
 !Source/Views/MainContent.h
 !Source/Views/Statusbar.cpp

@@ -19,38 +19,80 @@
 \*/
 
 
-
 #include "JuceBoilerplateStore.h"
 #include "Seeds.h"
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/StorageConstants.h"
+#include "../Controllers/JuceBoilerplate.h"
+#ifdef CONTROLLER_OWNS_STORAGE
+#include "../Views/MainContent.h"
+#endif // CONTROLLER_OWNS_STORAGE
 #include "../Trace/TraceJuceBoilerplateStore.h"
 
 
 /* JuceBoilerplateStore public instance methods */
 
-JuceBoilerplateStore::~JuceBoilerplateStore() { }
+/* setup/teardown */
 
-
-/* JuceBoilerplateStore private instance methods */
-
-/* initialization */
-
-JuceBoilerplateStore::JuceBoilerplateStore() { }
-
-bool JuceBoilerplateStore::initialize()
+JuceBoilerplateStore::JuceBoilerplateStore()
 {
   // create shared config ValueTree from persistent storage or defaults
   loadConfig() ; verifyConfig() ;
 
-  listen(true) ;
+DEBUG_PRIME_CLIPS_STORAGE
 
-  return true ;
+#ifndef CONTROLLER_OWNS_STORAGE
+  listen(true) ;
+#endif // CONTROLLER_OWNS_STORAGE
 }
 
-void JuceBoilerplateStore::teardown() { listen(false) ; storeConfig(this->deviceStateXml.get()) ; }
+JuceBoilerplateStore::~JuceBoilerplateStore() { listen(false) ; storeConfig() ; }
 
+
+/* getters/setters */
+
+bool JuceBoilerplateStore::setProperty(ValueTree node  , const Identifier& key ,
+                                   const var value                         )
+{
+  bool is_valid = node.isValid() ;
+
+DEBUG_TRACE_SET_PROPERTY
+
+  if (is_valid) node.setProperty(key , value , nullptr) ;
+
+  return is_valid ;
+}
+
+bool JuceBoilerplateStore::setConfig(ValueTree config_node , const Identifier& key ,
+                                 const var value                               )
+{
+DEBUG_TRACE_SET_CONFIG
+
+  // validate mutating of critical configuration
+  bool is_valid = STORE::RootNodes().contains(STRING(config_node.getType())) &&
+                  isKnownProperty(config_node , key)                          ;
+
+  if (is_valid) setProperty(config_node , key , value) ;
+
+  return is_valid ;
+}
+
+ValueTree JuceBoilerplateStore::getChildNodeById(ValueTree root_store , Identifier node_id)
+{
+  ValueTree child_node ;
+
+  if ((child_node = root_store.getChildWithName(node_id)).isValid())
+    return child_node ;
+  else for (int master_n = 0 ; master_n < root_store.getNumChildren() ; ++master_n)
+    if ((child_node = root_store.getChild(master_n).getChildWithName(node_id)).isValid())
+      return child_node ;
+
+  return ValueTree::invalid ;
+}
+
+
+/* JuceBoilerplateStore private instance methods */
 
 /* validations */
 
@@ -234,7 +276,8 @@ DEBUG_TRACE_STORE_CONFIG
   File temp_file = this->storageFile.getSiblingFile(STORE::STORAGE_FILENAME + ".temp") ;
   if (temp_file.create().failed() || !temp_file.deleteFile())
   {
-    Trace::TraceError(GUI::FILESYSTEM_WRITE_ERROR_MSG) ;
+    JuceBoilerplate::Error(GUI::FILESYSTEM_WRITE_ERROR_MSG) ;
+
     return false ;
   }
 
@@ -257,7 +300,7 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
     }
     else
     {
-      Trace::TraceError(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
+      JuceBoilerplate::Error(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
       delete storage_stream ;
 
       return false ;
@@ -271,7 +314,7 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
       delete storage_xml ;
     else
     {
-      Trace::TraceError(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
+      JuceBoilerplate::Error(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
       delete storage_xml ;
 
       return false ;
@@ -283,16 +326,13 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
   // marshall audio device configuration out to persistent XML storage
   if (device_state_xml != nullptr)
   {
-    if (device_state_xml->writeToFile(temp_file , String::empty))
-    {
-      this->deviceStateXml.reset(device_state_xml) ;
+    this->deviceStateXml.reset(device_state_xml) ;
+
+    if (this->deviceStateXml->writeToFile(temp_file , String::empty))
       temp_file.moveFileTo(this->deviceXmlFile) ;
-      delete device_state_xml ;
-    }
     else
     {
-      if (device_state_xml != this->deviceStateXml.get()) delete device_state_xml ;
-      Trace::TraceError(GUI::STORAGE_WRITE_ERROR_MSG + "audio device configuration") ;
+      JuceBoilerplate::Error(GUI::STORAGE_WRITE_ERROR_MSG + "audio device configuration") ;
 
       return false ;
     }
@@ -306,15 +346,33 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
 
 void JuceBoilerplateStore::listen(bool should_listen)
 {
+  if (!JuceBoilerplate::IsInitialized) return ;
+
 DEBUG_TRACE_LISTEN
 
   if (should_listen) { this->root.addListener   (this) ; }
   else               { this->root.removeListener(this) ; }
 }
 
+void JuceBoilerplateStore::changeListenerCallback(ChangeBroadcaster* source)
+{
+  if (source == &(JuceBoilerplate::Gui->deviceManager))
+  {
+    bool        is_device_ready  = JuceBoilerplate::Gui->deviceManager.getCurrentAudioDevice() != nullptr ;
+    XmlElement* device_state_xml = JuceBoilerplate::Gui->deviceManager.createStateXml() ;
+
+DEBUG_TRACE_DEVICE_STATE_CHANGED
+
+    if      (!is_device_ready           ) JuceBoilerplate::Warning(GUI::DEVICE_ERROR_MSG) ;
+    else if (device_state_xml != nullptr) storeConfig(device_state_xml) ;
+  }
+}
+
 void JuceBoilerplateStore::valueTreePropertyChanged(ValueTree& node , const Identifier& key)
 {
 DEBUG_TRACE_CONFIG_TREE_CHANGED
+
+  if (isKnownProperty(node , key)) JuceBoilerplate::HandleConfigChanged(key) ;
 }
 
 
@@ -326,25 +384,4 @@ bool JuceBoilerplateStore::isKnownProperty(ValueTree node , const Identifier& ke
 
   return (node == this->root) ? STORE::RootKeys().contains(key) :
                                 false                           ;
-}
-
-void JuceBoilerplateStore::setProperty(ValueTree node  , const Identifier& key ,
-                                       const var value                         )
-{
-DEBUG_TRACE_SET_PROPERTY
-
-  if (node.isValid()) node.setProperty(key , value , nullptr) ;
-}
-
-bool JuceBoilerplateStore::setConfig(ValueTree config_node , const Identifier& key ,
-                                     const var value                               )
-{
-DEBUG_TRACE_SET_CONFIG
-
-  // validate mutating of critical configuration
-  bool is_valid = config_node == this->root && isKnownProperty(config_node , key) ;
-
-  if (is_valid) setProperty(config_node , key , value) ;
-
-  return is_valid ;
 }

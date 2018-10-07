@@ -26,7 +26,7 @@
 #include "../../JuceLibraryCode/JuceHeader.h"
 
 
-class AudioTagTooStore ;
+class JuceBoilerplateStore ;
 class Statusbar ;
 class Waveform ;
 
@@ -46,6 +46,11 @@ class MainContent  : public AudioAppComponent,
                      private ChangeListener,
                      private ValueTree::Listener
 {
+#ifndef CONTROLLER_OWNS_STORAGE
+  friend class JuceBoilerplate ;
+#endif // CONTROLLER_OWNS_STORAGE
+
+
 public:
     //==============================================================================
     MainContent ();
@@ -53,6 +58,16 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+
+#ifdef CONTROLLER_OWNS_STORAGE
+  void initialize(ValueTree& storage , NamedValueSet& features) ;
+#else // CONTROLLER_OWNS_STORAGE
+  void initialize(NamedValueSet& features) ;
+#endif // CONTROLLER_OWNS_STORAGE
+  void setStatusL(String statusText) ;
+  void setStatusC(String statusText) ;
+  void setStatusR(String statusText) ;
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -64,21 +79,24 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
   WildcardFileFilter                       audioFileFilter ;
-  AudioFormatManager                       formatManager ;
-  TimeSliceThread                          workerThread ;
   DirectoryContentsList                    directoryList ;
-  URL                                      currentAudioFile ;
+  TimeSliceThread                          workerThread ;
+  String                                   audioFilename ;
+  AudioFormatManager                       formatManager ;
   AudioSourcePlayer                        audioSourcePlayer ;
   AudioTransportSource                     transportSource ;
-  std::unique_ptr<AudioFormatReaderSource> currentAudioFileSource ;
+  std::unique_ptr<AudioFormatReaderSource> audioFileSource ;
+  std::vector<Waveform*>                   waveforms ;
+#ifndef CONTROLLER_OWNS_STORAGE
   std::unique_ptr<JuceBoilerplateStore>    storage ;
+#else // CONTROLLER_OWNS_STORAGE
+  ValueTree                                storage ;
+#endif // CONTROLLER_OWNS_STORAGE
 
   // getters/setters
-  void showAudioResource    (URL resource) ;
-  bool loadURLIntoTransport (const URL& audio_url) ;
-  void toggleFollowTransport(void) ;
+  void loadUrl              (File audio_url) ;
   void toggleTransport      (void) ;
-  void updateTransportButton(bool is_rolling) ;
+  void updateTransportButton(void) ;
   void setHeadMarker        (void) ;
   void setTailMarker        (void) ;
 
@@ -106,9 +124,10 @@ private:
     //[/UserVariables]
 
     //==============================================================================
+
     std::unique_ptr<Waveform> upperWaveform;
     std::unique_ptr<Waveform> lowerWaveform;
-    std::unique_ptr<ToggleButton> followButton;
+    std::unique_ptr<GroupComponent> groupComponent;
     std::unique_ptr<TextButton> headButton;
     std::unique_ptr<TextButton> transportButton;
     std::unique_ptr<TextButton> tailButton;

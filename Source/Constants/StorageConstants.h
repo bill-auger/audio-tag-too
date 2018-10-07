@@ -18,7 +18,6 @@
 |*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
-
 /*\ NOTES:
 |*|  the application data model is implemented in the JuceBoilerplateStore class
 |*|      as JUCE ValueTrees with a JUCE binary file-out for persistence (STORAGE_FILENAME)
@@ -30,12 +29,14 @@
 |*| STORAGE_ID:
 |*| {
 |*|   // config root
-|*|   CONFIG_VERSION_ID: an_int
+|*|   CONFIG_VERSION_KEY : an_int   ,
+|*|   WINDOW_STATE_KEY   : a_string
 |*| }
 \*/
 
 
 #pragma once
+
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "AppConstants.h"
@@ -54,7 +55,7 @@ public:
   } ;
   static const Identifier  FilterId           (String a_string , String retain_chars = APP::VALID_ID_CHARS) ;
   static const StringArray RootPersistentNodes() ;
-//   static const StringArray RootNodes          () ;
+  static const StringArray RootNodes          () ;
   static const StringArray RootPersistentKeys () ;
   static const StringArray RootKeys           () ;
 
@@ -64,6 +65,7 @@ public:
 
   // root IDs
   static const Identifier CONFIG_VERSION_KEY ;
+  static const Identifier WINDOW_STATE_KEY ;
 
   // root defaults
   static const String STORAGE_DIRNAME ;
