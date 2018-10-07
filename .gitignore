@@ -19,7 +19,7 @@
 !Documentation/README.md
 
 !JuceLibraryCode/
-!JuceLibraryCode/*
+!JuceLibraryCode/**
 
 !Source/
 !Source/AppConstants.cpp
