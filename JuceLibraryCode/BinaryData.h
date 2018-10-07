@@ -9,7 +9,7 @@
 namespace BinaryData
 {
     extern const char*   audioxgeneric_png;
-    const int            audioxgeneric_pngSize = 2814;
+    const int            audioxgeneric_pngSize = 2060;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
     const int namedResourceListSize = 1;

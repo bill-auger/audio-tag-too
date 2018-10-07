@@ -35,13 +35,13 @@ const Identifier STORE::FilterId(String a_string , String retain_chars)
                  .replaceCharacters(APP::FILTER_CHARS , APP::REPLACE_CHARS) ;
 }
 #define ROOT_PERSISTENT_NODE_IDS String::empty
-// #define ROOT_TRANSIENT_NODE_IDS  String::empty
+#define ROOT_TRANSIENT_NODE_IDS  String::empty
 #define ROOT_PERSISTENT_IDS      STRING(CONFIG_VERSION_KEY) + newLine + \
-                                 String::empty
+                                 STRING(WINDOW_STATE_KEY  )
 #define ROOT_TRANSIENT_IDS       String::empty
 const StringArray STORE::RootPersistentNodes() { return StringArray::fromLines(ROOT_PERSISTENT_NODE_IDS           ) ; }
-// const StringArray STORE::RootNodes()           { return StringArray::fromLines(ROOT_PERSISTENT_NODE_IDS + newLine +
-//                                                                                ROOT_TRANSIENT_NODE_IDS            ) ; }
+const StringArray STORE::RootNodes()           { return StringArray::fromLines(ROOT_PERSISTENT_NODE_IDS + newLine +
+                                                                               ROOT_TRANSIENT_NODE_IDS            ) ; }
 const StringArray STORE::RootPersistentKeys()  { return StringArray::fromLines(ROOT_PERSISTENT_IDS                ) ; }
 const StringArray STORE::RootKeys()            { return StringArray::fromLines(ROOT_PERSISTENT_IDS      + newLine +
                                                                                ROOT_TRANSIENT_IDS                 ) ; }
@@ -52,6 +52,7 @@ const Identifier STORE::DEVICE_XML_ID = "juce-boilerplate-device-config" ;
 
 // root IDs
 const Identifier STORE::CONFIG_VERSION_KEY = "config-version" ;
+const Identifier STORE::WINDOW_STATE_KEY   = "window-state" ;
 
 // root defaults
 const int STORE::CONFIG_VERSION = 1 ;

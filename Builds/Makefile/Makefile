@@ -72,10 +72,12 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/GuiConstants_d00d5cbd.o \
   $(JUCE_OBJDIR)/MediaConstants_dc2ebbb4.o \
   $(JUCE_OBJDIR)/StorageConstants_d344b97d.o \
+  $(JUCE_OBJDIR)/JuceBoilerplate_cf681fb5.o \
   $(JUCE_OBJDIR)/Main_90ebc5c2.o \
   $(JUCE_OBJDIR)/JuceBoilerplateStore_119f6b1b.o \
   $(JUCE_OBJDIR)/Seeds_7de92226.o \
   $(JUCE_OBJDIR)/Trace_fd3024bc.o \
+  $(JUCE_OBJDIR)/Alert_b633633c.o \
   $(JUCE_OBJDIR)/MainContent_91787020.o \
   $(JUCE_OBJDIR)/Statusbar_b88450c1.o \
   $(JUCE_OBJDIR)/Waveform_b456ee67.o \
@@ -123,6 +125,11 @@ $(JUCE_OBJDIR)/StorageConstants_d344b97d.o: ../../Source/Constants/StorageConsta
 	@echo "Compiling StorageConstants.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
+$(JUCE_OBJDIR)/JuceBoilerplate_cf681fb5.o: ../../Source/Controllers/JuceBoilerplate.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling JuceBoilerplate.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
 $(JUCE_OBJDIR)/Main_90ebc5c2.o: ../../Source/Main.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling Main.cpp"
@@ -141,6 +148,11 @@ $(JUCE_OBJDIR)/Seeds_7de92226.o: ../../Source/Models/Seeds.cpp
 $(JUCE_OBJDIR)/Trace_fd3024bc.o: ../../Source/Trace/Trace.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling Trace.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/Alert_b633633c.o: ../../Source/Views/Alert.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling Alert.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/MainContent_91787020.o: ../../Source/Views/MainContent.cpp

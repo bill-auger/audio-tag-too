@@ -34,6 +34,12 @@ const String APP::VALID_ID_CHARS     = ALPHANUMERIC + "_- " ;
 const String APP::FILTER_CHARS       = "-_.:/?=@#&[] " ;
 const String APP::REPLACE_CHARS      = String::repeatedString("-" , FILTER_CHARS.length()) ;
 
+// timers
+int timer_ids[]  = { APP::TIMER_HI_ID  , APP::TIMER_MED_ID  , APP::TIMER_LO_ID  } ;
+int timer_ivls[] = { APP::TIMER_HI_IVL , APP::TIMER_MED_IVL , APP::TIMER_LO_IVL } ;
+const Array<int> APP::TIMER_IDS  = Array<int>(timer_ids  , N_TIMERS) ;
+const Array<int> APP::TIMER_IVLS = Array<int>(timer_ivls , N_TIMERS) ;
+
 // CLI params
 const String     APP::CLI_HELP_TOKEN    = "--help" ;
 const String     APP::CLI_VERSION_TOKEN = "--version" ;
@@ -45,6 +51,7 @@ const Identifier APP::INIT_DIR_KEY      = "initial-dir" ;
 const Identifier APP::COURSE_FPS_KEY    = "course-fps" ;
 const Identifier APP::FINE_FPS_KEY      = "fine-fps" ;
 
+
 // user messages
 #define APP_CMD_PAD String("").paddedLeft(' ' , APP_CMD.length())
 #define HELP_USAGE_MSG    "prints this message and exits"
@@ -52,23 +59,23 @@ const Identifier APP::FINE_FPS_KEY      = "fine-fps" ;
 #define AUDIO_USAGE_MSG   "disables audio output (safe mode)"
 #define DIR_USAGE_MSG     "starts " + APP_NAME + " with the file browser rooted at DIRECTORY"
 #define FPS_USAGE_MSG     "starts " + APP_NAME + " with integer(N) frames per second graphics update"
-#define CLI_DIR_TOKEN_ENTRY CLI_DIR_TOKEN + " <DIRECTORY>"
-#define CLI_FPS_TOKEN_ENTRY CLI_FPS_TOKEN + " <N>"
+#define CLI_DIR_TOKEN_ENTRY  CLI_DIR_TOKEN  + " <DIRECTORY>"
+#define CLI_FPS_TOKEN_ENTRY  CLI_FPS_TOKEN  + " <N>"
 const StringArray APP::CLI_USAGE_MSG = StringArray::fromLines(
-  String("AudioTagToo Usage:\n")                                                  +
-  "\n\t" + APP_CMD + " [ " + CLI_HELP_TOKEN      + " | "                          +
-                             CLI_VERSION_TOKEN   + " ]"                           +
-  "\n\t" + APP_CMD + " [ " + CLI_AUDIO_TOKEN     + " ]"                           +
-                     " [ " + CLI_DIR_TOKEN_ENTRY + " ]"                           +
-                     " [ " + CLI_FPS_TOKEN_ENTRY + " ]"                           +
-  "\n\n\n\tINFORMATION:"                                                          +
-  "\n\n\t\t"               + CLI_HELP_TOKEN      + "\n\t\t\t" + HELP_USAGE_MSG    +
-  "\n\n\t\t"               + CLI_VERSION_TOKEN   + "\n\t\t\t" + VERSION_USAGE_MSG +
-  "\n\n\n\tFEATURE SWITCHES:"                                                     +
-  "\n\n\t\t"               + CLI_AUDIO_TOKEN     + "\n\t\t\t" + AUDIO_USAGE_MSG   +
-  "\n\n\n\tCONFIGURATION:"                                                        +
-  "\n\n\t\t"               + CLI_DIR_TOKEN_ENTRY + "\n\t\t\t" + DIR_USAGE_MSG     +
-  "\n\n\t\t"               + CLI_FPS_TOKEN_ENTRY + "\n\t\t\t" + FPS_USAGE_MSG     ) ;
+  String("JuceBoilerplate Usage:\n")                                               +
+  "\n\t" + APP_CMD + " [ " + CLI_HELP_TOKEN       + " | "                          +
+                             CLI_VERSION_TOKEN    + " ]"                           +
+  "\n\t" + APP_CMD + " [ " + CLI_AUDIO_TOKEN      + " ]"                           +
+                     " [ " + CLI_DIR_TOKEN_ENTRY  + " ]"                           +
+                     " [ " + CLI_FPS_TOKEN_ENTRY  + " ]"                           +
+  "\n\n\n\tINFORMATION:"                                                           +
+  "\n\n\t\t"               + CLI_HELP_TOKEN       + "\n\t\t\t" + HELP_USAGE_MSG    +
+  "\n\n\t\t"               + CLI_VERSION_TOKEN    + "\n\t\t\t" + VERSION_USAGE_MSG +
+  "\n\n\n\tFEATURE SWITCHES:"                                                      +
+  "\n\n\t\t"               + CLI_AUDIO_TOKEN      + "\n\t\t\t" + AUDIO_USAGE_MSG   +
+  "\n\n\n\tCONFIGURATION:"                                                         +
+  "\n\n\t\t"               + CLI_DIR_TOKEN_ENTRY  + "\n\t\t\t" + DIR_USAGE_MSG     +
+  "\n\n\t\t"               + CLI_FPS_TOKEN_ENTRY  + "\n\t\t\t" + FPS_USAGE_MSG     ) ;
 
 
 // filesystem

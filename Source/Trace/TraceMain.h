@@ -1,5 +1,5 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
+|*|  JuceBoilerplate - Clip and stitch audio samples
 |*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
 |*|
 |*|  This file is part of the JuceBoilerplate program.
@@ -19,18 +19,26 @@
 \*/
 
 
-#include "Seeds.h"
-#include "../Constants/StorageConstants.h"
+#pragma once
 
 
-/* Seeds public class methods */
+#include "Trace.h"
 
-ValueTree Seeds::DefaultStore()
-{
-  ValueTree default_store = ValueTree(STORE::STORAGE_ID) ;
 
-  default_store.setProperty(STORE::CONFIG_VERSION_KEY , STORE::CONFIG_VERSION , nullptr) ;
-  default_store.setProperty(STORE::WINDOW_STATE_KEY   , String::empty         , nullptr) ;
+#ifdef DEBUG_TRACE
 
-  return default_store ;
-}
+  #define DEBUG_TRACE_INIT_VERSION                                        \
+    if (!getCommandLineParameterArray().contains(APP::CLI_VERSION_TOKEN)) \
+      LOG(JuceBoilerplate::VersionMsg().joinIntoString("\n") + "\n")      ;
+
+  #define DEBUG_TRACE_SHUTDOWN_IN  Trace::TraceState("shutting down") ;
+
+  #define DEBUG_TRACE_SHUTDOWN_OUT Trace::TraceState("clean shutdown - bye") ;
+
+#else // DEBUG_TRACE
+
+  #define DEBUG_TRACE_INIT_VERSION ;
+  #define DEBUG_TRACE_SHUTDOWN_IN  ;
+  #define DEBUG_TRACE_SHUTDOWN_OUT ;
+
+#endif // DEBUG_TRACE

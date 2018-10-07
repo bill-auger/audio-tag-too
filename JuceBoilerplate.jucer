@@ -17,7 +17,10 @@
         <FILE id="TC9mWS" name="StorageConstants.h" compile="0" resource="0"
               file="Source/Constants/StorageConstants.h"/>
       </GROUP>
-      <GROUP id="{55652D33-3B99-E916-4581-01F32D8B02A3}" name="Controllers"/>
+      <GROUP id="{55652D33-3B99-E916-4581-01F32D8B02A3}" name="Controllers">
+        <FILE id="Y1RJdt" name="JuceBoilerplate.h" compile="0" resource="0"
+              file="Source/Controllers/JuceBoilerplate.h"/>
+      </GROUP>
       <GROUP id="{2768B552-4034-9A6D-B8C5-09132B2600A8}" name="Models">
         <FILE id="IPb9bQ" name="JuceBoilerplateStore.h" compile="0" resource="0"
               file="Source/Models/JuceBoilerplateStore.h"/>
@@ -41,6 +44,8 @@
               file="Source/Constants/StorageConstants.cpp"/>
       </GROUP>
       <GROUP id="{A8664DA2-7E22-44C8-FB46-7E41D252C2EE}" name="Controllers">
+        <FILE id="Ogm9Oz" name="JuceBoilerplate.cpp" compile="1" resource="0"
+              file="Source/Controllers/JuceBoilerplate.cpp"/>
         <FILE id="cp26CJ" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       </GROUP>
       <GROUP id="{E9EA4621-DD2E-354B-071C-2A1C46F6694E}" name="Models">
@@ -52,6 +57,7 @@
         <FILE id="UtOwFh" name="Trace.cpp" compile="1" resource="0" file="Source/Trace/Trace.cpp"/>
       </GROUP>
       <GROUP id="{415C92D0-6DB5-561E-5112-51D267588674}" name="Views">
+        <FILE id="yQDChz" name="Alert.cpp" compile="1" resource="0" file="Source/Views/Alert.cpp"/>
         <FILE id="Y76Tzw" name="MainContent.cpp" compile="1" resource="0" file="Source/Views/MainContent.cpp"/>
         <FILE id="Cxr1BM" name="Statusbar.cpp" compile="1" resource="0" file="Source/Views/Statusbar.cpp"/>
         <FILE id="M3PK9P" name="Waveform.cpp" compile="1" resource="0" file="Source/Views/Waveform.cpp"/>

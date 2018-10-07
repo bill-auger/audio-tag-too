@@ -24,6 +24,8 @@
 #define UNUSED(x)           (void)(x)
 #define Url                 URL
 
+#define CONTROLLER_OWNS_STORAGE
+
 // [END_USER_CODE_SECTION]
 
 /*

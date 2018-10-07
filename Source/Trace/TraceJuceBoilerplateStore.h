@@ -27,7 +27,20 @@
 
 #if DEBUG_TRACE
 
-/* persistence */
+  #define DEBUG_TRACE_SET_PROPERTY                                                                 \
+    if (!node.isValid()) Trace::TraceError("request to set property on invalid tree - ignoring") ;
+
+  #define DEBUG_TRACE_SET_CONFIG                                                     \
+    String node_id            = STRING(config_node.getType()) ;                      \
+    String key_str            = STRING(key) ;                                        \
+    bool   is_not_config_node = config_node != this->root ;                          \
+    bool   is_not_config_key  = !isKnownProperty(this->root , key) ;                 \
+    String change_msg         = Trace::TraceSetValue(config_node , key , value) ;    \
+    String node_error_msg     = "non-config node '"  + node_id + "' - (ignoring) " ; \
+    String key_error_msg      = "unknown key '"      + key_str + "' - (ignoring) " ; \
+    if      (is_not_config_node) Trace::TraceError  (node_error_msg + change_msg) ;  \
+    else if (is_not_config_key ) Trace::TraceError  (key_error_msg  + change_msg) ;  \
+    else                         Trace::TraceStoreVb(                 change_msg)    ;
 
   #define DEBUG_TRACE_VERIFY_STORED_CONFIG                                                      \
     String not_found_msg = "stored config not found - restoring defaults" ;                     \
@@ -75,32 +88,19 @@
     if (!this->root.isValid()) Trace::TraceError("stored config invalid - not storing") ; \
     else                       Trace::TraceStore("storing config to " + file_path)        ;
 
-
-/* maintenance */
-
   #define DEBUG_TRACE_LISTEN                                   \
     String state = (should_listen) ? "resumed" : "suspended" ; \
     Trace::TraceStore(state + " listening for model changes")  ;
 
   #define DEBUG_TRACE_CONFIG_TREE_CHANGED Trace::TraceTreeChanged(node , key) ;
 
-  #define DEBUG_TRACE_SET_PROPERTY                                                                 \
-    if (!node.isValid()) Trace::TraceError("request to set property on invalid tree - ignoring") ;
-
-  #define DEBUG_TRACE_SET_CONFIG                                                     \
-    String node_id            = STRING(config_node.getType()) ;                      \
-    String key_str            = STRING(key) ;                                        \
-    bool   is_not_config_node = config_node != this->root ;                          \
-    bool   is_not_config_key  = !isKnownProperty(this->root , key) ;                 \
-    String change_msg         = Trace::TraceSetValue(config_node , key , value) ;    \
-    String node_error_msg     = "non-config node '"  + node_id + "' - (ignoring) " ; \
-    String key_error_msg      = "unknown key '"      + key_str + "' - (ignoring) " ; \
-    if      (is_not_config_node) Trace::TraceError  (node_error_msg + change_msg) ;  \
-    else if (is_not_config_key ) Trace::TraceError  (key_error_msg  + change_msg) ;  \
-    else                         Trace::TraceStoreVb(                 change_msg)    ;
+  #define DEBUG_TRACE_DEVICE_STATE_CHANGED                                                           \
+    Trace::TraceState("audio device state changed: " + String((is_device_ready) ? "ready" : "idle")) ;
 
 #else // DEBUG_TRACE
 
+  #define DEBUG_TRACE_SET_PROPERTY            ;
+  #define DEBUG_TRACE_SET_CONFIG              ;
   #define DEBUG_TRACE_VERIFY_STORED_CONFIG    ;
   #define DEBUG_TRACE_VERIFY_MISSING_NODE     ;
   #define DEBUG_TRACE_VERIFY_MISSING_PROPERTY ;
@@ -112,7 +112,6 @@
   #define DEBUG_TRACE_STORE_CONFIG            ;
   #define DEBUG_TRACE_LISTEN                  ;
   #define DEBUG_TRACE_CONFIG_TREE_CHANGED     ;
-  #define DEBUG_TRACE_SET_PROPERTY            ;
-  #define DEBUG_TRACE_SET_CONFIG              ;
+  #define DEBUG_TRACE_DEVICE_STATE_CHANGED    ;
 
 #endif // DEBUG_TRACE
