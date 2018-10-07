@@ -21,6 +21,27 @@
 
 //[Headers] You can add your own extra header files here...
 
+/* This class was derived from:
+  ==============================================================================
+
+   JUCE AudioPlaybackDemo v1.0.0
+   Copyright (c) 2017 - ROLI Ltd.
+
+   The code included in this file is provided under the terms of the ISC license
+   http://www.isc.org/downloads/software-support-policy/isc-license. Permission
+   To use, copy, modify, and/or distribute this software for any purpose with or
+   without fee is hereby granted provided that the above copyright notice and
+   this permission notice appear in all copies.
+
+   THE SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY WARRANTY, AND ALL WARRANTIES,
+   WHETHER EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR
+   PURPOSE, ARE DISCLAIMED.
+
+  ==============================================================================
+*/
+
+
+#include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/MediaConstants.h"
 
@@ -34,19 +55,24 @@
 
 //==============================================================================
 MainContent::MainContent ()
+    : audioFileFilter(MEDIA::IMPORT_WAVEFILE_MASK , "*" , MEDIA::IMPORT_WAVEFILE_DESC) , directoryList(&audioFileFilter , workerThread) , workerThread(APP::WORKER_THREAD_NAME)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+
+  processCliParams() ;
+
     //[/Constructor_pre]
 
-    waveformUpper.reset (new Waveform (formatManager , transportSource));
+    waveformUpper.reset (new Waveform (formatManager , transportSource , courseFps));
     addAndMakeVisible (waveformUpper.get());
 
-    waveformLower.reset (new Waveform (formatManager , transportSource));
+    waveformLower.reset (new Waveform (formatManager , transportSource , fineFps));
     addAndMakeVisible (waveformLower.get());
 
-    followButton.reset (new ToggleButton (String()));
-    addAndMakeVisible (followButton.get());
-    followButton->setButtonText (TRANS("Follow Cursor"));
+    groupComponent.reset (new GroupComponent ("new group",
+                                              String()));
+    addAndMakeVisible (groupComponent.get());
+    groupComponent->setColour (GroupComponent::outlineColourId, Colour (0x00000000));
 
     headButton.reset (new TextButton (String()));
     addAndMakeVisible (headButton.get());
@@ -63,12 +89,12 @@ MainContent::MainContent ()
     fileTree.reset (new FileTreeComponent (directoryList));
     addAndMakeVisible (fileTree.get());
 
-    deviceSelector.reset (new AudioDeviceSelectorComponent (deviceManager , 0 , 0 , 2 , 2 , false , false , true , true));
+    deviceSelector.reset (new AudioDeviceSelectorComponent (deviceManager , 0 , 0 , 2 , 2 , false , false , true , false));
     addAndMakeVisible (deviceSelector.get());
-    deviceSelector->setName ("deviceSelector");
 
     statusbar.reset (new Statusbar());
     addAndMakeVisible (statusbar.get());
+    statusbar->setName ("statusbar");
 
 
     //[UserPreSize]
@@ -78,6 +104,9 @@ MainContent::MainContent ()
 
   this->waveformUpper.setName(GUI::UPPER_WAVEFORM_ID) ;
   this->waveformLower.setName(GUI::LOWER_WAVEFORM_ID) ;
+  this->waveforms.push_back(this->waveformUpper.get()) ;
+  this->waveforms.push_back(this->waveformLower.get()) ;
+
   this->fileTree->setColour(FileTreeComponent::backgroundColourId , GUI::BROWSER_BG_COLOR) ;
 
     //[/UserPreSize]
@@ -87,17 +116,16 @@ MainContent::MainContent ()
 
     //[Constructor] You can add your own custom stuff here..
 
-  this->formatManager.registerBasicFormats() ;
+  this->directoryList    .setDirectory(this->workingDir , true , true) ;
+  this->formatManager    .registerBasicFormats() ;
   this->audioSourcePlayer.setSource(&transportSource) ;
   this->directoryList    .setDirectory(File::getSpecialLocation(File::userHomeDirectory) , true , true) ;
 
-  this->followButton   ->addListener      (this);
   this->headButton     ->addListener      (this);
   this->transportButton->addListener      (this);
   this->tailButton     ->addListener      (this);
   this->deviceManager   .addAudioCallback (&audioSourcePlayer) ;
   this->deviceManager   .addChangeListener(this) ;
-  this->waveformLower  ->addChangeListener(this) ;
   this->transportSource .addChangeListener(this) ;
   this->fileTree       ->addListener      (this) ;
   this->storage->root  ->addListener      (this) ;
@@ -107,17 +135,8 @@ MainContent::MainContent ()
 
 #if ! DISABLE_MEDIA
   // start audio and worker threads
-  #if __ANDROID_API__ >= 23
-  RuntimePermissions::request(RuntimePermissions::recordAudio , [this] (bool granted)
-  {
-    int numInputChannels = granted ? MEDIA::N_CHANNELS_IN : 0 ;
-
-    this->deviceManager.initialise(numInputChannels , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get() , true , {} , nullptr) ;
-  }) ;
-  #else // __ANDROID_API__ >= 23
   setAudioChannels(MEDIA::N_CHANNELS_IN , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get()) ;
-  #endif // __ANDROID_API__ >= 23
-  this->thread.startThread(3) ;
+  this->workerThread.startThread(3) ;
 #endif // DISABLE_MEDIA
 
   setOpaque(true) ;
@@ -135,16 +154,22 @@ MainContent::~MainContent()
   this->transportSource  .setSource(nullptr) ;
   this->audioSourcePlayer.setSource(nullptr) ;
 
-  this->fileTree       ->removeListener      (this) ;
+  this->headButton     ->removeListener      (this);
+  this->transportButton->removeListener      (this);
+  this->tailButton     ->removeListener      (this);
+  this->deviceManager   .removeAudioCallback (&audioSourcePlayer) ;
+  this->deviceManager   .removeChangeListener(this) ;
   this->transportSource .removeChangeListener(this) ;
-  this->waveformLower  ->removeChangeListener(this) ;
-  this->deviceManager   .removeAudioCallback(&audioSourcePlayer) ;
+  this->fileTree       ->removeListener      (this) ;
+  this->storage->root   .removeListener      (this) ;
+
+  this->storage = nullptr ;
 
     //[/Destructor_pre]
 
     waveformUpper = nullptr;
     waveformLower = nullptr;
-    followButton = nullptr;
+    groupComponent = nullptr;
     headButton = nullptr;
     transportButton = nullptr;
     tailButton = nullptr;
@@ -188,18 +213,16 @@ void MainContent::resized()
 
     waveformUpper->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), 16, getWidth() - 32, 120);
     waveformLower->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), 16 + 120 - -8, getWidth() - 32, 120);
-    followButton->setBounds (624, (16 + 120 - -8) + 120 - -8, 126, 24);
+    groupComponent->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), (16 + 120 - -8) + 120 - -8, getWidth() - 32, 24);
     headButton->setBounds ((getWidth() / 2) + -150 - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
     transportButton->setBounds ((getWidth() / 2) - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
     tailButton->setBounds ((getWidth() / 2) + 150 - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
-    fileTree->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), getHeight() - 56 - (getHeight() - 368), getWidth() - 32, getHeight() - 368);
-    deviceSelector->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), getHeight() - 56 - (getHeight() - 368), getWidth() - 32, getHeight() - 368);
+    fileTree->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3901f));
+    deviceSelector->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3901f));
     statusbar->setBounds ((getWidth() / 2) - ((getWidth() - 16) / 2), getHeight() - 8 - 32, getWidth() - 16, 32);
-
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
-
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -234,84 +257,93 @@ void MainContent::releaseResources()
     // For more details, see the help for AudioProcessor::releaseResources()
 }
 
-void MainContent::showAudioResource(URL resource)
+void MainContent::processCliParams()
 {
-  if (loadURLIntoTransport(resource)) this->currentAudioFile = static_cast<URL&&>(resource) ;
+  // load configuration options passed via command line
+  StringArray cli_params = JUCEApplicationBase::getCommandLineParameterArray() ;
+  int         token_idx ;
+  String      string_value ;
+  int         int_value ;
 
-  this->waveformLower->setURL(currentAudioFile) ;
+  bool is_valid_dir = (((token_idx    = cli_params.contains(APP::CLI_DIR_TOKEN)) > -1) &&
+                       ((string_value = cli_params[token_idx + 1]).isNotEmpty()      ) &&
+                       File(string_value).exists()                                      ) ;
+  this->workingDir  = (is_valid_dir            ) ? File(string_value) :
+                      (APP::MusicDir().exists()) ? APP::MusicDir()    : APP::HomeDir() ;
+
+  bool is_valid_fine_fps = (((token_idx = cli_params.contains(APP::CLI_FPS_TOKEN)) > -1) &&
+                            ((int_value = cli_params[token_idx + 1].getIntValue()) >  0)  ) ;
+  this->courseFps        = GUI::COURSE_FPS ;
+  this->fineFps          = (is_valid_fine_fps) ? int_value : GUI::FINE_FPS ;
 }
 
 void MainContent::buttonClicked(Button* a_button)
 {
-  if      (a_button == this->followButton   .get()) toggleFollowTransport() ;
-  else if (a_button == this->headButton     .get()) setHeadMarker() ;
+  if      (a_button == this->headButton     .get()) setHeadMarker() ;
   else if (a_button == this->transportButton.get()) toggleTransport() ;
   else if (a_button == this->tailButton     .get()) setTailMarker() ;
 }
 
-bool MainContent::loadURLIntoTransport(const URL& audio_url)
+void MainContent::loadUrl(File audio_file)
 {
-  // unload the previous file source and delete it..
-  this->transportSource.stop() ;
-  this->transportSource.setSource(nullptr) ;
-  this->currentAudioFileSource.reset() ;
-
+  const Url          url    = Url(audio_file) ;
   AudioFormatReader* reader = nullptr ;
 
+  this->transportSource.stop() ;
+  this->transportSource.setSource(nullptr) ;
+  this->audioFileSource.reset() ;
+
   #if ! JUCE_IOS
-  if (audio_url.isLocalFile()) reader = this->formatManager.createReaderFor(audio_url.getLocalFile()) ;
+  if (url.isLocalFile()) reader = this->formatManager.createReaderFor(url.getLocalFile()) ;
   else
   #endif
-  if (reader == nullptr) reader = this->formatManager.createReaderFor(audio_url.createInputStream(false)) ;
+  reader = this->formatManager.createReaderFor(url.createInputStream(false)) ;
 
-  bool did_load_succeed = (reader != nullptr) ;
+  if (reader == nullptr) return ;
 
-  if (did_load_succeed)
-  {
-    this->currentAudioFileSource.reset(new AudioFormatReaderSource(reader , true)) ;
-    this->transportSource.setSource(this->currentAudioFileSource.get() ,
-                                    32768                              ,
-                                    &thread                            ,
-                                    reader->sampleRate                 ) ;
+  std::unique_ptr<AudioFormatReaderSource> audio_source(new AudioFormatReaderSource(reader , true)) ;
+  this->transportSource.setSource(audio_source.get() , 32768 , &workerThread , reader->sampleRate) ;
+  this->audioFileSource.reset(audio_source.release()) ;
+  this->audioFilename = audio_file.getFullPathName() ;
 
-    setAudioChannels(MEDIA::N_CHANNELS_IN , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get()) ;
-  }
+  for (Waveform* waveform : this->waveforms) { waveform->setUrl(url) ; }
 
-  return did_load_succeed ;
-}
-
-void MainContent::toggleFollowTransport()
-{
-  this->waveformLower->setFollowsTransport(this->followButton->getToggleState()) ;
+  shutdownAudio() ; setAudioChannels(MEDIA::N_CHANNELS_IN , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get()) ;
 }
 
 void MainContent::toggleTransport()
 {
-  bool is_rolling = this->transportSource.isPlaying() ;
-
-  if (is_rolling) { this->transportSource.stop() ;                                         }
-  else            { this->transportSource.setPosition(0) ; this->transportSource.start() ; }
-
-  updateTransportButton(is_rolling) ;
+  if (this->transportSource.isPlaying()) this->transportSource.stop()  ;
+  else                                   this->transportSource.start() ;
 }
 
-void MainContent::updateTransportButton(bool is_rolling)
+void MainContent::updateTransportButton()
 {
+  bool is_rolling = this->transportSource.isPlaying() ;
+
+  if (!is_rolling) this->transportSource.setPosition(this->waveformLower->getHeadTime()) ;
   transportButton->setButtonText((is_rolling) ? "Stop" : "Start") ;
   transportButton->setToggleState(is_rolling , juce::dontSendNotification) ;
 }
 
-void MainContent::setHeadMarker() { this->waveformLower->setHeadMarker() ; }
+void MainContent::setHeadMarker()
+{
+  for (Waveform* waveform : this->waveforms) { waveform->setHeadMarker() ; }
+}
 
-void MainContent::setTailMarker() { this->waveformLower->setTailMarker() ; }
+void MainContent::setTailMarker()
+{
+  for (Waveform* waveform : this->waveforms) waveform->setTailMarker() ;
+  if (!this->transportSource.isPlaying())
+    for (Waveform* waveform : this->waveforms) waveform->resetPosition() ;
+}
 
-void MainContent::selectionChanged() { showAudioResource(URL(this->fileTree->getSelectedFile())) ; }
+void MainContent::selectionChanged() { loadUrl(this->fileTree->getSelectedFile()) ; }
 
 void MainContent::changeListenerCallback(ChangeBroadcaster* source)
 {
-  if      (source ==   this->waveformLower.get()) showAudioResource(URL(this->waveformLower->getLastDroppedFile())) ;
-  else if (source == &(this->transportSource)   ) updateTransportButton(this->transportSource.isPlaying()) ;
-  else if (source == &(this->deviceManager  )  )
+  if      (source == &(this->transportSource)) updateTransportButton() ;
+  else if (source == &(this->deviceManager  ))
   {
     bool is_device_initialized = this->deviceManager.getCurrentAudioDevice() != nullptr ;
 
@@ -337,23 +369,22 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="MainContent" componentName=""
                  parentClasses="public AudioAppComponent, private Button::Listener, private FileBrowserListener, private ChangeListener, private ValueTree::Listener"
-                 constructorParams="" variableInitialisers="" snapPixels="8" snapActive="1"
-                 snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="766"
-                 initialHeight="742">
+                 constructorParams="" variableInitialisers="audioFileFilter(MEDIA::IMPORT_WAVEFILE_MASK , &quot;*&quot; , MEDIA::IMPORT_WAVEFILE_DESC) , directoryList(&amp;audioFileFilter , workerThread) , workerThread(APP::WORKER_THREAD_NAME)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="766" initialHeight="742">
   <BACKGROUND backgroundColour="ff101010">
     <ROUNDRECT pos="0Cc 8 16M 56M" cornerSize="10.00000000000000000000" fill="solid: ff202020"
                hasStroke="1" stroke="1, mitered, butt" strokeColour="solid: ffffffff"/>
   </BACKGROUND>
   <GENERICCOMPONENT name="" id="6d2236e7e917afa4" memberName="waveformUpper" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc 16 32M 120" class="Waveform"
-                    params="formatManager , transportSource"/>
+                    params="formatManager , transportSource , courseFps"/>
   <GENERICCOMPONENT name="" id="f967fc403ed73574" memberName="waveformLower" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc -8R 32M 120" posRelativeY="6d2236e7e917afa4"
-                    class="Waveform" params="formatManager , transportSource"/>
-  <TOGGLEBUTTON name="" id="643342ab575f0407" memberName="followButton" virtualName=""
-                explicitFocusOrder="0" pos="624 -8R 126 24" posRelativeY="f967fc403ed73574"
-                buttonText="Follow Cursor" connectedEdges="0" needsCallback="0"
-                radioGroupId="0" state="0"/>
+                    class="Waveform" params="formatManager , transportSource , fineFps"/>
+  <GROUPCOMPONENT name="new group" id="f42caa46057f2a0" memberName="groupComponent"
+                  virtualName="" explicitFocusOrder="0" pos="0.5Cc -8R 32M 24"
+                  posRelativeY="f967fc403ed73574" outlinecol="0" title=""/>
   <TEXTBUTTON name="" id="9953692c678b8d85" memberName="headButton" virtualName=""
               explicitFocusOrder="0" pos="-150Cc -8R 150 24" posRelativeY="f967fc403ed73574"
               buttonText="Head" connectedEdges="0" needsCallback="0" radioGroupId="0"/>
@@ -364,14 +395,14 @@ BEGIN_JUCER_METADATA
               explicitFocusOrder="0" pos="150Cc -8R 150 24" posRelativeY="f967fc403ed73574"
               buttonText="Tail" connectedEdges="0" needsCallback="0" radioGroupId="0"/>
   <GENERICCOMPONENT name="" id="230286b07ddaa9d7" memberName="fileTree" virtualName=""
-                    explicitFocusOrder="0" pos="0.5Cc 56Rr 32M 368M" class="FileTreeComponent"
-                    params="directoryList"/>
-  <GENERICCOMPONENT name="deviceSelector" id="fa801866cc59e27a" memberName="deviceSelector"
-                    virtualName="" explicitFocusOrder="0" pos="0.5Cc 56Rr 32M 368M"
-                    class="AudioDeviceSelectorComponent" params="deviceManager , 0 , 0 , 2 , 2 , false , false , true , true"/>
-  <GENERICCOMPONENT name="" id="957b301f5907e647" memberName="statusbar" virtualName=""
-                    explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 32" class="Statusbar"
-                    params=""/>
+                    explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.012%" posRelativeY="f42caa46057f2a0"
+                    class="FileTreeComponent" params="directoryList"/>
+  <GENERICCOMPONENT name="" id="fa801866cc59e27a" memberName="deviceSelector" virtualName=""
+                    explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.012%" posRelativeY="f42caa46057f2a0"
+                    class="AudioDeviceSelectorComponent" params="deviceManager , 0 , 0 , 2 , 2 , false , false , true , false"/>
+  <GENERICCOMPONENT name="statusbar" id="957b301f5907e647" memberName="statusbar"
+                    virtualName="" explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 32"
+                    class="Statusbar" params=""/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -30,6 +30,8 @@ class MEDIA
 {
 public:
 
-  static const int N_CHANNELS_IN ;
-  static const int N_CHANNELS_OUT ;
+  static const uint8  N_CHANNELS_IN ;
+  static const uint8  N_CHANNELS_OUT ;
+  static const String IMPORT_WAVEFILE_MASK ;
+  static const String IMPORT_WAVEFILE_DESC ;
 } ;

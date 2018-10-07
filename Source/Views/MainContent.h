@@ -64,21 +64,25 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
+  WildcardFileFilter                       audioFileFilter ;
+  DirectoryContentsList                    directoryList ;
+  TimeSliceThread                          workerThread ;
+  File                                     workingDir ;
+  String                                   audioFilename ;
   AudioFormatManager                       formatManager ;
-  TimeSliceThread                          thread { "audio-preview" } ;
-  DirectoryContentsList                    directoryList { nullptr , thread } ;
-  URL                                      currentAudioFile ;
   AudioSourcePlayer                        audioSourcePlayer ;
   AudioTransportSource                     transportSource ;
-  std::unique_ptr<AudioFormatReaderSource> currentAudioFileSource ;
+  std::unique_ptr<AudioFormatReaderSource> audioFileSource ;
   std::unique_ptr<JuceBoilerplateStore>    storage ;
+  std::vector<Waveform*>                   waveforms ;
+  uint8                                    courseFps ;
+  uint8                                    fineFps ;
 
   // getters/setters
-  void showAudioResource    (URL resource) ;
-  bool loadURLIntoTransport (const URL& audio_url) ;
-  void toggleFollowTransport(void) ;
+  void processCliParams     () ;
+  void loadUrl              (File audio_url) ;
   void toggleTransport      (void) ;
-  void updateTransportButton(bool is_rolling) ;
+  void updateTransportButton(void) ;
   void setHeadMarker        (void) ;
   void setTailMarker        (void) ;
 
@@ -108,7 +112,7 @@ private:
     //==============================================================================
     std::unique_ptr<Waveform> waveformUpper;
     std::unique_ptr<Waveform> waveformLower;
-    std::unique_ptr<ToggleButton> followButton;
+    std::unique_ptr<GroupComponent> groupComponent;
     std::unique_ptr<TextButton> headButton;
     std::unique_ptr<TextButton> transportButton;
     std::unique_ptr<TextButton> tailButton;

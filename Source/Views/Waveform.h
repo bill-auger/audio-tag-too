@@ -37,34 +37,25 @@
 */
 class Waveform  : public Component,
                   public ChangeListener,
-                  public FileDragAndDropTarget,
                   public ChangeBroadcaster,
                   private ScrollBar::Listener,
                   private Timer
 {
 public:
     //==============================================================================
-    Waveform (AudioFormatManager& format_manager , AudioTransportSource& source);
+    Waveform (AudioFormatManager& format_manager , AudioTransportSource& source , uint8 fps);
     ~Waveform();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 
-  void setURL              (const URL& url) ;
-  void setZoomFactor       (float delta) ;
-  void setViewRange        (Range<double> view_range) ;
-  void setFollowsTransport (bool should_follow) ;
-  URL  getLastDroppedFile  (void) const noexcept ;
-  void setHeadMarker       (void) ;
-  void setTailMarker       (void) ;
-
-  void changeListenerCallback(ChangeBroadcaster* object_that_changed)             override ;
-  bool isInterestedInFileDrag(const StringArray& files)                           override ;
-  void filesDropped          (const StringArray& files , int x , int y)           override ;
-  void mouseDown             (const MouseEvent& e)                                override ;
-  void mouseDrag             (const MouseEvent& e)                                override ;
-  void mouseUp               (const MouseEvent&)                                  override ;
-  void mouseWheelMove        (const MouseEvent& , const MouseWheelDetails& wheel) override ;
+  // getters/setters
+  void   setUrl       (const Url& url) ;
+  void   resetPosition(void) ;
+  double getHeadTime  (void) const ;
+  double getTailTime  (void) const ;
+  void   setHeadMarker(void) ;
+  void   setTailMarker(void) ;
 
     //[/UserMethods]
 
@@ -76,26 +67,34 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
+  // event handlers
+  void changeListenerCallback(ChangeBroadcaster* object_that_changed)               override ;
+  void mouseDown             (const MouseEvent& e)                                  override ;
+  void mouseDrag             (const MouseEvent& e)                                  override ;
+  void mouseUp               (const MouseEvent&)                                    override ;
+  void mouseWheelMove        (const MouseEvent& , const MouseWheelDetails& wheel)   override ;
+  void scrollBarMoved        (ScrollBar* scrollbar_that_moved , double range_start) override ;
+  void timerCallback         (void)                                                 override ;
+
+  // getters/setters
+  void setPosition (double time) ;
+  void setViewRange(Range<double> view_range) ;
+
+  // helpers
+  float  timeToX     (const double time) const ;
+  double xToTime     (const float x)     const ;
+  void   updateCursor(void) ;
+  void   setMarker   (DrawableRectangle& marker , const double time) ;
+
+  // vars
   AudioTransportSource& transport ;
-  AudioThumbnailCache   thumbnailCache { 5 } ;
+  AudioThumbnailCache   thumbnailCache ;
   AudioThumbnail        thumbnail ;
-  float                 zoomFactor ;
+  double                zoomFactor ;
   Range<double>         viewRange ;
-  bool                  isFollowingTransport ;
-  URL                   lastFileDropped ;
-
-  DrawableRectangle cursorMarker ;
-  DrawableRectangle headMarker   ; double headTime ;
-  DrawableRectangle tailMarker   ; double tailTime ;
-
-  void scrollBarMoved(ScrollBar* scrollbar_that_moved , double new_range_start) override ;
-  void timerCallback (void)                                                     override ;
-
-  float  timeToX         (const double time) const ;
-  double xToTime         (const float x)     const ;
-  bool   canMoveTransport(void)              const noexcept ;
-  void   updateCursor    (void) ;
-  void   setMarker       (DrawableRectangle& marker , const double time) ;
+  DrawableRectangle     cursorMarker ;
+  DrawableRectangle     headMarker ; double headTime ;
+  DrawableRectangle     tailMarker ; double tailTime ;
 
     //[/UserVariables]
 
