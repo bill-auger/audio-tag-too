@@ -16,7 +16,7 @@
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
 
-#define JUCE_JACK_CLIENT_NAME "juce-boilerplate"
+#define JUCE_JACK_CLIENT_NAME "audio-tag-too"
 
 #define STRING(a_var_or_id) a_var_or_id.toString()
 #define CHARSTAR(a_string)  a_string.toStdString().c_str()

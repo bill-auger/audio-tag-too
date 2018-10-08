@@ -1,6 +1,6 @@
-### JuceAudio Assets Licenses
+### AudioTagToo Assets Licenses
 
-The original audio, video, and image files in the JuceAudio Assets/ directory are licensed under
+The original audio, video, and image files in the AudioTagToo Assets/ directory are licensed under
 [version 3 of the GNU General Public License](COPYING_ASSETS), or any later version,
 with the "sources" or "preferred form" explicitly defined to be any and all
 binary data, meta-data, editor project files, scripts, and source code of custom executables

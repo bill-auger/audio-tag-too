@@ -1,36 +1,38 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
 |*|
-|*|  This file is part of the JuceBoilerplate program.
+|*|  This file is part of the AudioTagToo program.
 |*|
-|*|  JuceBoilerplate is free software: you can redistribute it and/or modify
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
 |*|  it under the terms of the GNU General Public License as published by
 |*|  the Free Software Foundation, either version 3 of the License, or
 |*|  (at your option) any later version.
 |*|
-|*|  JuceBoilerplate is distributed in the hope that it will be useful,
+|*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
 |*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 |*|  GNU General Public License for more details.
 |*|
 |*|  You should have received a copy of the GNU General Public License
-|*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
 
 #include "Constants/AppConstants.h"
 #include "Constants/GuiConstants.h"
-#include "Controllers/JuceBoilerplate.h"
+#include "Controllers/AudioTagToo.h"
 #include "Views/Alert.h"
 #include "Views/MainContent.h"
+#include "Trace/TraceMain.h"
 
 
-class JuceBoilerplateApplication : public JUCEApplication , private MultiTimer
+class AudioTagTooApplication : public JUCEApplication , private MultiTimer
 {
 public:
 
-  JuceBoilerplateApplication() {}
+  AudioTagTooApplication() {}
+
 
   void initialise(const String& cli_args) override
   {
@@ -38,7 +40,7 @@ DEBUG_TRACE_INIT_VERSION
 
     this->mainWindow.reset(new MainWindow()) ;
 
-    if (JuceBoilerplate::Initialize(this->mainWindow.get() , this->mainWindow->mainContent.get()))
+    if (AudioTagToo::Initialize(this->mainWindow.get() , this->mainWindow->mainContent.get()))
     {
 #ifdef JUCE_LINUX
       // create desktop launch file
@@ -84,7 +86,7 @@ DEBUG_QUIT_BEFORE_MAIN_LOOP // NOTE: may call quit()
   {
 DEBUG_TRACE_SHUTDOWN_IN
 
-    stopTimers() ; JuceBoilerplate::Teardown() ;
+    stopTimers() ; AudioTagToo::Teardown() ;
 
     this->mainWindow = nullptr ;
 
@@ -143,7 +145,7 @@ private:
   {
 DEBUG_QUIT_AFTER_MAIN_LOOP // NOTE: may call quit()
 
-      JuceBoilerplate::HandleTimer(timer_id) ;
+      AudioTagToo::HandleTimer(timer_id) ;
   }
 
 
@@ -151,4 +153,4 @@ DEBUG_QUIT_AFTER_MAIN_LOOP // NOTE: may call quit()
 } ;
 
 
-START_JUCE_APPLICATION(JuceBoilerplateApplication)
+START_JUCE_APPLICATION(AudioTagTooApplication)

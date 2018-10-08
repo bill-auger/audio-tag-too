@@ -1,21 +1,21 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
 |*|
-|*|  This file is part of the JuceBoilerplate program.
+|*|  This file is part of the AudioTagToo program.
 |*|
-|*|  JuceBoilerplate is free software: you can redistribute it and/or modify
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
 |*|  it under the terms of the GNU General Public License as published by
 |*|  the Free Software Foundation, either version 3 of the License, or
 |*|  (at your option) any later version.
 |*|
-|*|  JuceBoilerplate is distributed in the hope that it will be useful,
+|*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
 |*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 |*|  GNU General Public License for more details.
 |*|
 |*|  You should have received a copy of the GNU General Public License
-|*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
 
@@ -28,14 +28,14 @@
 
 
 /**
-  JuceBoilerplateStore is the model class for the JuceBoilerplate application.
+  AudioTagTooStore is the model class for the AudioTagToo application.
   It holds the runtime configuration via shared value holders
       and handles persistence via XML or JUCE binary storage.
 */
-class JuceBoilerplateStore : private ChangeListener      ,
-                             private ValueTree::Listener
+class AudioTagTooStore : private ChangeListener      ,
+                         private ValueTree::Listener
 {
-  friend class JuceBoilerplate ;
+  friend class AudioTagToo ;
 #ifndef CONTROLLER_OWNS_STORAGE
   friend class MainContent ;
 #else // CONTROLLER_OWNS_STORAGE
@@ -45,8 +45,8 @@ class JuceBoilerplateStore : private ChangeListener      ,
 
 public:
 
-  JuceBoilerplateStore(void) ;
-  ~JuceBoilerplateStore(void) ;
+  AudioTagTooStore(void) ;
+  ~AudioTagTooStore(void) ;
 
 
   // getters/setters

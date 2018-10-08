@@ -1,21 +1,21 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
 |*|
-|*|  This file is part of the JuceBoilerplate program.
+|*|  This file is part of the AudioTagToo program.
 |*|
-|*|  JuceBoilerplate is free software: you can redistribute it and/or modify
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
 |*|  it under the terms of the GNU General Public License as published by
 |*|  the Free Software Foundation, either version 3 of the License, or
 |*|  (at your option) any later version.
 |*|
-|*|  JuceBoilerplate is distributed in the hope that it will be useful,
+|*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
 |*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 |*|  GNU General Public License for more details.
 |*|
 |*|  You should have received a copy of the GNU General Public License
-|*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
 
@@ -26,7 +26,7 @@
 #include "../../JuceLibraryCode/JuceHeader.h"
 
 
-class JuceBoilerplateStore ;
+class AudioTagTooStore ;
 class Statusbar ;
 class Waveform ;
 
@@ -37,7 +37,7 @@ class Waveform ;
 //==============================================================================
 /**
                                                                     //[Comments]
-  MainComponent is the top-most parent GUI container for the JuceBoilerplate application.
+  MainComponent is the top-most parent GUI container for the AudioTagToo application.
                                                                     //[/Comments]
 */
 class MainContent  : public AudioAppComponent,
@@ -47,7 +47,7 @@ class MainContent  : public AudioAppComponent,
                      private ValueTree::Listener
 {
 #ifndef CONTROLLER_OWNS_STORAGE
-  friend class JuceBoilerplate ;
+  friend class AudioTagToo ;
 #endif // CONTROLLER_OWNS_STORAGE
 
 
@@ -88,7 +88,7 @@ private:
   std::unique_ptr<AudioFormatReaderSource> audioFileSource ;
   std::vector<Waveform*>                   waveforms ;
 #ifndef CONTROLLER_OWNS_STORAGE
-  std::unique_ptr<JuceBoilerplateStore>    storage ;
+  std::unique_ptr<AudioTagTooStore>        storage ;
 #else // CONTROLLER_OWNS_STORAGE
   ValueTree                                storage ;
 #endif // CONTROLLER_OWNS_STORAGE
@@ -125,8 +125,9 @@ private:
 
     //==============================================================================
 
-    std::unique_ptr<Waveform> upperWaveform;
-    std::unique_ptr<Waveform> lowerWaveform;
+
+    std::unique_ptr<Waveform> fullWaveform;
+    std::unique_ptr<Waveform> clipWaveform;
     std::unique_ptr<GroupComponent> groupComponent;
     std::unique_ptr<TextButton> headButton;
     std::unique_ptr<TextButton> transportButton;

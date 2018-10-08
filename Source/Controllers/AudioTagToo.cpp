@@ -1,60 +1,60 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
 |*|
-|*|  This file is part of the JuceBoilerplate program.
+|*|  This file is part of the AudioTagToo program.
 |*|
-|*|  JuceBoilerplate is free software: you can redistribute it and/or modify
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
 |*|  it under the terms of the GNU General Public License as published by
 |*|  the Free Software Foundation, either version 3 of the License, or
 |*|  (at your option) any later version.
 |*|
-|*|  JuceBoilerplate is distributed in the hope that it will be useful,
+|*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
 |*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 |*|  GNU General Public License for more details.
 |*|
 |*|  You should have received a copy of the GNU General Public License
-|*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
 
-#include "JuceBoilerplate.h"
+#include "AudioTagToo.h"
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/MediaConstants.h"
 #include "../Constants/StorageConstants.h"
-#include "../Trace/TraceJuceBoilerplate.h"
-#include "../Models/JuceBoilerplateStore.h"
+#include "../Trace/TraceAudioTagToo.h"
+#include "../Models/AudioTagTooStore.h"
 #include "../Views/MainContent.h"
 #include "../Trace/TraceAudioTagToo.h"
 #include "../Views/Alert.h"
 
 
-/* JuceBoilerplate public class variables */
+/* AudioTagToo public class variables */
 
 #ifdef CONTROLLER_OWNS_STORAGE
-std::unique_ptr<JuceBoilerplateStore> JuceBoilerplate::Store ; // Initialize()
+std::unique_ptr<AudioTagTooStore> AudioTagToo::Store ; // Initialize()
 #endif // CONTROLLER_OWNS_STORAGE
 
 
-/* JuceBoilerplate private class variables */
+/* AudioTagToo private class variables */
 
-JUCEApplication* JuceBoilerplate::App            = nullptr ; // Initialize()
-DocumentWindow*  JuceBoilerplate::Window         = nullptr ; // Initialize()
-MainContent*     JuceBoilerplate::Gui            = nullptr ; // Initialize()
-bool             JuceBoilerplate::IsInitialized  = false ;   // Initialize()
-bool             JuceBoilerplate::IsAudioEnabled = true ;    // Initialize()
-NamedValueSet    JuceBoilerplate::Features ;                 // ProcessCliParams()
+JUCEApplication* AudioTagToo::App            = nullptr ; // Initialize()
+DocumentWindow*  AudioTagToo::Window         = nullptr ; // Initialize()
+MainContent*     AudioTagToo::Gui            = nullptr ; // Initialize()
+bool             AudioTagToo::IsInitialized  = false ;   // Initialize()
+bool             AudioTagToo::IsAudioEnabled = true ;    // Initialize()
+NamedValueSet    AudioTagToo::Features ;                 // ProcessCliParams()
 
 
-/* JuceBoilerplate public class methods */
+/* AudioTagToo public class methods */
 
-void JuceBoilerplate::Warning(String message_text) { Alert::Push(GUI::ALERT_TYPE_WARNING , message_text) ; }
+void AudioTagToo::Warning(String message_text) { Alert::Push(GUI::ALERT_TYPE_WARNING , message_text) ; }
 
-void JuceBoilerplate::Error(String message_text) { Alert::Push(GUI::ALERT_TYPE_ERROR , message_text) ; }
+void AudioTagToo::Error(String message_text) { Alert::Push(GUI::ALERT_TYPE_ERROR , message_text) ; }
 
-StringArray JuceBoilerplate::VersionMsg()
+StringArray AudioTagToo::VersionMsg()
 {
   StringArray version_msg = StringArray(GetVersionString()) ;
 
@@ -63,7 +63,7 @@ StringArray JuceBoilerplate::VersionMsg()
   return version_msg ;
 }
 
-String JuceBoilerplate::GetVersionString()
+String AudioTagToo::GetVersionString()
 {
 #ifdef DEBUG
   return APP::APP_NAME + " v" + APP::APP_VERSION + " (DEBUG)" ;
@@ -72,7 +72,7 @@ String JuceBoilerplate::GetVersionString()
 #endif // DEBUG
 }
 
-void JuceBoilerplate::SetConfig(const Identifier& a_key , const var a_value)
+void AudioTagToo::SetConfig(const Identifier& a_key , const var a_value)
 {
 #ifdef CONTROLLER_OWNS_STORAGE
   ValueTree storage_node = (STORE::RootKeys().contains(a_key)) ? Store->root        :
@@ -82,7 +82,7 @@ void JuceBoilerplate::SetConfig(const Identifier& a_key , const var a_value)
 #endif // CONTROLLER_OWNS_STORAGE
 }
 
-void JuceBoilerplate::ResetAudio()
+void AudioTagToo::ResetAudio()
 {
 #if ! DISABLE_AUDIO
   if (bool(Features[APP::AUDIO_KEY]))
@@ -99,9 +99,9 @@ void JuceBoilerplate::ResetAudio()
 }
 
 
-/* JuceBoilerplate private class methods */
+/* AudioTagToo private class methods */
 
-bool JuceBoilerplate::Initialize(DocumentWindow* main_window , MainContent* main_content)
+bool AudioTagToo::Initialize(DocumentWindow* main_window , MainContent* main_content)
 {
   App                    = JUCEApplication::getInstance() ;
   Window                 = main_window ;
@@ -121,7 +121,7 @@ DEBUG_TRACE_INIT_PHASE_1
 
   // load persistent configuration
 #ifdef CONTROLLER_OWNS_STORAGE
-  JuceBoilerplateStore* store = new JuceBoilerplateStore() ;
+  AudioTagTooStore* store = new AudioTagTooStore() ;
   if (store != nullptr) Store.reset(store) ; else return false ;
 #endif // CONTROLLER_OWNS_STORAGE
 
@@ -156,7 +156,7 @@ DEBUG_TRACE_INIT_PHASE_6
   return IsInitialized ;
 }
 
-void JuceBoilerplate::Teardown()
+void AudioTagToo::Teardown()
 {
   Alert::Display() ; Alert::Alerts.clear() ;
 
@@ -182,7 +182,7 @@ DEBUG_TRACE_SHUTDOWN_PHASE_3
   IsInitialized = false ;
 }
 
-void JuceBoilerplate::HandleTimer(int timer_id)
+void AudioTagToo::HandleTimer(int timer_id)
 {
   switch (timer_id)
   {
@@ -193,9 +193,9 @@ void JuceBoilerplate::HandleTimer(int timer_id)
   }
 }
 
-void JuceBoilerplate::HandleConfigChanged(const Identifier& a_key) { }
+void AudioTagToo::HandleConfigChanged(const Identifier& a_key) { }
 
-bool JuceBoilerplate::HandleCliParams(StringArray cli_params)
+bool AudioTagToo::HandleCliParams(StringArray cli_params)
 {
   // detect terminating CLI params
   String token = (cli_params.contains(APP::CLI_HELP_TOKEN   )) ? APP::CLI_HELP_TOKEN    :
@@ -217,7 +217,7 @@ DEBUG_TRACE_HANDLE_CLI_PARAMS
   return true ;
 }
 
-void JuceBoilerplate::ProcessCliParams(StringArray cli_params)
+void AudioTagToo::ProcessCliParams(StringArray cli_params)
 {
 DEBUG_TRACE_PROCESS_CLI_PARAMS
 
@@ -259,7 +259,7 @@ DEBUG_TRACE_PROCESS_CLI_PARAMS
   Features.set(APP::ZOOM_KEY       , var(zoom_factor     )) ;
 }
 
-bool JuceBoilerplate::ValidateEnvironment()
+bool AudioTagToo::ValidateEnvironment()
 {
   bool is_valid_home_dir    = APP::HomeDir   ().isDirectory() ;
   bool is_valid_appdata_dir = APP::AppdataDir().isDirectory() ;
@@ -269,14 +269,14 @@ DEBUG_TRACE_VALIDATE_ENVIRONMENT
   return is_valid_home_dir && is_valid_appdata_dir ;
 }
 
-void JuceBoilerplate::UpdateStatusGUI()
+void AudioTagToo::UpdateStatusGUI()
 {
   Gui->setStatusL(String::empty) ;
   Gui->setStatusC(String::empty) ;
   Gui->setStatusR(String::empty) ;
 }
 
-void JuceBoilerplate::PumpThreads()
+void AudioTagToo::PumpThreads()
 {
   bool is_quit_pending = App->getApplicationReturnValue() != 0 ;
   bool should_quit     = is_quit_pending && !Alert::AreAnyPending() ;
