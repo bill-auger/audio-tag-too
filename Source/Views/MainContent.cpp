@@ -67,6 +67,10 @@ MainContent::MainContent ()
     fileTree.reset (new FileTreeComponent (directoryList));
     addAndMakeVisible (fileTree.get());
 
+    deviceSelector.reset (new AudioDeviceSelectorComponent (deviceManager , 0 , 0 , 2 , 2 , false , false , true , true));
+    addAndMakeVisible (deviceSelector.get());
+    deviceSelector->setName ("deviceSelector");
+
     statusbar.reset (new Statusbar());
     addAndMakeVisible (statusbar.get());
 
@@ -83,17 +87,16 @@ MainContent::MainContent ()
 
     //[Constructor] You can add your own custom stuff here..
 
-  fileTree->setColour(FileTreeComponent::backgroundColourId , Colours::lightgrey.withAlpha(0.6f)) ;
-
-  this->formatManager.registerBasicFormats() ;
+  this->formatManager    .registerBasicFormats() ;
   this->audioSourcePlayer.setSource(&transportSource) ;
-  this->directoryList.setDirectory(File::getSpecialLocation(File::userHomeDirectory) , true , true) ;
+  this->directoryList    .setDirectory(File::getSpecialLocation(File::userHomeDirectory) , true , true) ;
 
   this->followButton   ->addListener      (this) ;
   this->headButton     ->addListener      (this) ;
   this->transportButton->addListener      (this) ;
   this->tailButton     ->addListener      (this) ;
   this->deviceManager   .addAudioCallback (&audioSourcePlayer) ;
+  this->deviceManager   .addChangeListener(this) ;
   this->lowerWaveform  ->addChangeListener(this) ;
   this->transportSource .addChangeListener(this) ;
   this->fileTree       ->addListener      (this) ;
@@ -146,6 +149,7 @@ MainContent::~MainContent()
     transportButton = nullptr;
     tailButton = nullptr;
     fileTree = nullptr;
+    deviceSelector = nullptr;
     statusbar = nullptr;
 
 
@@ -189,6 +193,7 @@ void MainContent::resized()
     transportButton->setBounds ((getWidth() / 2) - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
     tailButton->setBounds ((getWidth() / 2) + 150 - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
     fileTree->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), getHeight() - 56 - (getHeight() - 368), getWidth() - 32, getHeight() - 368);
+    deviceSelector->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), getHeight() - 56 - (getHeight() - 368), getWidth() - 32, getHeight() - 368);
     statusbar->setBounds ((getWidth() / 2) - ((getWidth() - 16) / 2), getHeight() - 8 - 32, getWidth() - 16, 32);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -326,6 +331,9 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="" id="230286b07ddaa9d7" memberName="fileTree" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc 56Rr 32M 368M" class="FileTreeComponent"
                     params="directoryList"/>
+  <GENERICCOMPONENT name="deviceSelector" id="fa801866cc59e27a" memberName="deviceSelector"
+                    virtualName="" explicitFocusOrder="0" pos="0.5Cc 56Rr 32M 368M"
+                    class="AudioDeviceSelectorComponent" params="deviceManager , 0 , 0 , 2 , 2 , false , false , true , true"/>
   <GENERICCOMPONENT name="" id="957b301f5907e647" memberName="statusbar" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 32" class="Statusbar"
                     params=""/>
