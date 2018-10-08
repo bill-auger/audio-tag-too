@@ -37,7 +37,7 @@
 #if ! JUCE_DONT_DECLARE_PROJECTINFO
 namespace ProjectInfo
 {
-    const char* const  projectName    = "JuceBoilerplate";
+    const char* const  projectName    = "AudioTagToo";
     const char* const  versionString  = "0.0.1";
     const int          versionNumber  = 0x1;
 }

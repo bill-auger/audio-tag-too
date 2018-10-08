@@ -1,21 +1,21 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
 |*|
-|*|  This file is part of the JuceBoilerplate program.
+|*|  This file is part of the AudioTagToo program.
 |*|
-|*|  JuceBoilerplate is free software: you can redistribute it and/or modify
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
 |*|  it under the terms of the GNU General Public License as published by
 |*|  the Free Software Foundation, either version 3 of the License, or
 |*|  (at your option) any later version.
 |*|
-|*|  JuceBoilerplate is distributed in the hope that it will be useful,
+|*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
 |*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 |*|  GNU General Public License for more details.
 |*|
 |*|  You should have received a copy of the GNU General Public License
-|*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
 
@@ -63,11 +63,11 @@ MainContent::MainContent ()
 
     //[/Constructor_pre]
 
-    waveformUpper.reset (new Waveform (formatManager , transportSource , courseFps));
-    addAndMakeVisible (waveformUpper.get());
+    fullWaveform.reset (new Waveform (formatManager , transportSource , courseFps));
+    addAndMakeVisible (fullWaveform.get());
 
-    waveformLower.reset (new Waveform (formatManager , transportSource , fineFps));
-    addAndMakeVisible (waveformLower.get());
+    clipWaveform.reset (new Waveform (formatManager , transportSource , fineFps));
+    addAndMakeVisible (clipWaveform.get());
 
     groupComponent.reset (new GroupComponent ("new group",
                                               String()));
@@ -94,18 +94,16 @@ MainContent::MainContent ()
 
     statusbar.reset (new Statusbar());
     addAndMakeVisible (statusbar.get());
-    statusbar->setName ("statusbar");
-
 
     //[UserPreSize]
 
   this->app = JUCEApplication::getInstance() ;
-  this->storage.reset(new JuceBoilerplateStore()) ;
+  this->storage.reset(new AudioTagTooStore()) ;
 
-  this->waveformUpper.setName(GUI::UPPER_WAVEFORM_ID) ;
-  this->waveformLower.setName(GUI::LOWER_WAVEFORM_ID) ;
-  this->waveforms.push_back(this->waveformUpper.get()) ;
-  this->waveforms.push_back(this->waveformLower.get()) ;
+  this->fullWaveform->setName(GUI::FULL_WAVEFORM_ID) ;
+  this->clipWaveform->setName(GUI::CLIP_WAVEFORM_ID) ;
+  this->waveforms.push_back(this->fullWaveform.get()) ;
+  this->waveforms.push_back(this->clipWaveform.get()) ;
 
   this->fileTree->setColour(FileTreeComponent::backgroundColourId , GUI::BROWSER_BG_COLOR) ;
 
@@ -167,8 +165,8 @@ MainContent::~MainContent()
 
     //[/Destructor_pre]
 
-    waveformUpper = nullptr;
-    waveformLower = nullptr;
+    fullWaveform = nullptr;
+    clipWaveform = nullptr;
     groupComponent = nullptr;
     headButton = nullptr;
     transportButton = nullptr;
@@ -211,15 +209,16 @@ void MainContent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    waveformUpper->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), 16, getWidth() - 32, 120);
-    waveformLower->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), 16 + 120 - -8, getWidth() - 32, 120);
+    fullWaveform->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), 16, getWidth() - 32, 120);
+    clipWaveform->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), 16 + 120 - -8, getWidth() - 32, 120);
     groupComponent->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), (16 + 120 - -8) + 120 - -8, getWidth() - 32, 24);
     headButton->setBounds ((getWidth() / 2) + -150 - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
     transportButton->setBounds ((getWidth() / 2) - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
     tailButton->setBounds ((getWidth() / 2) + 150 - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
-    fileTree->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3901f));
-    deviceSelector->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3901f));
+    fileTree->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3900f));
+    deviceSelector->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3900f));
     statusbar->setBounds ((getWidth() / 2) - ((getWidth() - 16) / 2), getHeight() - 8 - 32, getWidth() - 16, 32);
+
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -376,10 +375,10 @@ BEGIN_JUCER_METADATA
     <ROUNDRECT pos="0Cc 8 16M 56M" cornerSize="10.00000000000000000000" fill="solid: ff202020"
                hasStroke="1" stroke="1, mitered, butt" strokeColour="solid: ffffffff"/>
   </BACKGROUND>
-  <GENERICCOMPONENT name="" id="6d2236e7e917afa4" memberName="waveformUpper" virtualName=""
+  <GENERICCOMPONENT name="" id="6d2236e7e917afa4" memberName="fullWaveform" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc 16 32M 120" class="Waveform"
                     params="formatManager , transportSource , courseFps"/>
-  <GENERICCOMPONENT name="" id="f967fc403ed73574" memberName="waveformLower" virtualName=""
+  <GENERICCOMPONENT name="" id="f967fc403ed73574" memberName="clipWaveform" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc -8R 32M 120" posRelativeY="6d2236e7e917afa4"
                     class="Waveform" params="formatManager , transportSource , fineFps"/>
   <GROUPCOMPONENT name="new group" id="f42caa46057f2a0" memberName="groupComponent"
@@ -395,12 +394,12 @@ BEGIN_JUCER_METADATA
               explicitFocusOrder="0" pos="150Cc -8R 150 24" posRelativeY="f967fc403ed73574"
               buttonText="Tail" connectedEdges="0" needsCallback="0" radioGroupId="0"/>
   <GENERICCOMPONENT name="" id="230286b07ddaa9d7" memberName="fileTree" virtualName=""
-                    explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.012%" posRelativeY="f42caa46057f2a0"
+                    explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.000%" posRelativeY="f42caa46057f2a0"
                     class="FileTreeComponent" params="directoryList"/>
   <GENERICCOMPONENT name="" id="fa801866cc59e27a" memberName="deviceSelector" virtualName=""
-                    explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.012%" posRelativeY="f42caa46057f2a0"
+                    explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.000%" posRelativeY="f42caa46057f2a0"
                     class="AudioDeviceSelectorComponent" params="deviceManager , 0 , 0 , 2 , 2 , false , false , true , false"/>
-  <GENERICCOMPONENT name="statusbar" id="957b301f5907e647" memberName="statusbar"
+  <GENERICCOMPONENT name="" id="957b301f5907e647" memberName="statusbar"
                     virtualName="" explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 32"
                     class="Statusbar" params=""/>
 </JUCER_COMPONENT>

@@ -1,45 +1,44 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
 |*|
-|*|  This file is part of the JuceBoilerplate program.
+|*|  This file is part of the AudioTagToo program.
 |*|
-|*|  JuceBoilerplate is free software: you can redistribute it and/or modify
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
 |*|  it under the terms of the GNU General Public License as published by
 |*|  the Free Software Foundation, either version 3 of the License, or
 |*|  (at your option) any later version.
 |*|
-|*|  JuceBoilerplate is distributed in the hope that it will be useful,
+|*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
 |*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 |*|  GNU General Public License for more details.
 |*|
 |*|  You should have received a copy of the GNU General Public License
-|*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
 
-
-#include "JuceBoilerplateStore.h"
+#include "AudioTagTooStore.h"
 #include "Seeds.h"
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/StorageConstants.h"
-#include "../Trace/TraceJuceBoilerplateStore.h"
+#include "../Trace/TraceAudioTagTooStore.h"
 
 
-/* JuceBoilerplateStore public instance methods */
+/* AudioTagTooStore public instance methods */
 
-JuceBoilerplateStore::~JuceBoilerplateStore() { }
+AudioTagTooStore::~AudioTagTooStore() { }
 
 
-/* JuceBoilerplateStore private instance methods */
+/* AudioTagTooStore private instance methods */
 
 /* initialization */
 
-JuceBoilerplateStore::JuceBoilerplateStore() { }
+AudioTagTooStore::AudioTagTooStore() { }
 
-bool JuceBoilerplateStore::initialize()
+bool AudioTagTooStore::initialize()
 {
   // create shared config ValueTree from persistent storage or defaults
   loadConfig() ; verifyConfig() ;
@@ -49,12 +48,12 @@ bool JuceBoilerplateStore::initialize()
   return true ;
 }
 
-void JuceBoilerplateStore::teardown() { listen(false) ; storeConfig(this->deviceStateXml.get()) ; }
+void AudioTagTooStore::teardown() { listen(false) ; storeConfig(this->deviceStateXml.get()) ; }
 
 
 /* validations */
 
-void JuceBoilerplateStore::verifyConfig()
+void AudioTagTooStore::verifyConfig()
 {
   // verify or reset stored configuration
   bool was_storage_found   = this->root.isValid() ;
@@ -79,23 +78,22 @@ void JuceBoilerplateStore::verifyConfig()
 DEBUG_TRACE_VERIFY_STORED_CONFIG
 }
 
-void JuceBoilerplateStore::verifyRoot()
+void AudioTagTooStore::verifyRoot()
 {
   // ensure missing properties exist
   verifyRootProperty(STORE::CONFIG_VERSION_KEY , var(STORE::CONFIG_VERSION)) ;
 }
 
-void JuceBoilerplateStore::sanitizeRoot()
+void AudioTagTooStore::sanitizeRoot()
 {
   // filter any rogue data
   filterRogueKeys (this->root , STORE::RootPersistentKeys ()) ;
   filterRogueNodes(this->root , STORE::RootPersistentNodes()) ;
 }
 
-
 /* validation/sanitization helpers */
 
-void JuceBoilerplateStore::verifyChildNode(ValueTree store , Identifier node_id)
+void AudioTagTooStore::verifyChildNode(ValueTree store , Identifier node_id)
 {
 DEBUG_TRACE_VERIFY_MISSING_NODE
 
@@ -103,24 +101,24 @@ DEBUG_TRACE_VERIFY_MISSING_NODE
     store.addChild(ValueTree(node_id) , -1 , nullptr) ;
 }
 
-void JuceBoilerplateStore::verifyRootChildNode(Identifier node_id)
+void AudioTagTooStore::verifyRootChildNode(Identifier node_id)
 {
   verifyChildNode(this->root , node_id) ;
 }
 
-void JuceBoilerplateStore::verifyProperty(ValueTree store , Identifier key , var default_value)
+void AudioTagTooStore::verifyProperty(ValueTree store , Identifier key , var default_value)
 {
 DEBUG_TRACE_VERIFY_MISSING_PROPERTY
 
   if (!store.hasProperty(key)) store.setProperty(key , default_value , nullptr) ;
 }
 
-void JuceBoilerplateStore::verifyRootProperty(Identifier key , var default_value)
+void AudioTagTooStore::verifyRootProperty(Identifier key , var default_value)
 {
   verifyProperty(this->root , key , default_value) ;
 }
 
-bool JuceBoilerplateStore::hasDuplicatedNodes(ValueTree stored_config)
+bool AudioTagTooStore::hasDuplicatedNodes(ValueTree stored_config)
 {
   StringArray root_node_ids      = STORE::RootPersistentNodes() ;
   int         n_duplicated_nodes = 0 ;
@@ -132,7 +130,7 @@ bool JuceBoilerplateStore::hasDuplicatedNodes(ValueTree stored_config)
   return has_duplicates ;
 }
 
-int JuceBoilerplateStore::nDuplicatedNodes(ValueTree parent_node , StringArray node_ids)
+int AudioTagTooStore::nDuplicatedNodes(ValueTree parent_node , StringArray node_ids)
 {
   int n_duplicated_nodes = 0 ;
 
@@ -147,14 +145,14 @@ int JuceBoilerplateStore::nDuplicatedNodes(ValueTree parent_node , StringArray n
   return n_duplicated_nodes ;
 }
 
-void JuceBoilerplateStore::removeConflictedNodes(ValueTree parent_node , Identifier node_id)
+void AudioTagTooStore::removeConflictedNodes(ValueTree parent_node , Identifier node_id)
 {
   ValueTree node ;
   while ((node = parent_node.getChildWithName(node_id)).isValid())
     parent_node.removeChild(node , nullptr) ;
 }
 
-void JuceBoilerplateStore::filterRogueKeys(ValueTree parent_node , StringArray persistent_keys)
+void AudioTagTooStore::filterRogueKeys(ValueTree parent_node , StringArray persistent_keys)
 {
   for (int key_n = 0 ; key_n < parent_node.getNumProperties() ; ++key_n)
   {
@@ -167,7 +165,7 @@ DEBUG_TRACE_FILTER_ROGUE_KEY
   }
 }
 
-void JuceBoilerplateStore::filterRogueNodes(ValueTree parent_node , StringArray persistent_node_ids)
+void AudioTagTooStore::filterRogueNodes(ValueTree parent_node , StringArray persistent_node_ids)
 {
   for (int child_n = 0 ; child_n < parent_node.getNumChildren() ; ++child_n)
   {
@@ -180,8 +178,8 @@ DEBUG_TRACE_FILTER_ROGUE_NODE
   }
 }
 
-void JuceBoilerplateStore::sanitizeIntProperty(ValueTree store     , Identifier key      ,
-                                               int       min_value , int        max_value)
+void AudioTagTooStore::sanitizeIntProperty(ValueTree store     , Identifier key      ,
+                                           int       min_value , int        max_value)
 {
   int value = int(store[key]) ;
 
@@ -190,8 +188,8 @@ void JuceBoilerplateStore::sanitizeIntProperty(ValueTree store     , Identifier 
 DEBUG_TRACE_SANITIZE_INT_PROPERTY
 }
 
-void JuceBoilerplateStore::sanitizeComboProperty(ValueTree   store   , Identifier key ,
-                                                 StringArray options                  )
+void AudioTagTooStore::sanitizeComboProperty(ValueTree   store   , Identifier key ,
+                                             StringArray options                  )
 {
   sanitizeIntProperty(store , key , 0 , options.size() - 1) ;
 }
@@ -199,7 +197,7 @@ void JuceBoilerplateStore::sanitizeComboProperty(ValueTree   store   , Identifie
 
 /* persistence */
 
-void JuceBoilerplateStore::loadConfig()
+void AudioTagTooStore::loadConfig()
 {
   // load application configuration from persistent storage
   File storage_dir         = APP::AppdataDir().getChildFile(STORE::STORAGE_DIRNAME ) ;
@@ -226,7 +224,7 @@ void JuceBoilerplateStore::loadConfig()
   if (!is_config_valid) this->deviceStateXml.reset() ;
 }
 
-bool JuceBoilerplateStore::storeConfig(XmlElement* device_state_xml)
+bool AudioTagTooStore::storeConfig(XmlElement* device_state_xml)
 {
 DEBUG_TRACE_STORE_CONFIG
 
@@ -263,7 +261,7 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
     else
     {
   #ifdef HAS_MAIN_CONTROLLER
-      JuceBoilerplate::Error(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
+      AudioTagToo::Error(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
   #else // HAS_MAIN_CONTROLLER
       Trace::TraceError(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
   #endif // HAS_MAIN_CONTROLLER
@@ -321,10 +319,10 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
 
 /* event handlers */
 
-void JuceBoilerplateStore::listen(bool should_listen)
+void AudioTagTooStore::listen(bool should_listen)
 {
 #ifdef HAS_MAIN_CONTROLLER
-  if (!JuceBoilerplate::IsInitialized) return ;
+  if (!AudioTagToo::IsInitialized) return ;
 #endif // HAS_MAIN_CONTROLLER
 
 DEBUG_TRACE_LISTEN
@@ -333,19 +331,19 @@ DEBUG_TRACE_LISTEN
   else               { this->root.removeListener(this) ; }
 }
 
-void JuceBoilerplateStore::valueTreePropertyChanged(ValueTree& node , const Identifier& key)
+void AudioTagTooStore::valueTreePropertyChanged(ValueTree& node , const Identifier& key)
 {
 DEBUG_TRACE_CONFIG_TREE_CHANGED
 
 #ifdef HAS_MAIN_CONTROLLER
-  JuceBoilerplate::HandleConfigChanged(key) ;
+  AudioTagToo::HandleConfigChanged(key) ;
 #endif // HAS_MAIN_CONTROLLER
 }
 
 
 /* getters/setters */
 
-bool JuceBoilerplateStore::isKnownProperty(ValueTree node , const Identifier& key)
+bool AudioTagTooStore::isKnownProperty(ValueTree node , const Identifier& key)
 {
   ValueTree parent_node = node.getParent() ;
 
@@ -353,16 +351,16 @@ bool JuceBoilerplateStore::isKnownProperty(ValueTree node , const Identifier& ke
                                 false                           ;
 }
 
-void JuceBoilerplateStore::setProperty(ValueTree node  , const Identifier& key ,
-                                       const var value                         )
+void AudioTagTooStore::setProperty(ValueTree node  , const Identifier& key ,
+                                   const var value                         )
 {
 DEBUG_TRACE_SET_PROPERTY
 
   if (node.isValid()) node.setProperty(key , value , nullptr) ;
 }
 
-void JuceBoilerplateStore::setConfig(ValueTree config_node , const Identifier& key ,
-                                     const var value                               )
+void AudioTagTooStore::setConfig(ValueTree config_node , const Identifier& key ,
+                                 const var value                               )
 {
 DEBUG_TRACE_SET_CONFIG
 
@@ -370,7 +368,8 @@ DEBUG_TRACE_SET_CONFIG
   if (!config_node.isValid() || !isKnownProperty(config_node , key)) return ;
 
 #ifdef HAS_MAIN_CONTROLLER
-  if (!JuceBoilerplate::IsInitialized || !JuceBoilerplate::DisabledFeatures.contains(key))
+
+  if (!AudioTagToo::IsInitialized || !AudioTagToo::DisabledFeatures.contains(key))
 #endif // HAS_MAIN_CONTROLLER
     setProperty(config_node , key , value) ;
 }

@@ -1,23 +1,22 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
 |*|
-|*|  This file is part of the JuceBoilerplate program.
+|*|  This file is part of the AudioTagToo program.
 |*|
-|*|  JuceBoilerplate is free software: you can redistribute it and/or modify
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
 |*|  it under the terms of the GNU General Public License as published by
 |*|  the Free Software Foundation, either version 3 of the License, or
 |*|  (at your option) any later version.
 |*|
-|*|  JuceBoilerplate is distributed in the hope that it will be useful,
+|*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
 |*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 |*|  GNU General Public License for more details.
 |*|
 |*|  You should have received a copy of the GNU General Public License
-|*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
 \*/
-
 
 
 #include "AppConstants.h"
@@ -26,8 +25,8 @@
 // names and IDs
 const String APP::APP_NAME           = ProjectInfo::projectName ;
 const String APP::APP_VERSION        = ProjectInfo::versionString ;
-const String APP::APP_CMD            = "juce-boilerplate" ;
-const String APP::WORKER_THREAD_NAME = "juceboilerplate-worker" ;
+const String APP::APP_CMD            = "audio-tag-too" ;
+const String APP::WORKER_THREAD_NAME = "audiotagtoo-worker" ;
 const String APP::DIGITS             = "0123456789" ;
 const String APP::LETTERS            = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ;
 const String APP::ALPHANUMERIC       = DIGITS + LETTERS ;
@@ -44,7 +43,7 @@ const String APP::CLI_FPS_TOKEN     = "--fps" ;
 // runtime constants
 #define APP_CMD_PAD String("").paddedLeft(' ' , APP_CMD.length())
 const StringArray APP::CLI_USAGE_MSG = StringArray::fromLines(
-    String("JuceAudio Usage:\n")                                                                                                                +
+    String("AudioTagToo Usage:\n")                                                                                                              +
     "\n\t" + APP_CMD     + " [ " + CLI_HELP_TOKEN                 + " | "                                                                       +
                                    CLI_VERSION_TOKEN              + " ]"                                                                        +
     "\n\t" + APP_CMD     + " [ " + CLI_DIR_TOKEN                  + " <DIRECTORY> ]"                                                            +
@@ -57,10 +56,10 @@ const StringArray APP::CLI_USAGE_MSG = StringArray::fromLines(
     "\n\n\t\t"                   + CLI_FPS_TOKEN + " <N>"         + "\n\t\t\tstarts " + APP_NAME + " with N frames per second graphics update"  ) ;
 
 // filesystem
-const String APP::IconFilename()    { return APP_CMD + ".png" ;                         }
-const String APP::DesktopFilename() { return APP_CMD + ".desktop" ;                     }
+const String APP::IconFilename()    { return APP_CMD + ".png"                         ; }
+const String APP::DesktopFilename() { return APP_CMD + ".desktop"                     ; }
 const String APP::IconsPath()       { return ".local/share/icons/hicolor/48x48/apps/" ; }
-const String APP::AppsPath()        { return ".local/share/applications/" ;             }
+const String APP::AppsPath()        { return ".local/share/applications/"             ; }
 const File   APP::HomeDir()         { return File::getSpecialLocation(File::userHomeDirectory           ) ; }
 const File   APP::MusicDir()        { return File::getSpecialLocation(File::userMusicDirectory          ) ; }
 const File   APP::AppdataDir()      { return File::getSpecialLocation(File::userApplicationDataDirectory) ; }
@@ -68,7 +67,7 @@ const File   APP::BinFile()         { return File::getSpecialLocation(File::curr
 const File   APP::IconFile()        { return HomeDir().getChildFile  (IconsPath() + IconFilename()   ) ; }
 const File   APP::DesktopFile()     { return HomeDir().getChildFile  (AppsPath()  + DesktopFilename()) ; }
 const String APP::DesktopFileText() { return String("[Desktop Entry]\r\n")                          +
-                                                    "Name=JuceBoilerplate\r\n"                      +
+                                                    "Name=AudioTagToo\r\n"                          +
                                                     "GenericName=\r\n"                              +
                                                     "Comment=\r\n"                                  +
                                                     "Categories=AudioVideo;\r\n"                    +

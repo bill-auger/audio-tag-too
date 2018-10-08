@@ -1,33 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="CQ5KH7" name="JuceBoilerplate" projectType="guiapp" jucerVersion="5.3.2"
-              version="0.0.1" bundleIdentifier="free.bill-auger.JuceBoilerplate"
+<JUCERPROJECT id="CQ5KH7" name="AudioTagToo" projectType="guiapp" jucerVersion="5.3.2"
+              version="0.0.1" bundleIdentifier="free.bill-auger.AudioTagToo"
               includeBinaryInAppConfig="1">
-  <MAINGROUP id="iiOCZm" name="JuceBoilerplate">
+  <MAINGROUP id="iiOCZm" name="AudioTagToo">
     <GROUP id="{06C763FB-F36A-9659-50AA-012427409460}" name="Assets">
       <FILE id="Ebmfjk" name="audio-x-generic.png" compile="0" resource="1"
             file="Assets/audio-x-generic.png"/>
-    </GROUP>
-    <GROUP id="{32AF26B6-CF18-68B4-7459-D9B8142253DB}" name="Headers">
-      <GROUP id="{4FEEE1CF-563A-D8A1-87F6-1211E4D29A2D}" name="Constants">
-        <FILE id="NM7o5M" name="AppConstants.h" compile="0" resource="0" file="Source/Constants/AppConstants.h"/>
-        <FILE id="ZoGSCF" name="GuiConstants.h" compile="0" resource="0" file="Source/Constants/GuiConstants.h"/>
-        <FILE id="QR0Gqt" name="MediaConstants.h" compile="0" resource="0"
-              file="Source/Constants/MediaConstants.h"/>
-        <FILE id="TC9mWS" name="StorageConstants.h" compile="0" resource="0"
-              file="Source/Constants/StorageConstants.h"/>
-      </GROUP>
-      <GROUP id="{55652D33-3B99-E916-4581-01F32D8B02A3}" name="Controllers"/>
-      <GROUP id="{2768B552-4034-9A6D-B8C5-09132B2600A8}" name="Models">
-        <FILE id="IPb9bQ" name="JuceBoilerplateStore.h" compile="0" resource="0"
-              file="Source/Models/JuceBoilerplateStore.h"/>
-        <FILE id="tbdSoY" name="Seeds.h" compile="0" resource="0" file="Source/Models/Seeds.h"/>
-      </GROUP>
-      <GROUP id="{9E64E2B6-E375-E580-7CB9-4BBEE3763656}" name="Views">
-        <FILE id="d76iQn" name="MainContent.h" compile="0" resource="0" file="Source/Views/MainContent.h"/>
-        <FILE id="q1Tywf" name="Statusbar.h" compile="0" resource="0" file="Source/Views/Statusbar.h"/>
-        <FILE id="NtTq3q" name="Waveform.h" compile="0" resource="0" file="Source/Views/Waveform.h"/>
-      </GROUP>
     </GROUP>
     <GROUP id="{83125242-B25A-290C-4B4B-C3FF04190730}" name="Source">
       <GROUP id="{B7072F38-DF7A-61A1-713D-C261BA28F538}" name="Constants">
@@ -44,12 +23,12 @@
         <FILE id="cp26CJ" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       </GROUP>
       <GROUP id="{E9EA4621-DD2E-354B-071C-2A1C46F6694E}" name="Models">
-        <FILE id="N4KbYW" name="JuceBoilerplateStore.cpp" compile="1" resource="0"
-              file="Source/Models/JuceBoilerplateStore.cpp"/>
+        <FILE id="N4KbYW" name="AudioTagTooStore.cpp" compile="1" resource="0"
+              file="Source/Models/AudioTagTooStore.cpp"/>
         <FILE id="nz3oas" name="Seeds.cpp" compile="1" resource="0" file="Source/Models/Seeds.cpp"/>
       </GROUP>
       <GROUP id="{81B8290E-73B1-FE35-8D6E-6EBE793DD6CC}" name="Trace">
-        <FILE id="UtOwFh" name="Trace.cpp" compile="1" resource="0" file="Source/Trace/Trace.cpp"/>
+        <FILE id="X1J7e9" name="Trace.cpp" compile="1" resource="0" file="Source/Trace/Trace.cpp"/>
       </GROUP>
       <GROUP id="{415C92D0-6DB5-561E-5112-51D267588674}" name="Views">
         <FILE id="Y76Tzw" name="MainContent.cpp" compile="1" resource="0" file="Source/Views/MainContent.cpp"/>
@@ -61,8 +40,8 @@
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/Makefile">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="juce-boilerplate-dbg"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="juce-boilerplate"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="audio-tag-too-dbg"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="audio-tag-too"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../juce/modules"/>

@@ -21,12 +21,24 @@
 
 #pragma once
 
-#include "../../JuceLibraryCode/JuceHeader.h"
+
+#ifdef DEBUG_TRACE
+
+  #include "Trace.h"
 
 
-class Seeds
-{
-public:
+  #define DEBUG_TRACE_INIT_VERSION                        \
+  if (!cli_params.contains(APP::CLI_VERSION_TOKEN))       \
+    LOG(AvCaster::VersionMsg().joinIntoString("\n") + "\n") ;
 
-  static ValueTree DefaultStore() ;
-} ;
+  #define DEBUG_TRACE_SHUTDOWN_IN  Trace::TraceState("shutting down") ;
+
+  #define DEBUG_TRACE_SHUTDOWN_OUT Trace::TraceState("clean shutdown - bye") ;
+
+#else // DEBUG_TRACE
+
+  #define DEBUG_TRACE_INIT_VERSION ;
+  #define DEBUG_TRACE_SHUTDOWN_IN  ;
+  #define DEBUG_TRACE_SHUTDOWN_OUT ;
+
+#endif // DEBUG_TRACE

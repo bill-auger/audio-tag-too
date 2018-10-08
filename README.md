@@ -4,7 +4,7 @@
 #### Arch, Parabola:
 ```
 ### build and install with makepkg ###
-$ wget https://raw.githubusercontent.com/bill-auger/juce-boilerplate/master/Builds/Packaging/PKGBUILD
+$ wget https://raw.githubusercontent.com/bill-auger/audio-tag-too/master/Builds/Packaging/PKGBUILD
 # makepkg -sri ./PKGBUILD
 ```
 
@@ -26,7 +26,7 @@ $ make
 $ sudo make install
 
 ### run ###
-$ juce-boilerplate
+$ audio-tag-too
 ```
 
 #### Fedora:
@@ -45,7 +45,7 @@ $ make
 $ su -c "make install"
 
 ### run ###
-$ juce-boilerplate
+$ audio-tag-too
 ```
 
 #### OpenSuse Leap >= 42, OpenSuse Tumbleweed, Suse SLE >= 12:
@@ -63,7 +63,7 @@ $ make
 $ sudo make install
 
 ### run ###
-$ juce-boilerplate
+$ audio-tag-too
 ```
 
 #### Other GNU/Linux:

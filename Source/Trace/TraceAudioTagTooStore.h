@@ -1,21 +1,21 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
 |*|
-|*|  This file is part of the JuceBoilerplate program.
+|*|  This file is part of the AudioTagToo program.
 |*|
-|*|  JuceBoilerplate is free software: you can redistribute it and/or modify
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
 |*|  it under the terms of the GNU General Public License as published by
 |*|  the Free Software Foundation, either version 3 of the License, or
 |*|  (at your option) any later version.
 |*|
-|*|  JuceBoilerplate is distributed in the hope that it will be useful,
+|*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
 |*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 |*|  GNU General Public License for more details.
 |*|
 |*|  You should have received a copy of the GNU General Public License
-|*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
 
@@ -89,7 +89,7 @@
   // 'HAS_MAIN_CONTROLLER' switches can simply be removed if controller exists
   //                       or if such guards are not needed
   #ifdef HAS_MAIN_CONTROLLER
-    #define MAIN_CONTROLLER_GUARD (JuceBoilerplate::IsInitialized && JuceBoilerplate::DisabledFeatures.contains(key))
+    #define MAIN_CONTROLLER_GUARD (AudioTagToo::IsInitialized && AudioTagToo::DisabledFeatures.contains(key))
   #else // HAS_MAIN_CONTROLLER
     #define MAIN_CONTROLLER_GUARD (true)
   #endif // HAS_MAIN_CONTROLLER

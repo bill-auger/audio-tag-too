@@ -1,43 +1,54 @@
 /*\
-|*|  JuceBoilerplate - JUCE boilerplate audio player GUI application
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/juce-boilerplate/issues>
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
 |*|
-|*|  This file is part of the JuceBoilerplate program.
+|*|  This file is part of the AudioTagToo program.
 |*|
-|*|  JuceBoilerplate is free software: you can redistribute it and/or modify
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
 |*|  it under the terms of the GNU General Public License as published by
 |*|  the Free Software Foundation, either version 3 of the License, or
 |*|  (at your option) any later version.
 |*|
-|*|  JuceBoilerplate is distributed in the hope that it will be useful,
+|*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
 |*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 |*|  GNU General Public License for more details.
 |*|
 |*|  You should have received a copy of the GNU General Public License
-|*|  along with JuceBoilerplate.  If not, see <http://www.gnu.org/licenses/>.
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
 \*/
 
 
 #include "Constants/AppConstants.h"
 #include "Constants/GuiConstants.h"
 #include "Views/MainContent.h"
+#include "Trace/TraceMain.h"
 
 
-class JuceBoilerplateApplication : public JUCEApplication
+class AudioTagTooApplication : public JUCEApplication
 {
 public:
 
-  JuceBoilerplateApplication() {}
+  AudioTagTooApplication() {}
+
 
   void initialise(const String& cli_args) override
   {
+DEBUG_TRACE_INIT_VERSION
+
     this->mainWindow.reset(new MainWindow()) ;
 
-    if (! true /*JuceBoilerplate::Init()*/) { setApplicationReturnValue(255) ; quit() ; }
+    if (! true /*AudioTagToo::Init()*/) { setApplicationReturnValue(255) ; quit() ; }
   }
 
-  void shutdown() override { this->mainWindow = nullptr ; }
+  void shutdown() override
+  {
+DEBUG_TRACE_SHUTDOWN_IN
+
+    this->mainWindow = nullptr ;
+
+DEBUG_TRACE_SHUTDOWN_OUT
+  }
 
   void systemRequestedQuit()                          override { quit() ; }
   const String getApplicationName()                   override { return ProjectInfo::projectName ; }
@@ -91,4 +102,4 @@ private:
 } ;
 
 
-START_JUCE_APPLICATION(JuceBoilerplateApplication)
+START_JUCE_APPLICATION(AudioTagTooApplication)

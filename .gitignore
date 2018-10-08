@@ -1,6 +1,5 @@
-
 *
-!JuceBoilerplate.jucer
+!AudioTagToo.jucer
 !.gitignore
 !COPYING
 !LICENSES.md
@@ -40,15 +39,16 @@
 !Source/Controllers/
 
 !Source/Models/
-!Source/Models/JuceBoilerplateStore.cpp
-!Source/Models/JuceBoilerplateStore.h
+!Source/Models/AudioTagTooStore.cpp
+!Source/Models/AudioTagTooStore.h
 !Source/Models/Seeds.cpp
 !Source/Models/Seeds.h
 
 !Source/Trace/
 !Source/Trace/Trace.cpp
 !Source/Trace/Trace.h
-!Source/Trace/JuceBoilerplateStore.h
+!Source/Trace/TraceAudioTagTooStore.h
+!Source/Trace/TraceMain.h
 !Source/Trace/TraceWaveform.h
 
 !Source/Views/
