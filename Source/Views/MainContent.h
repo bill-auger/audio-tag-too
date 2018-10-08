@@ -98,6 +98,7 @@ private:
     std::unique_ptr<TextButton> transportButton;
     std::unique_ptr<TextButton> tailButton;
     std::unique_ptr<FileTreeComponent> fileTree;
+    std::unique_ptr<AudioDeviceSelectorComponent> deviceSelector;
     std::unique_ptr<Statusbar> statusbar;
 
 
