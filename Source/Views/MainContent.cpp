@@ -23,7 +23,7 @@
 #include "../Constants/GuiConstants.h"
 #include "../Constants/MediaConstants.h"
 #include "../Constants/StorageConstants.h"
-#include "../Models/AudioTagTooStore.h"
+#include "../Models/JuceBoilerplateStore.h"
 #include "Statusbar.h"
 #include "Waveform.h"
 
@@ -77,8 +77,12 @@ MainContent::MainContent ()
 
     //[UserPreSize]
 
+  this->storage.reset(new JuceBoilerplateStore()) ;
+
   this->upperWaveform->setName(GUI::UPPER_WAVEFORM_ID) ;
   this->lowerWaveform->setName(GUI::LOWER_WAVEFORM_ID) ;
+
+  this->fileTree->setColour(FileTreeComponent::backgroundColourId , GUI::BROWSER_BG_COLOR) ;
 
     //[/UserPreSize]
 
@@ -87,7 +91,7 @@ MainContent::MainContent ()
 
     //[Constructor] You can add your own custom stuff here..
 
-  this->formatManager    .registerBasicFormats() ;
+  this->formatManager.registerBasicFormats() ;
   this->audioSourcePlayer.setSource(&transportSource) ;
   this->directoryList    .setDirectory(File::getSpecialLocation(File::userHomeDirectory) , true , true) ;
 
@@ -100,6 +104,10 @@ MainContent::MainContent ()
   this->lowerWaveform  ->addChangeListener(this) ;
   this->transportSource .addChangeListener(this) ;
   this->fileTree       ->addListener      (this) ;
+  this->storage->root   .addListener      (this) ;
+
+  // initialize stored state
+  this->storage->initialize() ;
 
 #if ! DISABLE_AUDIO
   // start audio and worker threads
@@ -108,10 +116,10 @@ MainContent::MainContent ()
   {
     int numInputChannels = granted ? MEDIA::N_CHANNELS_IN : 0 ;
 
-    this->deviceManager.initialise(numInputChannels , MEDIA::N_CHANNELS_IN , nullptr , true , {} , nullptr) ;
+    this->deviceManager.initialise(numInputChannels , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get() , true , {} , nullptr) ;
   }) ;
   #else // __ANDROID_API__ >= 23
-  setAudioChannels(MEDIA::N_CHANNELS_IN , MEDIA::N_CHANNELS_OUT) ;
+  setAudioChannels(MEDIA::N_CHANNELS_IN , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get()) ;
   #endif // __ANDROID_API__ >= 23
   this->workerThread.startThread(3) ;
 #endif // DISABLE_AUDIO
@@ -136,9 +144,11 @@ MainContent::~MainContent()
   this->transportButton->removeListener      (this) ;
   this->tailButton     ->removeListener      (this) ;
   this->deviceManager   .removeAudioCallback(&audioSourcePlayer) ;
+  this->deviceManager   .removeChangeListener(this) ;
   this->transportSource .removeChangeListener(this) ;
   this->lowerWaveform  ->removeChangeListener(this) ;
   this->fileTree       ->removeListener      (this) ;
+  this->storage->root   .removeListener      (this) ;
 
     //[/Destructor_pre]
 
@@ -236,6 +246,8 @@ bool MainContent::loadURLIntoTransport(const URL& audio_url)
                                     32768                              ,
                                     &thread                            ,
                                     reader->sampleRate                 ) ;
+
+    setAudioChannels(MEDIA::N_CHANNELS_IN , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get()) ;
   }
 
   return did_load_succeed ;
@@ -286,6 +298,16 @@ void MainContent::changeListenerCallback(ChangeBroadcaster* source)
 {
   if      (source ==   this->lowerWaveform.get()) showAudioResource(URL(this->lowerWaveform->getLastDroppedFile())) ;
   else if (source == &(this->transportSource)   ) updateTransportButton(this->transportSource.isPlaying()) ;
+  else if (source == &(this->deviceManager  )  )
+  {
+    bool is_device_initialized = this->deviceManager.getCurrentAudioDevice() != nullptr ;
+
+    if (is_device_initialized) this->storage->storeConfig(this->deviceManager.createStateXml()) ;
+    else AlertWindow::showMessageBox(AlertWindow::WarningIcon , GUI::DEVICE_ERROR_TITLE ,
+                                                                GUI::DEVICE_ERROR_MSG   ) ;
+    this->fileTree      ->setVisible( is_device_initialized) ;
+    this->deviceSelector->setVisible(!is_device_initialized) ;
+  }
 }
 
 //[/MiscUserCode]
@@ -301,7 +323,7 @@ void MainContent::changeListenerCallback(ChangeBroadcaster* source)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="MainContent" componentName=""
-                 parentClasses="public AudioAppComponent, private Button::Listener, private FileBrowserListener, private ChangeListener"
+                 parentClasses="public AudioAppComponent, private Button::Listener, private FileBrowserListener, private ChangeListener, private ValueTree::Listener"
                  constructorParams="" variableInitialisers="audioFileFilter(MEDIA::IMPORT_WAVEFILE_MASK , String(&quot;*&quot;) , MEDIA::IMPORT_WAVEFILE_DESC) , directoryList(&amp;audioFileFilter , workerThread) , workerThread(APP::WORKER_THREAD_NAME)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="766" initialHeight="742">

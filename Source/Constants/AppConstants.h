@@ -18,6 +18,8 @@ public:
 
   // names and IDs
   static const String APP_NAME ;
+  static const String APP_VERSION ;
+  static const String APP_CMD ;
   static const String WORKER_THREAD_NAME ;
   static const String DIGITS ;
   static const String LETTERS ;

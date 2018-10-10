@@ -41,7 +41,8 @@ class Waveform ;
 class MainContent  : public AudioAppComponent,
                      private Button::Listener,
                      private FileBrowserListener,
-                     private ChangeListener
+                     private ChangeListener,
+                     private ValueTree::Listener
 {
 public:
     //==============================================================================
@@ -68,6 +69,7 @@ private:
   AudioSourcePlayer                        audioSourcePlayer ;
   AudioTransportSource                     transportSource ;
   std::unique_ptr<AudioFormatReaderSource> currentAudioFileSource ;
+  std::unique_ptr<JuceBoilerplateStore>    storage ;
 
   // getters/setters
   void showAudioResource    (URL resource) ;
@@ -85,6 +87,14 @@ private:
   void buttonClicked         (Button* a_button)                           override ;
   void selectionChanged      (void)                                       override ;
   void changeListenerCallback(ChangeBroadcaster* source)                  override ;
+
+  // unhandled ValueTree::Listener events
+  void valueTreeRedirected       (ValueTree&                                                     ) override {}
+  void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node                   ) override {}
+  void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override {}
+  void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override {}
+  void valueTreePropertyChanged  (ValueTree& , const Identifier&                                 ) override {}
+  void valueTreeParentChanged    (ValueTree&                                                     ) override {}
 
   // unhandled FileBrowserListener events
   void fileClicked       (const File&, const MouseEvent&) override {}

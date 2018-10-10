@@ -3,6 +3,8 @@
 
 // names and IDs
 const String APP::APP_NAME           = ProjectInfo::projectName ;
+const String APP::APP_VERSION        = ProjectInfo::versionString ;
+const String APP::APP_CMD            = "juce-boilerplate" ;
 const String APP::WORKER_THREAD_NAME = "juceboilerplate-worker" ;
 const String APP::DIGITS             = "0123456789" ;
 const String APP::LETTERS            = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ;
