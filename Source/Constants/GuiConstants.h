@@ -22,6 +22,7 @@ public:
   static const uint16 WINDOW_W ;
   static const uint16 WINDOW_H ;
   static const Colour WINDOW_BG_COLOR ;
+  static const Colour BROWSER_BG_COLOR ;
   static const int    TITLEBAR_BTNS ;
 
   // Waveform
@@ -37,4 +38,10 @@ public:
   static const String UPPER_WAVEFORM_ID ;
   static const String LOWER_WAVEFORM_ID ;
   static const String NO_FILE_TEXT ;
+
+  // user messages
+  static const String DEVICE_ERROR_TITLE ;
+  static const String DEVICE_ERROR_MSG ;
+  static const String FILESYSTEM_WRITE_ERROR_MSG ;
+  static const String STORAGE_WRITE_ERROR_MSG ;
 } ;

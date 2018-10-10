@@ -3,4 +3,5 @@
 
 
 // names and IDs
-const String APP::APP_NAME = "JuceBoilerplate" ;
+const String APP::APP_NAME    = ProjectInfo::projectName ;
+const String APP::APP_VERSION = ProjectInfo::versionString ;

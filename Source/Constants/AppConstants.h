@@ -19,4 +19,5 @@ public:
 
   // names and IDs
   static const String APP_NAME ;
+  static const String APP_VERSION ;
 } ;

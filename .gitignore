@@ -22,10 +22,16 @@
 !Source/Constants/GuiConstants.h
 !Source/Constants/MediaConstants.cpp
 !Source/Constants/MediaConstants.h
+!Source/Constants/StorageConstants.cpp
+!Source/Constants/StorageConstants.h
 
 !Source/Controllers/
 
 !Source/Models/
+!Source/Models/JuceBoilerplateStore.cpp
+!Source/Models/JuceBoilerplateStore.h
+!Source/Models/Seeds.cpp
+!Source/Models/Seeds.h
 
 !Source/Views/
 !Source/Views/MainContent.cpp
