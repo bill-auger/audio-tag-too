@@ -75,6 +75,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/Main_90ebc5c2.o \
   $(JUCE_OBJDIR)/JuceBoilerplateStore_119f6b1b.o \
   $(JUCE_OBJDIR)/Seeds_7de92226.o \
+  $(JUCE_OBJDIR)/Trace_fd3024bc.o \
   $(JUCE_OBJDIR)/MainContent_91787020.o \
   $(JUCE_OBJDIR)/Statusbar_b88450c1.o \
   $(JUCE_OBJDIR)/Waveform_b456ee67.o \
@@ -135,6 +136,11 @@ $(JUCE_OBJDIR)/JuceBoilerplateStore_119f6b1b.o: ../../Source/Models/JuceBoilerpl
 $(JUCE_OBJDIR)/Seeds_7de92226.o: ../../Source/Models/Seeds.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling Seeds.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/Trace_fd3024bc.o: ../../Source/Trace/Trace.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling Trace.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/MainContent_91787020.o: ../../Source/Views/MainContent.cpp
