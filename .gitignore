@@ -33,6 +33,12 @@
 !Source/Models/Seeds.cpp
 !Source/Models/Seeds.h
 
+!Source/Trace/
+!Source/Trace/Trace.cpp
+!Source/Trace/Trace.h
+!Source/Trace/JuceBoilerplateStore.h
+!Source/Trace/TraceWaveform.h
+
 !Source/Views/
 !Source/Views/MainContent.cpp
 !Source/Views/MainContent.h

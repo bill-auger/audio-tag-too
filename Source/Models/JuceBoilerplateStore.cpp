@@ -4,6 +4,7 @@
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/StorageConstants.h"
+#include "../Trace/TraceJuceBoilerplateStore.h"
 
 
 /* JuceBoilerplateStore public instance methods */
@@ -53,6 +54,8 @@ void JuceBoilerplateStore::verifyConfig()
 
     this->root.removeProperty(STORE::CONFIG_VERSION_KEY , nullptr) ;
   }
+
+DEBUG_TRACE_VERIFY_STORED_CONFIG
 }
 
 void JuceBoilerplateStore::verifyRoot()
@@ -73,6 +76,8 @@ void JuceBoilerplateStore::sanitizeRoot()
 
 void JuceBoilerplateStore::verifyChildNode(ValueTree store , Identifier node_id)
 {
+DEBUG_TRACE_VERIFY_MISSING_NODE
+
   if (!store.getChildWithName(node_id).isValid())
     store.addChild(ValueTree(node_id) , -1 , nullptr) ;
 }
@@ -84,6 +89,8 @@ void JuceBoilerplateStore::verifyRootChildNode(Identifier node_id)
 
 void JuceBoilerplateStore::verifyProperty(ValueTree store , Identifier key , var default_value)
 {
+DEBUG_TRACE_VERIFY_MISSING_PROPERTY
+
   if (!store.hasProperty(key)) store.setProperty(key , default_value , nullptr) ;
 }
 
@@ -132,6 +139,8 @@ void JuceBoilerplateStore::filterRogueKeys(ValueTree parent_node , StringArray p
   {
     String property_id = STRING(parent_node.getPropertyName(key_n)) ;
 
+DEBUG_TRACE_FILTER_ROGUE_KEY
+
     if (!persistent_keys.contains(property_id))
       parent_node.removeProperty( property_id , nullptr) ;
   }
@@ -142,6 +151,8 @@ void JuceBoilerplateStore::filterRogueNodes(ValueTree parent_node , StringArray 
   for (int child_n = 0 ; child_n < parent_node.getNumChildren() ; ++child_n)
   {
     String node_id = STRING(parent_node.getChild(child_n).getType()) ;
+
+DEBUG_TRACE_FILTER_ROGUE_NODE
 
     if (!persistent_node_ids.contains(node_id))
       parent_node.removeChild(child_n , nullptr) ;
@@ -154,6 +165,8 @@ void JuceBoilerplateStore::sanitizeIntProperty(ValueTree store     , Identifier 
   int value = int(store[key]) ;
 
   if (value < min_value || value > max_value) store.removeProperty(key , nullptr) ;
+
+DEBUG_TRACE_SANITIZE_INT_PROPERTY
 }
 
 void JuceBoilerplateStore::sanitizeComboProperty(ValueTree   store   , Identifier key ,
@@ -194,6 +207,8 @@ void JuceBoilerplateStore::loadConfig()
 
 bool JuceBoilerplateStore::storeConfig(XmlElement* device_state_xml)
 {
+DEBUG_TRACE_STORE_CONFIG
+
   // prepare storage directory
   File temp_file = this->storageFile.getSiblingFile(STORE::STORAGE_FILENAME + ".temp") ;
   if (temp_file.create().failed() || !temp_file.deleteFile())
@@ -207,9 +222,13 @@ bool JuceBoilerplateStore::storeConfig(XmlElement* device_state_xml)
     return false ;
   }
 
+DEBUG_TRACE_DUMP_STORE(this->root , "root")
+
   if (this->root.isValid())
   {
 #ifdef STORAGE_IS_BINARY
+
+DEBUG_WRITE_STORE_XML(this->root , "root")
 
     // marshall application configuration out to persistent binary storage
     FileOutputStream* storage_stream = new FileOutputStream(temp_file) ;
@@ -287,12 +306,16 @@ void JuceBoilerplateStore::listen(bool should_listen)
   if (!JuceBoilerplate::IsInitialized) return ;
 #endif // HAS_MAIN_CONTROLLER
 
+DEBUG_TRACE_LISTEN
+
   if (should_listen) { this->root.addListener   (this) ; }
   else               { this->root.removeListener(this) ; }
 }
 
 void JuceBoilerplateStore::valueTreePropertyChanged(ValueTree& node , const Identifier& key)
 {
+DEBUG_TRACE_CONFIG_TREE_CHANGED
+
 #ifdef HAS_MAIN_CONTROLLER
   JuceBoilerplate::HandleConfigChanged(key) ;
 #endif // HAS_MAIN_CONTROLLER
@@ -312,12 +335,16 @@ bool JuceBoilerplateStore::isKnownProperty(ValueTree node , const Identifier& ke
 void JuceBoilerplateStore::setProperty(ValueTree node  , const Identifier& key ,
                                        const var value                         )
 {
-  if (config_node.isValid()) node.setProperty(key , value , nullptr) ;
+DEBUG_TRACE_SET_PROPERTY
+
+  if (node.isValid()) node.setProperty(key , value , nullptr) ;
 }
 
 void JuceBoilerplateStore::setConfig(ValueTree config_node , const Identifier& key ,
                                      const var value                               )
 {
+DEBUG_TRACE_SET_CONFIG
+
   // validate mutating of critical configuration
   if (!config_node.isValid() || !isKnownProperty(config_node , key)) return ;
 

@@ -48,6 +48,9 @@
               file="Source/Models/JuceBoilerplateStore.cpp"/>
         <FILE id="nz3oas" name="Seeds.cpp" compile="1" resource="0" file="Source/Models/Seeds.cpp"/>
       </GROUP>
+      <GROUP id="{81B8290E-73B1-FE35-8D6E-6EBE793DD6CC}" name="Trace">
+        <FILE id="UtOwFh" name="Trace.cpp" compile="1" resource="0" file="Source/Trace/Trace.cpp"/>
+      </GROUP>
       <GROUP id="{415C92D0-6DB5-561E-5112-51D267588674}" name="Views">
         <FILE id="Y76Tzw" name="MainContent.cpp" compile="1" resource="0" file="Source/Views/MainContent.cpp"/>
         <FILE id="Cxr1BM" name="Statusbar.cpp" compile="1" resource="0" file="Source/Views/Statusbar.cpp"/>

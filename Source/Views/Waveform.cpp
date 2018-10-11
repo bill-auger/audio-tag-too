@@ -20,6 +20,7 @@
 //[Headers] You can add your own extra header files here...
 
 #include "../Constants/GuiConstants.h"
+#include "../Trace/TraceWaveform.h"
 
 //[/Headers]
 
@@ -185,6 +186,8 @@ URL Waveform::getLastDroppedFile() const noexcept { return this->lastFileDropped
 
 void Waveform::setHeadMarker()
 {
+DEBUG_TRACE_WAVEFORM_SET_HEAD_OR_TAIL("headMarker")
+
   this->headTime = jlimit((double)0.0                                 ,
                           (double)this->tailTime                      ,
                           (double)this->transport.getCurrentPosition()) ;
@@ -194,6 +197,8 @@ void Waveform::setHeadMarker()
 
 void Waveform::setTailMarker()
 {
+DEBUG_TRACE_WAVEFORM_SET_HEAD_OR_TAIL("tailMarker")
+
   this->tailTime = jlimit((double)this->headTime                      ,
                           (double)this->transport.getTotalLength()    ,
                           (double)this->transport.getCurrentPosition()) ;
@@ -220,6 +225,9 @@ void Waveform::setViewRange(Range<double> view_range)
   this->cursorMarker.setVisible(view_range.contains(this->transport.getCurrentPosition())) ;
   this->headMarker  .setVisible(view_range.contains(this->headTime                      )) ;
   this->tailMarker  .setVisible(view_range.contains(this->tailTime                      )) ;
+
+DEBUG_TRACE_WAVEFORM_SET_VIEWRANGE
+
   this->scrollbar->setCurrentRange(this->viewRange = view_range) ;
 
   setMarker(this->headMarker , this->headTime) ;
