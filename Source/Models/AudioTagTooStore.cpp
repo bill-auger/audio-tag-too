@@ -91,6 +91,11 @@ ValueTree AudioTagTooStore::getChildNodeById(ValueTree root_store , Identifier n
   return ValueTree::invalid ;
 }
 
+bool AudioTagTooStore::createClip(String audio_filename , double begin_time , double end_time)
+{
+  return true ;
+}
+
 
 /* AudioTagTooStore private instance methods */
 

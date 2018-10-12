@@ -36,7 +36,6 @@ const uint8  GUI::TITLEBAR_H       = 24 ;
 const uint16 GUI::WINDOW_W         = 768 - BORDERS_W ;              // jucer 766
 const uint16 GUI::WINDOW_H         = 768 - BORDERS_W - TITLEBAR_H ; // jucer 742
 const Colour GUI::WINDOW_BG_COLOR  = Colour(0xFF404040) ;
-const Colour GUI::BROWSER_BG_COLOR = Colour(0xFF606060) ;
 const int    GUI::TITLEBAR_BTNS    = DocumentWindow::allButtons ;
 
 // Waveform
@@ -54,6 +53,25 @@ const uint8  GUI::FINE_FPS            = 12 ;
 const String GUI::FULL_WAVEFORM_ID    = "full-waveform" ;
 const String GUI::CLIP_WAVEFORM_ID    = "clip-waveform" ;
 const String GUI::NO_FILE_TEXT        = "(No audio file selected)" ;
+
+// TabbedComponent
+const int GUI::FILE_BROWSER_IDX    = 0 ;
+const int GUI::CLIPS_IDX           = 1 ;
+const int GUI::COMPILATIONS_IDX    = 2 ;
+const int GUI::DEVICE_SELECTOR_IDX = 3 ;
+
+// FileBrowserComponent
+const Colour GUI::TABPANEL_BG_COLOR         = Colour(0xFF303030) ;
+const Colour GUI::TABPANEL_FG_COLOR         = Colour(0xFF808080) ;
+const Colour GUI::FILEPATH_BG_COLOR         = Colour(0xFF606060) ;
+const Colour GUI::FILEPATH_FG_COLOR         = Colour(0xFFFFFFFF) ;
+const Colour GUI::FILEPATH_ARROW_COLOR      = Colour(0xFF80FF80) ;
+const Colour GUI::FILENAME_BG_COLOR         = Colour(0xFF000000) ;
+const Colour GUI::FILENAME_FG_COLOR         = Colour(0xFFFFFFFF) ;
+const Colour GUI::BROWSER_BG_COLOR          = Colour(0xFF000000) ;
+const Colour GUI::BROWSER_FG_COLOR          = Colour(0xFFFFFFFF) ;
+const Colour GUI::BROWSER_SELECTED_BG_COLOR = Colour(0xFF404040) ;
+const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 
 // Alert
 const String GUI::MODAL_WARNING_TITLE = APP::APP_NAME + " Warning" ;
