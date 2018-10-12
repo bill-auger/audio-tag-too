@@ -65,9 +65,10 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
   WildcardFileFilter                       audioFileFilter ;
-  DirectoryContentsList                    directoryList ;
   TimeSliceThread                          workerThread ;
+  FileBrowserComponent*                    fileBrowser ;
   File                                     workingDir ;
+  String                                   projectFilename ;
   String                                   audioFilename ;
   AudioFormatManager                       formatManager ;
   AudioSourcePlayer                        audioSourcePlayer ;
@@ -113,12 +114,12 @@ private:
     //==============================================================================
     std::unique_ptr<Waveform> fullWaveform;
     std::unique_ptr<Waveform> clipWaveform;
-    std::unique_ptr<GroupComponent> groupComponent;
+    std::unique_ptr<GroupComponent> controlsGroup;
     std::unique_ptr<TextButton> headButton;
     std::unique_ptr<TextButton> transportButton;
+    std::unique_ptr<TextButton> clipButton;
     std::unique_ptr<TextButton> tailButton;
-    std::unique_ptr<FileTreeComponent> fileTree;
-    std::unique_ptr<AudioDeviceSelectorComponent> deviceSelector;
+    std::unique_ptr<TabbedComponent> tabPanel;
     std::unique_ptr<Statusbar> statusbar;
 
 

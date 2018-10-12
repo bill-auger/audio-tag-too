@@ -43,7 +43,6 @@ public:
   static const uint16 WINDOW_W ;
   static const uint16 WINDOW_H ;
   static const Colour WINDOW_BG_COLOR ;
-  static const Colour BROWSER_BG_COLOR ;
   static const int    TITLEBAR_BTNS ;
 
   // Waveform
@@ -61,6 +60,25 @@ public:
   static const String FULL_WAVEFORM_ID ;
   static const String CLIP_WAVEFORM_ID ;
   static const String NO_FILE_TEXT ;
+
+  // TabbedComponent
+  static const int FILE_BROWSER_IDX ;
+  static const int CLIPS_IDX ;
+  static const int COMPILATIONS_IDX ;
+  static const int DEVICE_SELECTOR_IDX ;
+
+  // FileBrowserComponent
+  static const Colour TABPANEL_BG_COLOR ;
+  static const Colour TABPANEL_FG_COLOR ;
+  static const Colour FILEPATH_BG_COLOR ;
+  static const Colour FILEPATH_FG_COLOR ;
+  static const Colour FILEPATH_ARROW_COLOR ;
+  static const Colour FILENAME_BG_COLOR ;
+  static const Colour FILENAME_FG_COLOR ;
+  static const Colour BROWSER_BG_COLOR ;
+  static const Colour BROWSER_FG_COLOR ;
+  static const Colour BROWSER_SELECTED_BG_COLOR ;
+  static const Colour BROWSER_SELECTED_FG_COLOR ;
 
   // user messages
   static const String DEVICE_ERROR_TITLE ;

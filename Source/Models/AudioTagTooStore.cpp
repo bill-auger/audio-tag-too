@@ -373,3 +373,19 @@ DEBUG_TRACE_SET_CONFIG
 #endif // HAS_MAIN_CONTROLLER
     setProperty(config_node , key , value) ;
 }
+
+void AudioTagTooStore::createClip(String& audio_filename , double begin_time , double end_time)
+{
+DBG("AudioTagTooStore::createClip() audio_filename=" + audio_filename     +
+                                  " begin_time="     + String(begin_time) +
+                                  " end_time="       + String(end_time)   ) ;
+
+  Identifier clip_id = STORE::FilterId(audio_filename     + '-' +
+                                       String(begin_time) + '-' +
+                                       String(end_time  ) + '-' ) ;
+  ValueTree clip = ValueTree(clip_id) ;
+  setProperty(clip , STORE::FILENAME_KEY   , audio_filename) ;
+  setProperty(clip , STORE::BEGIN_TIME_KEY , begin_time    ) ;
+  setProperty(clip , STORE::END_TIME_KEY   , end_time      ) ;
+  this->root.addChild(clip , -1 , nullptr) ;
+}
