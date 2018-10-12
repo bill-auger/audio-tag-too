@@ -65,10 +65,10 @@ MainContent::MainContent ()
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    fullWaveform.reset (new Waveform (formatManager , transportSource , courseFps));
+    fullWaveform.reset (new Waveform (formatManager , transportSource));
     addAndMakeVisible (fullWaveform.get());
 
-    clipWaveform.reset (new Waveform (formatManager , transportSource , fineFps));
+    clipWaveform.reset (new Waveform (formatManager , transportSource));
     addAndMakeVisible (clipWaveform.get());
 
     groupComponent.reset (new GroupComponent ("new group",
@@ -226,7 +226,7 @@ void MainContent::resized()
     tailButton->setBounds ((getWidth() / 2) + 150 - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
     fileTree->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3900f));
     deviceSelector->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3900f));
-    statusbar->setBounds ((getWidth() / 2) - ((getWidth() - 16) / 2), getHeight() - 8 - 32, getWidth() - 16, 32);
+    statusbar->setBounds ((getWidth() / 2) - ((getWidth() - 16) / 2), getHeight() - 8 - 40, getWidth() - 16, 40);
 
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -235,7 +235,7 @@ void MainContent::resized()
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-/* setup/teardown */
+/* getters/setters */
 
 #ifdef CONTROLLER_OWNS_STORAGE
 void MainContent::initialize(ValueTree& storage , NamedValueSet& features)
@@ -262,14 +262,11 @@ void MainContent::initialize(NamedValueSet& features)
 #endif // CONTROLLER_OWNS_STORAGE
   this->storage      .addListener      (this) ;
 
-  this->directoryList .setDirectory(File(initial_dir) , true , true) ;
-  this->upperWaveform->startTimerHz(course_fps) ;
-  this->lowerWaveform->startTimerHz(fine_fps  ) ;
-  this->lowerWaveform->setZoomScaleFactor(zoom_factor) ;
+  this->fileBrowser ->setRoot(File(initial_dir)) ;
+  this->fullWaveform->startTimerHz(course_fps) ;
+  this->clipWaveform->startTimerHz(fine_fps  ) ;
+  this->clipWaveform->setZoomFactor(zoom_factor) ;
 }
-
-
-/* getters/setters */
 
 void MainContent::setStatusL(String statusText) { this->statusbar->setStatusL(statusText) ; }
 
@@ -331,7 +328,46 @@ void MainContent::setTailMarker()
     for (Waveform* waveform : this->waveforms) waveform->resetPosition() ;
 }
 
+
 /* event handlers */
+
+void MainContent::paintOverChildren(Graphics& g)
+{
+  if (this->clipWaveform->getZoomScale() == 1.0) return ;
+
+  Rectangle<int> full_wave_head_bounds = getLocalArea(this->fullWaveform.get() , this->fullWaveform->getHeadMarkerBounds()) ;
+  Rectangle<int> full_wave_tail_bounds = getLocalArea(this->fullWaveform.get() , this->fullWaveform->getTailMarkerBounds()) ;
+  Rectangle<int> clip_wave_tail_bounds = getLocalArea(this->clipWaveform.get() , this->clipWaveform->getTailMarkerBounds()) ;
+  Rectangle<int> clip_wave_head_bounds = getLocalArea(this->clipWaveform.get() , this->clipWaveform->getHeadMarkerBounds()) ;
+  Point<int>     full_wave_head_bl     = full_wave_head_bounds.getBottomLeft () ;
+  Point<int>     full_wave_tail_br     = full_wave_tail_bounds.getBottomRight() ;
+  Point<int>     clip_wave_tail_tr     = clip_wave_tail_bounds.getTopRight   () ;
+  Point<int>     clip_wave_head_tl     = clip_wave_head_bounds.getTopLeft    () ;
+
+  Path seam ;
+  g.setColour(GUI::WAVE_SELECTED_COLOR) ;
+//   bezier splines
+//   seam.startNewSubPath(           (float)full_wave_head_bl.getX() , (float)full_wave_head_bl.getY()) ;
+//   seam.quadraticTo(0.0f,  150.0f, (float)clip_wave_head_tl.getX() , (float)clip_wave_head_tl.getY()) ;
+//   seam.lineTo(                    (float)clip_wave_tail_tr.getX() , (float)clip_wave_tail_tr.getY()) ;
+//   seam.quadraticTo(0.0f,  150.0f, (float)full_wave_tail_br.getX() , (float)full_wave_tail_br.getY()) ;
+//   seam.closeSubPath() ;
+  seam.addQuadrilateral(full_wave_head_bl.getX() , full_wave_head_bl.getY() ,
+                        full_wave_tail_br.getX() , full_wave_tail_br.getY() ,
+                        clip_wave_tail_tr.getX() , clip_wave_tail_tr.getY() ,
+                        clip_wave_head_tl.getX() , clip_wave_head_tl.getY() ) ;
+  g.fillPath(seam) ;
+
+  g.setColour(GUI::GUI::HEAD_COLOR) ;
+  g.drawDashedLine(Line<float>(full_wave_head_bl.getX() , full_wave_head_bl.getY() ,
+                               clip_wave_head_tl.getX() , clip_wave_head_tl.getY() ) ,
+                   GUI::DASH_LENGTHS , GUI::N_DASH_LENGTHS                           ) ;
+
+  g.setColour(GUI::GUI::TAIL_COLOR) ;
+  g.drawDashedLine(Line<float>(full_wave_tail_br.getX() , full_wave_tail_br.getY() ,
+                               clip_wave_tail_tr.getX() , clip_wave_tail_tr.getY() ) ,
+                   GUI::DASH_LENGTHS , GUI::N_DASH_LENGTHS                           ) ;
+}
 
 void MainContent::prepareToPlay (int samplesPerBlockExpected, double sampleRate) { }
 
@@ -350,8 +386,9 @@ void MainContent::selectionChanged() { loadUrl(this->fileTree->getSelectedFile()
 
 void MainContent::changeListenerCallback(ChangeBroadcaster* source)
 {
-  if      (source == &(this->transportSource)) updateTransportButton() ;
-  else if (source == &(this->deviceManager  ))
+  if      (source ==   this->clipWaveform.get()) repaint() ;
+  else if (source == &(this->transportSource)  ) updateTransportButton() ;
+  else if (source == &(this->deviceManager  )  )
   {
     bool is_device_initialized = this->deviceManager.getCurrentAudioDevice() != nullptr ;
 
@@ -378,12 +415,12 @@ BEGIN_JUCER_METADATA
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="766" initialHeight="742">
   <BACKGROUND backgroundColour="ff101010">
-    <ROUNDRECT pos="0Cc 8 16M 56M" cornerSize="10.00000000000000000000" fill="solid: ff202020"
+    <ROUNDRECT pos="0Cc 8 16M 64M" cornerSize="10.00000000000000000000" fill="solid: ff202020"
                hasStroke="1" stroke="1, mitered, butt" strokeColour="solid: ffffffff"/>
   </BACKGROUND>
   <GENERICCOMPONENT name="" id="6d2236e7e917afa4" memberName="fullWaveform" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc 16 32M 120" class="Waveform"
-                    params="formatManager , transportSource , courseFps"/>
+                    params="formatManager , transportSource"/>
   <GENERICCOMPONENT name="" id="f967fc403ed73574" memberName="clipWaveform" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc -8R 32M 120" posRelativeY="6d2236e7e917afa4"
                     class="Waveform" params="formatManager , transportSource"/>
@@ -406,7 +443,7 @@ BEGIN_JUCER_METADATA
                     explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.000%" posRelativeY="f42caa46057f2a0"
                     class="AudioDeviceSelectorComponent" params="deviceManager , 0 , 0 , 2 , 2 , false , false , true , false"/>
   <GENERICCOMPONENT name="" id="957b301f5907e647" memberName="statusbar"
-                    virtualName="" explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 32"
+                    virtualName="" explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 40"
                     class="Statusbar" params=""/>
 </JUCER_COMPONENT>
 

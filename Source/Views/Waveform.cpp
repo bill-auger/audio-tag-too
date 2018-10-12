@@ -213,7 +213,7 @@ void Waveform::setHeadMarker()
                           (double)this->transport.getCurrentPosition()) ;
 
   setMarker(this->headMarker , this->headTime) ;
-  repaint() ;
+  sendChangeMessage() ;
 
 DEBUG_TRACE_WAVEFORM_SET_HEAD_OR_TAIL("headMarker")
 }
@@ -225,7 +225,7 @@ void Waveform::setTailMarker()
                           (double)this->transport.getCurrentPosition() ) ;
 
   setMarker(this->tailMarker , this->tailTime) ;
-  repaint() ;
+  sendChangeMessage() ;
 
 DEBUG_TRACE_WAVEFORM_SET_HEAD_OR_TAIL("tailMarker")
 }
@@ -239,12 +239,16 @@ DEBUG_TRACE_WAVEFORM_SET_ZOOM_FACTOR
 
 double Waveform::getZoomScale() const { return this->currentZoom ; }
 
+Rectangle<int> Waveform::getHeadMarkerBounds() const { return this->headMarker.getBounds() ; }
+
+Rectangle<int> Waveform::getTailMarkerBounds() const { return this->tailMarker.getBounds() ; }
+
 
 /* event handlers */
 
 void Waveform::changeListenerCallback(ChangeBroadcaster* object_that_changed)
 {
-  if (object_that_changed == &(this->thumbnail)) repaint() ;
+  if (object_that_changed == &(this->thumbnail)) sendChangeMessage() ;
 }
 
 void Waveform::mouseDown(const MouseEvent& evt) { setPosition(xToTime((float)evt.x)) ; }
@@ -297,7 +301,7 @@ DEBUG_TRACE_WAVEFORM_MOUSE_WHEEL_MOVE
 void Waveform::scrollBarMoved(ScrollBar* scrollbar_that_moved , double range_start)
 {
   if (scrollbar_that_moved == this->scrollbar.get())
-  { setViewRange(this->viewRange.movedToStartAt(range_start)) ; repaint() ; }
+  { setViewRange(this->viewRange.movedToStartAt(range_start)) ; sendChangeMessage() ; }
 }
 
 void Waveform::timerCallback() { updateCursor() ; }
@@ -321,8 +325,6 @@ void Waveform::setMarker(DrawableRectangle& marker , double time)
 void Waveform::setViewRange(Range<double> view_range)
 {
   this->cursorMarker.setVisible(view_range.contains(this->transport.getCurrentPosition())) ;
-  this->headMarker  .setVisible(view_range.contains(this->headTime                      )) ;
-  this->tailMarker  .setVisible(view_range.contains(this->tailTime                      )) ;
 
 DEBUG_TRACE_WAVEFORM_SET_VIEWRANGE
 
@@ -331,7 +333,7 @@ DEBUG_TRACE_WAVEFORM_SET_VIEWRANGE
 
   setMarker(this->headMarker , this->headTime) ;
   setMarker(this->tailMarker , this->tailTime) ;
-  updateCursor() ;
+  updateCursor() ; sendChangeMessage() ;
 }
 
 
