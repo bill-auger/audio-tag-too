@@ -122,7 +122,7 @@ void Statusbar::paint (Graphics& g)
     }
 
     {
-        float x = static_cast<float> ((getWidth() / 2) - ((getWidth() - 336) / 2)), y = 8.0f, width = static_cast<float> (getWidth() - 336), height = 24.0f;
+        float x = static_cast<float> ((getWidth() / 2) - ((getWidth() - 352) / 2)), y = 8.0f, width = static_cast<float> (getWidth() - 352), height = 24.0f;
         Colour fillColour = Colours::black;
         Colour strokeColour = Colours::white;
         //[UserPaintCustomArguments] Customize the painting arguments here..
@@ -204,7 +204,7 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="0">
     <ROUNDRECT pos="0 0 0M 0M" cornerSize="10.00000000000000000000" fill="solid: ff181818"
                hasStroke="1" stroke="1, mitered, butt" strokeColour="solid: ffffffff"/>
-    <ROUNDRECT pos="0Cc 8 336M 24" cornerSize="10.00000000000000000000" fill="solid: ff000000"
+    <ROUNDRECT pos="0Cc 8 352M 24" cornerSize="10.00000000000000000000" fill="solid: ff000000"
                hasStroke="1" stroke="1, mitered, butt" strokeColour="solid: ffffffff"/>
     <ROUNDRECT pos="8Rr 8 160 24" cornerSize="10.00000000000000000000" fill="solid: ff000000"
                hasStroke="1" stroke="1, mitered, butt" strokeColour="solid: ffffffff"/>

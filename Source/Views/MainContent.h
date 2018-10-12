@@ -102,6 +102,7 @@ private:
   void setTailMarker        (void) ;
 
   // event handlers
+  void paintOverChildren     (Graphics& g)                                override ;
   void prepareToPlay         (int samples_per_block , double sample_rate) override ;
   void getNextAudioBlock     (const AudioSourceChannelInfo& buffer)       override ;
   void releaseResources      (void)                                       override ;

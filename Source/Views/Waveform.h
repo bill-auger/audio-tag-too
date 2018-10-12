@@ -53,14 +53,16 @@ public:
   void initialize(AudioFormatManager& format_manager , AudioThumbnailCache& thumbnail_cache) ;
 
   // getters/setters
-  void   setUrl        (const Url& url) ;
-  void   resetPosition (void) ;
-  double getHeadTime   (void) const ;
-  double getTailTime   (void) const ;
-  void   setHeadMarker (void) ;
-  void   setTailMarker (void) ;
-  void   setZoomFactor (double zoom_factor) ;
-  double getCurrentZoom(void) const ;
+  void           setUrl             (const Url& url) ;
+  void           resetPosition      (void) ;
+  double         getHeadTime        (void) const ;
+  double         getTailTime        (void) const ;
+  void           setHeadMarker      (void) ;
+  void           setTailMarker      (void) ;
+  Rectangle<int> getHeadMarkerBounds(void) const ;
+  Rectangle<int> getTailMarkerBounds(void) const ;
+  void           setZoomFactor      (double zoom_factor) ;
+  double         getCurrentZoom     (void) const ;
 
     //[/UserMethods]
 
@@ -83,13 +85,13 @@ private:
 
   // getters/setters
   void setPosition (double time) ;
+  void setMarker   (DrawableRectangle& marker , const double time) ;
   void setViewRange(Range<double> view_range) ;
 
   // helpers
   float  timeToX     (const double time) const ;
   double xToTime     (const float x)     const ;
   void   updateCursor(void) ;
-  void   setMarker   (DrawableRectangle& marker , const double time) ;
 
   // vars
   AudioTransportSource&           transport ;
