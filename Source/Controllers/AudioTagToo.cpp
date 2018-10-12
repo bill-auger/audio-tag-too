@@ -97,6 +97,11 @@ void AudioTagToo::ResetAudio()
 #endif // DISABLE_AUDIO
 }
 
+ValueTree AudioTagToo::CreateClip(String audio_filename , double begin_time , double end_time)
+{
+  return Store->createClip(audio_filename , begin_time , end_time) ;
+}
+
 
 /* AudioTagToo private class methods */
 

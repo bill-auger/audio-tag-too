@@ -60,7 +60,7 @@
 
 //==============================================================================
 MainContent::MainContent ()
-    : audioFileFilter(MEDIA::IMPORT_WAVEFILE_MASK , String("*") , MEDIA::IMPORT_WAVEFILE_DESC) , directoryList(&audioFileFilter , workerThread) , workerThread(APP::WORKER_THREAD_NAME)
+    : audioFileFilter(MEDIA::IMPORT_WAVEFILE_MASK , String("*") , MEDIA::IMPORT_WAVEFILE_DESC) , workerThread(APP::WORKER_THREAD_NAME)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -71,10 +71,10 @@ MainContent::MainContent ()
     clipWaveform.reset (new Waveform (transportSource));
     addAndMakeVisible (clipWaveform.get());
 
-    groupComponent.reset (new GroupComponent ("new group",
-                                              String()));
-    addAndMakeVisible (groupComponent.get());
-    groupComponent->setColour (GroupComponent::outlineColourId, Colour (0x00000000));
+    controlsGroup.reset (new GroupComponent (String(),
+                                             String()));
+    addAndMakeVisible (controlsGroup.get());
+    controlsGroup->setColour (GroupComponent::outlineColourId, Colour (0x00000000));
 
     headButton.reset (new TextButton (String()));
     addAndMakeVisible (headButton.get());
@@ -84,21 +84,31 @@ MainContent::MainContent ()
     addAndMakeVisible (transportButton.get());
     transportButton->setButtonText (TRANS("Play"));
 
+    clipButton.reset (new TextButton (String()));
+    addAndMakeVisible (clipButton.get());
+    clipButton->setButtonText (TRANS("Clip"));
+    clipButton->addListener (this);
+
     tailButton.reset (new TextButton (String()));
     addAndMakeVisible (tailButton.get());
     tailButton->setButtonText (TRANS("Tail"));
 
-    fileTree.reset (new FileTreeComponent (directoryList));
-    addAndMakeVisible (fileTree.get());
-
-    deviceSelector.reset (new AudioDeviceSelectorComponent (deviceManager , 0 , 0 , 2 , 2 , false , false , true , false));
-    addAndMakeVisible (deviceSelector.get());
+    tabPanel.reset (new TabbedComponent (TabbedButtonBar::TabsAtTop));
+    addAndMakeVisible (tabPanel.get());
+    tabPanel->setTabBarDepth (30);
+    tabPanel->addTab (TRANS("Files"), Colour (0xff404040), new FileBrowserComponent ((FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles) , File() , &(this->audioFileFilter) , nullptr), true);
+    tabPanel->addTab (TRANS("Clips"), Colour (0xff404040), new TreeView(), true);
+    tabPanel->addTab (TRANS("Compilations"), Colour (0xff404040), new TreeView(), true);
+    tabPanel->addTab (TRANS("Devices"), Colour (0xff404040), new AudioDeviceSelectorComponent (deviceManager , 0 , 0 , 2 , 2 , false , false , true , false), true);
+    tabPanel->setCurrentTabIndex (0);
 
     statusbar.reset (new Statusbar());
     addAndMakeVisible (statusbar.get());
 
+
     //[UserPreSize]
 
+  this->fileBrowser = static_cast<FileBrowserComponent*>(this->tabPanel->getTabContentComponent(GUI::FILE_BROWSER_IDX)) ;
 #ifndef CONTROLLER_OWNS_STORAGE
   this->storage.reset(new AudioTagTooStore()) ;
 #endif // CONTROLLER_OWNS_STORAGE
@@ -108,7 +118,20 @@ MainContent::MainContent ()
   this->waveforms.push_back(this->fullWaveform.get()) ;
   this->waveforms.push_back(this->clipWaveform.get()) ;
 
-  this->fileTree->setColour(FileTreeComponent::backgroundColourId , GUI::BROWSER_BG_COLOR) ;
+  this->tabPanel->setColour(TabbedComponent::backgroundColourId , GUI::TABPANEL_BG_COLOR) ;
+  this->tabPanel->setColour(TabbedComponent::outlineColourId    , GUI::TABPANEL_FG_COLOR) ;
+  this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxBackgroundColourId , GUI::FILEPATH_BG_COLOR   ) ;
+  this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxTextColourId       , GUI::FILEPATH_FG_COLOR   ) ;
+  this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxArrowColourId      , GUI::FILEPATH_ARROW_COLOR) ;
+  this->fileBrowser->setColour(FileBrowserComponent::filenameBoxBackgroundColourId    , GUI::FILENAME_BG_COLOR   ) ;
+  this->fileBrowser->setColour(FileBrowserComponent::filenameBoxTextColourId          , GUI::FILENAME_FG_COLOR   ) ;
+
+  FileListComponent* file_list = static_cast<FileListComponent*>(this->fileBrowser->getDisplayComponent()         ) ;
+  file_list->setColour(ListBox::backgroundColourId                                , GUI::BROWSER_BG_COLOR         ) ;
+  file_list->setColour(ListBox::textColourId                                      , Colour(0xFF2020FF)) ; // nfg
+  file_list->setColour(DirectoryContentsDisplayComponent::textColourId 		        , GUI::BROWSER_FG_COLOR         ) ;
+  file_list->setColour(DirectoryContentsDisplayComponent::highlightColourId	      , GUI::BROWSER_SELECTED_BG_COLOR) ;
+  file_list->setColour(DirectoryContentsDisplayComponent::highlightedTextColourId	, GUI::BROWSER_SELECTED_FG_COLOR) ;
 
     //[/UserPreSize]
 
@@ -119,10 +142,10 @@ MainContent::MainContent ()
 
   this->formatManager    .registerBasicFormats() ;
   this->audioSourcePlayer.setSource(&transportSource) ;
-  this->directoryList    .setDirectory(File::getSpecialLocation(File::userHomeDirectory) , true , true) ;
 
   this->headButton     ->addListener      (this) ;
   this->transportButton->addListener      (this) ;
+  this->clipButton     ->addListener      (this) ;
   this->tailButton     ->addListener      (this) ;
   this->deviceManager   .addAudioCallback (&audioSourcePlayer) ;
   this->deviceManager   .addChangeListener(this) ;
@@ -131,9 +154,11 @@ MainContent::MainContent ()
 #endif // CONTROLLER_OWNS_STORAGE
   this->clipWaveform   ->addChangeListener(this) ;
   this->transportSource .addChangeListener(this) ;
-  this->fileTree       ->addListener      (this) ;
+  this->fileBrowser    ->addListener      (this) ;
 #ifndef CONTROLLER_OWNS_STORAGE
   this->storage->root   .addListener      (this) ;
+#else // CONTROLLER_OWNS_STORAGE
+  this->storage         .addListener      (this) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
   setOpaque(true) ;
@@ -152,8 +177,9 @@ MainContent::~MainContent()
   this->headButton     ->removeListener      (this) ;
   this->transportButton->removeListener      (this) ;
   this->tailButton     ->removeListener      (this) ;
-  this->deviceManager   .removeAudioCallback (&audioSourcePlayer) ;
-  this->deviceManager   .removeChangeListener(this) ;
+  this->clipButton     ->removeListener      (this) ;
+  this->deviceManager  .removeAudioCallback  (&audioSourcePlayer) ;
+  this->deviceManager  .removeChangeListener (this) ;
 #ifndef CONTROLLER_OWNS_STORAGE
   this->deviceManager   .removeChangeListener(this->storage.get()) ;
 #else // CONTROLLER_OWNS_STORAGE
@@ -162,7 +188,7 @@ MainContent::~MainContent()
 #endif // CONTROLLER_OWNS_STORAGE
   this->clipWaveform   ->removeChangeListener(this) ;
   this->transportSource .removeChangeListener(this) ;
-  this->fileTree       ->removeListener      (this) ;
+  this->fileBrowser    ->removeListener      (this) ;
 #ifndef CONTROLLER_OWNS_STORAGE
   this->storage->root   .removeListener      (this) ;
 
@@ -176,12 +202,12 @@ MainContent::~MainContent()
 
     fullWaveform = nullptr;
     clipWaveform = nullptr;
-    groupComponent = nullptr;
+    controlsGroup = nullptr;
     headButton = nullptr;
     transportButton = nullptr;
+    clipButton = nullptr;
     tailButton = nullptr;
-    fileTree = nullptr;
-    deviceSelector = nullptr;
+    tabPanel = nullptr;
     statusbar = nullptr;
 
 
@@ -220,12 +246,12 @@ void MainContent::resized()
 
     fullWaveform->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), 16, getWidth() - 32, 120);
     clipWaveform->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), 16 + 120 - -8, getWidth() - 32, 120);
-    groupComponent->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), (16 + 120 - -8) + 120 - -8, getWidth() - 32, 24);
-    headButton->setBounds ((getWidth() / 2) + -150 - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
-    transportButton->setBounds ((getWidth() / 2) - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
-    tailButton->setBounds ((getWidth() / 2) + 150 - (150 / 2), (16 + 120 - -8) + 120 - -8, 150, 24);
-    fileTree->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3900f));
-    deviceSelector->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, proportionOfHeight (0.3900f));
+    controlsGroup->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), (16 + 120 - -8) + 120 - -8, getWidth() - 32, 24);
+    headButton->setBounds (((getWidth() / 2) - ((getWidth() - 32) / 2)) + (getWidth() - 32) / 2 + -100 - 100, ((16 + 120 - -8) + 120 - -8) + 0, 100, 24);
+    transportButton->setBounds (((getWidth() / 2) - ((getWidth() - 32) / 2)) + (getWidth() - 32) / 2 - 100, ((16 + 120 - -8) + 120 - -8) + 0, 100, 24);
+    clipButton->setBounds (((getWidth() / 2) - ((getWidth() - 32) / 2)) + (getWidth() - 32) / 2, ((16 + 120 - -8) + 120 - -8) + 0, 100, 24);
+    tailButton->setBounds (((getWidth() / 2) - ((getWidth() - 32) / 2)) + (getWidth() - 32) / 2 + 100, ((16 + 120 - -8) + 120 - -8) + 0, 100, 24);
+    tabPanel->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, getHeight() - 366);
     statusbar->setBounds ((getWidth() / 2) - ((getWidth() - 16) / 2), getHeight() - 8 - 40, getWidth() - 16, 40);
 
     //[UserResized] Add your own custom resize handling here..
@@ -317,7 +343,7 @@ void MainContent::updateTransportButton()
   bool is_rolling = this->transportSource.isPlaying() ;
 
   if (!is_rolling) this->transportSource.setPosition(this->clipWaveform->getHeadTime()) ;
-  transportButton->setButtonText((is_rolling) ? "Stop" : "Start") ;
+  transportButton->setButtonText((is_rolling) ? "Stop" : "Play") ;
   transportButton->setToggleState(is_rolling , juce::dontSendNotification) ;
 }
 
@@ -331,6 +357,20 @@ void MainContent::setTailMarker()
   for (Waveform* waveform : this->waveforms) waveform->setTailMarker() ;
   if (!this->transportSource.isPlaying())
     for (Waveform* waveform : this->waveforms) waveform->resetPosition() ;
+}
+
+
+bool MainContent::createClip()
+{
+#ifndef CONTROLLER_OWNS_STORAGE
+  this->storage->createClip(this->audioFilename               ,
+                            this->fullWaveform->getHeadTime() ,
+                            this->fullWaveform->getTailTime() ) ;
+#else // CONTROLLER_OWNS_STORAGE
+  AudioTagToo::CreateClip(this->audioFilename               ,
+                          this->fullWaveform->getHeadTime() ,
+                          this->fullWaveform->getTailTime() ) ;
+#endif // CONTROLLER_OWNS_STORAGE
 }
 
 
@@ -384,10 +424,11 @@ void MainContent::buttonClicked(Button* a_button)
 {
   if      (a_button == this->headButton     .get()) setHeadMarker() ;
   else if (a_button == this->transportButton.get()) toggleTransport() ;
+  else if (a_button == this->clipButton     .get()) createClip() ;
   else if (a_button == this->tailButton     .get()) setTailMarker() ;
 }
 
-void MainContent::selectionChanged() { loadUrl(this->fileTree->getSelectedFile()) ; }
+void MainContent::selectionChanged() { loadUrl(this->fileBrowser->getSelectedFile(0)) ; }
 
 void MainContent::changeListenerCallback(ChangeBroadcaster* source)
 {
@@ -395,10 +436,13 @@ void MainContent::changeListenerCallback(ChangeBroadcaster* source)
   else if (source == &(this->transportSource)  ) updateTransportButton() ;
   else if (source == &(this->deviceManager  )  )
   {
-    bool is_device_initialized = this->deviceManager.getCurrentAudioDevice() != nullptr ;
+    bool is_device_ready = this->deviceManager.getCurrentAudioDevice() != nullptr ;
+    int  tab_pane_idx    = (!is_device_ready                    ) ? GUI::DEVICE_SELECTOR_IDX :
+                           (File(this->projectFilename).exists()) ? GUI::COMPILATIONS_IDX    :
+                           (File(this->audioFilename  ).exists()) ? GUI::CLIPS_IDX           :
+                                                                    GUI::FILE_BROWSER_IDX    ;
 
-    this->fileTree      ->setVisible( is_device_initialized) ;
-    this->deviceSelector->setVisible(!is_device_initialized) ;
+    this->tabPanel->setCurrentTabIndex(tab_pane_idx) ;
   }
 }
 
@@ -416,7 +460,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="MainContent" componentName=""
                  parentClasses="public AudioAppComponent, private Button::Listener, private FileBrowserListener, private ChangeListener, private ValueTree::Listener"
-                 constructorParams="" variableInitialisers="audioFileFilter(MEDIA::IMPORT_WAVEFILE_MASK , String(&quot;*&quot;) , MEDIA::IMPORT_WAVEFILE_DESC) , directoryList(&amp;audioFileFilter , workerThread) , workerThread(APP::WORKER_THREAD_NAME)"
+                 constructorParams="" variableInitialisers="audioFileFilter(MEDIA::IMPORT_WAVEFILE_MASK , String(&quot;*&quot;) , MEDIA::IMPORT_WAVEFILE_DESC) , workerThread(APP::WORKER_THREAD_NAME)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="766" initialHeight="742">
   <BACKGROUND backgroundColour="ff101010">
@@ -429,27 +473,42 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="" id="f967fc403ed73574" memberName="clipWaveform" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc -8R 32M 120" posRelativeY="6d2236e7e917afa4"
                     class="Waveform" params="formatManager , transportSource"/>
-  <GROUPCOMPONENT name="new group" id="f42caa46057f2a0" memberName="groupComponent"
-                  virtualName="" explicitFocusOrder="0" pos="0.5Cc -8R 32M 24"
-                  posRelativeY="f967fc403ed73574" outlinecol="0" title=""/>
+  <GROUPCOMPONENT name="" id="f42caa46057f2a0" memberName="controlsGroup" virtualName=""
+                  explicitFocusOrder="0" pos="0.5Cc -8R 32M 24" posRelativeY="f967fc403ed73574"
+                  outlinecol="0" title=""/>
   <TEXTBUTTON name="" id="9953692c678b8d85" memberName="headButton" virtualName=""
-              explicitFocusOrder="0" pos="-150Cc -8R 150 24" posRelativeY="f967fc403ed73574"
-              buttonText="Head" connectedEdges="0" needsCallback="0" radioGroupId="0"/>
+              explicitFocusOrder="0" pos="-100Cr 0 100 24" posRelativeX="f42caa46057f2a0"
+              posRelativeY="f42caa46057f2a0" buttonText="Head" connectedEdges="0"
+              needsCallback="0" radioGroupId="0"/>
   <TEXTBUTTON name="" id="d6f37465bfb799aa" memberName="transportButton" virtualName=""
-              explicitFocusOrder="0" pos="0Cc -8R 150 24" posRelativeY="f967fc403ed73574"
-              buttonText="Play" connectedEdges="0" needsCallback="0" radioGroupId="0"/>
+              explicitFocusOrder="0" pos="0Cr 0 100 24" posRelativeX="f42caa46057f2a0"
+              posRelativeY="f42caa46057f2a0" buttonText="Play" connectedEdges="0"
+              needsCallback="0" radioGroupId="0"/>
+  <TEXTBUTTON name="" id="17eafcc50188fee2" memberName="clipButton" virtualName=""
+              explicitFocusOrder="0" pos="0C 0 100 24" posRelativeX="f42caa46057f2a0"
+              posRelativeY="f42caa46057f2a0" buttonText="Clip" connectedEdges="0"
+              needsCallback="0" radioGroupId="0"/>
   <TEXTBUTTON name="" id="306d8525bb18da83" memberName="tailButton" virtualName=""
-              explicitFocusOrder="0" pos="150Cc -8R 150 24" posRelativeY="f967fc403ed73574"
-              buttonText="Tail" connectedEdges="0" needsCallback="0" radioGroupId="0"/>
-  <GENERICCOMPONENT name="" id="230286b07ddaa9d7" memberName="fileTree" virtualName=""
-                    explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.000%" posRelativeY="f42caa46057f2a0"
-                    class="FileTreeComponent" params="directoryList"/>
-  <GENERICCOMPONENT name="" id="fa801866cc59e27a" memberName="deviceSelector" virtualName=""
-                    explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.000%" posRelativeY="f42caa46057f2a0"
-                    class="AudioDeviceSelectorComponent" params="deviceManager , 0 , 0 , 2 , 2 , false , false , true , false"/>
-  <GENERICCOMPONENT name="" id="957b301f5907e647" memberName="statusbar"
-                    virtualName="" explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 40"
-                    class="Statusbar" params=""/>
+              explicitFocusOrder="0" pos="100C 0 100 24" posRelativeX="f42caa46057f2a0"
+              posRelativeY="f42caa46057f2a0" buttonText="Tail" connectedEdges="0"
+              needsCallback="0" radioGroupId="0"/>
+  <TABBEDCOMPONENT name="" id="c0b551b7ecf04741" memberName="tabPanel" virtualName=""
+                   explicitFocusOrder="0" pos="0.5Cc -8R 32M 366M" posRelativeY="f42caa46057f2a0"
+                   orientation="top" tabBarDepth="30" initialTab="0">
+    <TAB name="Files" colour="ff404040" useJucerComp="0" contentClassName="FileBrowserComponent"
+         constructorParams="(FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles) , File() , &amp;(this-&gt;audioFileFilter) , nullptr"
+         jucerComponentFile=""/>
+    <TAB name="Clips" colour="ff404040" useJucerComp="0" contentClassName="TreeView"
+         constructorParams="" jucerComponentFile=""/>
+    <TAB name="Compilations" colour="ff404040" useJucerComp="0" contentClassName="TreeView"
+         constructorParams="" jucerComponentFile=""/>
+    <TAB name="Devices" colour="ff404040" useJucerComp="0" contentClassName="AudioDeviceSelectorComponent"
+         constructorParams="deviceManager , 0 , 0 , 2 , 2 , false , false , true , false"
+         jucerComponentFile=""/>
+  </TABBEDCOMPONENT>
+  <GENERICCOMPONENT name="" id="957b301f5907e647" memberName="statusbar" virtualName=""
+                    explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 40" class="Statusbar"
+                    params=""/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

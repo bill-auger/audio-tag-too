@@ -54,6 +54,7 @@ public:
   bool      setConfig       (ValueTree config_node , const Identifier& key , const var value) ;
   var       getConfig       (const Identifier& key) ;
   ValueTree getChildNodeById(ValueTree root_store , Identifier node_id) ;
+  ValueTree createClip      (String audio_filename , double begin_time , double end_time) ;
 
 
 private:
