@@ -124,6 +124,7 @@ MainContent::MainContent ()
   this->tailButton     ->addListener      (this);
   this->deviceManager   .addAudioCallback (&audioSourcePlayer) ;
   this->deviceManager   .addChangeListener(this) ;
+  this->clipWaveform   ->addChangeListener(this) ;
   this->transportSource .addChangeListener(this) ;
   this->fileTree       ->addListener      (this) ;
   this->storage->root  ->addListener      (this) ;
@@ -133,7 +134,7 @@ MainContent::MainContent ()
 
 #if ! DISABLE_MEDIA
   // start audio and worker threads
-  setAudioChannels(MEDIA::N_CHANNELS_IN , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get()) ;
+  setAudioChannels(0 , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get()) ;
   this->workerThread.startThread(3) ;
 #endif // DISABLE_MEDIA
 
@@ -226,6 +227,44 @@ void MainContent::resized()
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
+void MainContent::paintOverChildren(Graphics& g)
+{
+  if (this->clipWaveform->getZoomFactor() < 1.0) return ;
+
+  Rectangle<int> full_wave_head_bounds = getLocalArea(this->fullWaveform.get() , this->fullWaveform->getHeadMarkerBounds()) ;
+  Rectangle<int> full_wave_tail_bounds = getLocalArea(this->fullWaveform.get() , this->fullWaveform->getTailMarkerBounds()) ;
+  Rectangle<int> clip_wave_tail_bounds = getLocalArea(this->clipWaveform.get() , this->clipWaveform->getTailMarkerBounds()) ;
+  Rectangle<int> clip_wave_head_bounds = getLocalArea(this->clipWaveform.get() , this->clipWaveform->getHeadMarkerBounds()) ;
+  Point<int>     full_wave_head_bl     = full_wave_head_bounds.getBottomLeft () ;
+  Point<int>     full_wave_tail_br     = full_wave_tail_bounds.getBottomRight() ;
+  Point<int>     clip_wave_tail_tr     = clip_wave_tail_bounds.getTopRight   () ;
+  Point<int>     clip_wave_head_tl     = clip_wave_head_bounds.getTopLeft    () ;
+
+  Path seam ;
+  g.setColour(GUI::WAVE_SELECTED_COLOR) ;
+//   bezier splines
+//   seam.startNewSubPath(           (float)full_wave_head_bl.getX() , (float)full_wave_head_bl.getY()) ;
+//   seam.quadraticTo(0.0f,  150.0f, (float)clip_wave_head_tl.getX() , (float)clip_wave_head_tl.getY()) ;
+//   seam.lineTo(                    (float)clip_wave_tail_tr.getX() , (float)clip_wave_tail_tr.getY()) ;
+//   seam.quadraticTo(0.0f,  150.0f, (float)full_wave_tail_br.getX() , (float)full_wave_tail_br.getY()) ;
+//   seam.closeSubPath() ;
+  seam.addQuadrilateral(full_wave_head_bl.getX() , full_wave_head_bl.getY() ,
+                        full_wave_tail_br.getX() , full_wave_tail_br.getY() ,
+                        clip_wave_tail_tr.getX() , clip_wave_tail_tr.getY() ,
+                        clip_wave_head_tl.getX() , clip_wave_head_tl.getY() ) ;
+  g.fillPath(seam) ;
+
+  g.setColour(GUI::GUI::HEAD_COLOR) ;
+  g.drawDashedLine(Line<float>(full_wave_head_bl.getX() , full_wave_head_bl.getY() ,
+                               clip_wave_head_tl.getX() , clip_wave_head_tl.getY() ) ,
+                   GUI::DASH_LENGTHS , GUI::N_DASH_LENGTHS                           ) ;
+
+  g.setColour(GUI::GUI::TAIL_COLOR) ;
+  g.drawDashedLine(Line<float>(full_wave_tail_br.getX() , full_wave_tail_br.getY() ,
+                               clip_wave_tail_tr.getX() , clip_wave_tail_tr.getY() ) ,
+                   GUI::DASH_LENGTHS , GUI::N_DASH_LENGTHS                           ) ;
+}
+
 void MainContent::prepareToPlay(int samples_per_block , double sample_rate)
 {
     // This function will be called when the audio device is started, or when
@@ -307,7 +346,7 @@ void MainContent::loadUrl(File audio_file)
 
   for (Waveform* waveform : this->waveforms) { waveform->setUrl(url) ; }
 
-  shutdownAudio() ; setAudioChannels(MEDIA::N_CHANNELS_IN , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get()) ;
+  shutdownAudio() ; setAudioChannels(0 , MEDIA::N_CHANNELS_OUT , this->storage->deviceStateXml.get()) ;
 }
 
 void MainContent::toggleTransport()
@@ -320,7 +359,7 @@ void MainContent::updateTransportButton()
 {
   bool is_rolling = this->transportSource.isPlaying() ;
 
-  if (!is_rolling) this->transportSource.setPosition(this->waveformLower->getHeadTime()) ;
+  if (!is_rolling) this->transportSource.setPosition(this->clipWaveform->getHeadTime()) ;
   transportButton->setButtonText((is_rolling) ? "Stop" : "Start") ;
   transportButton->setToggleState(is_rolling , juce::dontSendNotification) ;
 }
@@ -341,8 +380,9 @@ void MainContent::selectionChanged() { loadUrl(this->fileTree->getSelectedFile()
 
 void MainContent::changeListenerCallback(ChangeBroadcaster* source)
 {
-  if      (source == &(this->transportSource)) updateTransportButton() ;
-  else if (source == &(this->deviceManager  ))
+  if      (source ==   this->clipWaveform.get()) repaint() ;
+  else if (source == &(this->transportSource)  ) updateTransportButton() ;
+  else if (source == &(this->deviceManager  )  )
   {
     bool is_device_initialized = this->deviceManager.getCurrentAudioDevice() != nullptr ;
 
@@ -372,7 +412,7 @@ BEGIN_JUCER_METADATA
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="766" initialHeight="742">
   <BACKGROUND backgroundColour="ff101010">
-    <ROUNDRECT pos="0Cc 8 16M 56M" cornerSize="10.00000000000000000000" fill="solid: ff202020"
+    <ROUNDRECT pos="0Cc 8 16M 64M" cornerSize="10.00000000000000000000" fill="solid: ff202020"
                hasStroke="1" stroke="1, mitered, butt" strokeColour="solid: ffffffff"/>
   </BACKGROUND>
   <GENERICCOMPONENT name="" id="6d2236e7e917afa4" memberName="fullWaveform" virtualName=""
@@ -400,7 +440,7 @@ BEGIN_JUCER_METADATA
                     explicitFocusOrder="0" pos="0.5Cc -8R 32M 39.000%" posRelativeY="f42caa46057f2a0"
                     class="AudioDeviceSelectorComponent" params="deviceManager , 0 , 0 , 2 , 2 , false , false , true , false"/>
   <GENERICCOMPONENT name="" id="957b301f5907e647" memberName="statusbar"
-                    virtualName="" explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 32"
+                    virtualName="" explicitFocusOrder="0" pos="0.5Cc 8Rr 16M 40"
                     class="Statusbar" params=""/>
 </JUCER_COMPONENT>
 

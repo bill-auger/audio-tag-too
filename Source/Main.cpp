@@ -38,7 +38,28 @@ DEBUG_TRACE_INIT_VERSION
 
     this->mainWindow.reset(new MainWindow()) ;
 
-    if (! true /*AudioTagToo::Init()*/) { setApplicationReturnValue(255) ; quit() ; }
+    if (true /*AudioTagToo::Init()*/)
+    {
+#ifdef JUCE_LINUX
+      // create desktop launch file
+      if (APP::DesktopFile().loadFileAsString() != APP::DesktopFileText())
+        APP::DesktopFile().replaceWithText(APP::DesktopFileText()) ;
+
+      // create desktop icon
+      if (!APP::IconFile().existsAsFile())
+      {
+        PNGImageFormat    image_format = PNGImageFormat() ;
+        Image             icon_image   = ImageCache::getFromMemory(BinaryData::audioxgeneric_png    ,
+                                                                   BinaryData::audioxgeneric_pngSize) ;
+        FileOutputStream* icon_stream  = new FileOutputStream(APP::IconFile()) ;
+
+        if (!icon_stream->failedToOpen())
+          image_format.writeImageToStream(icon_image , *icon_stream) ;
+        delete icon_stream ;
+      }
+#endif // JUCE_LINUX
+    }
+    else { setApplicationReturnValue(255) ; quit() ; }
   }
 
   void shutdown() override
