@@ -106,8 +106,10 @@ MainContent::MainContent ()
 
     //[UserPreSize]
 
-  this->app         = JUCEApplication::getInstance() ;
-  this->fileBrowser = static_cast<FileBrowserComponent*>(this->tabPanel->getTabContentComponent(GUI::FILE_BROWSER_IDX)) ;
+  this->app                  = JUCEApplication::getInstance() ;
+  this->fileBrowser          = static_cast<FileBrowserComponent*>(this->tabPanel->getTabContentComponent(GUI::FILE_BROWSER_IDX)) ;
+  this->clipsTreeview        = static_cast<TreeView*            >(this->tabPanel->getTabContentComponent(GUI::CLIPS_IDX       )) ;
+  this->compilationsTreeview = static_cast<TreeView*            >(this->tabPanel->getTabContentComponent(GUI::COMPILATIONS_IDX)) ;
   this->storage.reset(new AudioTagTooStore()) ;
 
   this->fullWaveform->setName(GUI::FULL_WAVEFORM_ID) ;
@@ -129,6 +131,9 @@ MainContent::MainContent ()
   file_list->setColour(DirectoryContentsDisplayComponent::textColourId 		        , GUI::BROWSER_FG_COLOR         ) ;
   file_list->setColour(DirectoryContentsDisplayComponent::highlightColourId	      , GUI::BROWSER_SELECTED_BG_COLOR) ;
   file_list->setColour(DirectoryContentsDisplayComponent::highlightedTextColourId	, GUI::BROWSER_SELECTED_FG_COLOR) ;
+
+  this->clipsTreeview       ->setRootItem(this->clips        = new TreeViewItem()) ;
+  this->compilationsTreeview->setRootItem(this->compilations = new TreeViewItem()) ;
 
     //[/UserPreSize]
 
