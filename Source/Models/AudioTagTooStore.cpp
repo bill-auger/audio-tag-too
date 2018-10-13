@@ -75,7 +75,8 @@ void AudioTagTooStore::verifyConfig()
     this->root.removeProperty(STORE::CONFIG_VERSION_KEY , nullptr) ;
   }
 
-  this->clips = this->root.getOrCreateChildWithName(STORE::CLIPS_ID , nullptr) ;
+  this->clips        = this->root.getOrCreateChildWithName(STORE::CLIPS_ID        , nullptr) ;
+  this->compilations = this->root.getOrCreateChildWithName(STORE::COMPILATIONS_ID , nullptr) ;
 
 DEBUG_TRACE_VERIFY_STORED_CONFIG
 }

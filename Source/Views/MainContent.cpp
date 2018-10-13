@@ -112,10 +112,22 @@ MainContent::MainContent ()
   this->compilationsTreeview = static_cast<TreeView*            >(this->tabPanel->getTabContentComponent(GUI::COMPILATIONS_IDX)) ;
   this->storage.reset(new AudioTagTooStore()) ;
 
-  this->fullWaveform->setName(GUI::FULL_WAVEFORM_ID) ;
-  this->clipWaveform->setName(GUI::CLIP_WAVEFORM_ID) ;
   this->waveforms.push_back(this->fullWaveform.get()) ;
   this->waveforms.push_back(this->clipWaveform.get()) ;
+
+  FileListComponent* file_list = static_cast<FileListComponent*>(this->fileBrowser->getDisplayComponent()         ) ;
+  this->clips        = new ClipsTreeViewItem("GUI::CLIPS_TREEVIEW_ID"       ) ;
+  this->compilations = new ClipsTreeViewItem("GUI::COMPILATIONS_TREEVIEW_ID") ;
+
+    //[/UserPreSize]
+
+    setSize (766, 742);
+
+
+    //[Constructor] You can add your own custom stuff here..
+
+  this->fullWaveform->setName(GUI::FULL_WAVEFORM_ID) ;
+  this->clipWaveform->setName(GUI::CLIP_WAVEFORM_ID) ;
 
   this->tabPanel->setColour(TabbedComponent::backgroundColourId , GUI::TABPANEL_BG_COLOR) ;
   this->tabPanel->setColour(TabbedComponent::outlineColourId    , GUI::TABPANEL_FG_COLOR) ;
@@ -124,23 +136,14 @@ MainContent::MainContent ()
   this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxArrowColourId      , GUI::FILEPATH_ARROW_COLOR) ;
   this->fileBrowser->setColour(FileBrowserComponent::filenameBoxBackgroundColourId    , GUI::FILENAME_BG_COLOR   ) ;
   this->fileBrowser->setColour(FileBrowserComponent::filenameBoxTextColourId          , GUI::FILENAME_FG_COLOR   ) ;
-
-  FileListComponent* file_list = static_cast<FileListComponent*>(this->fileBrowser->getDisplayComponent()         ) ;
   file_list->setColour(ListBox::backgroundColourId                                , GUI::BROWSER_BG_COLOR         ) ;
   file_list->setColour(ListBox::textColourId                                      , Colour(0xFF2020FF)) ; // nfg
   file_list->setColour(DirectoryContentsDisplayComponent::textColourId 		        , GUI::BROWSER_FG_COLOR         ) ;
   file_list->setColour(DirectoryContentsDisplayComponent::highlightColourId	      , GUI::BROWSER_SELECTED_BG_COLOR) ;
   file_list->setColour(DirectoryContentsDisplayComponent::highlightedTextColourId	, GUI::BROWSER_SELECTED_FG_COLOR) ;
 
-  this->clipsTreeview       ->setRootItem(this->clips        = new TreeViewItem()) ;
-  this->compilationsTreeview->setRootItem(this->compilations = new TreeViewItem()) ;
-
-    //[/UserPreSize]
-
-    setSize (766, 742);
-
-
-    //[Constructor] You can add your own custom stuff here..
+  this->clipsTreeview       ->setRootItem(this->clips       ) ;
+  this->compilationsTreeview->setRootItem(this->compilations) ;
 
   this->formatManager    .registerBasicFormats() ;
   this->audioSourcePlayer.setSource(&transportSource) ;
@@ -153,6 +156,7 @@ MainContent::MainContent ()
   this->clipWaveform   ->addChangeListener(this) ;
   this->transportSource .addChangeListener(this) ;
   this->fileBrowser    ->addListener      (this) ;
+  this->storage->clips  .addListener      (this) ;
   this->storage->clips  .addListener      (this) ;
 
   // initialize stored state
@@ -204,6 +208,10 @@ MainContent::~MainContent()
 
 
     //[Destructor]. You can add your own custom destruction code here..
+
+  this->clips        = nullptr ;
+  this->compilations = nullptr ;
+
     //[/Destructor]
 }
 
@@ -320,11 +328,11 @@ void MainContent::releaseResources()
     // For more details, see the help for AudioProcessor::releaseResources()
 }
 
-void MainContent::valueTreeChildAdded       (ValueTree& parent_node , ValueTree& node)
+void MainContent::valueTreeChildAdded(ValueTree& parent_node , ValueTree& node)
 {
 DBG("MainContent::valueTreeChildAdded() parent_node=" + parent_node.getType() + " node=" + node.getType()) ;
 }
-void MainContent::valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& node , int prev_idx)
+void MainContent::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& node , int prev_idx)
 {
 DBG("MainContent::valueTreeChildRemoved() parent_node=" + parent_node.getType() + " node=" + node.getType() + " prev_idx=" + String(prev_idx)) ;
 }
@@ -415,7 +423,7 @@ void MainContent::setTailMarker()
     for (Waveform* waveform : this->waveforms) waveform->resetPosition() ;
 }
 
-bool MainContent::createClip()
+void MainContent::createClip()
 {
   this->storage->createClip(this->audioFilename               ,
                             this->fullWaveform->getHeadTime() ,

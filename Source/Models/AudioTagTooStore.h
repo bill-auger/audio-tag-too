@@ -91,5 +91,6 @@ private:
   File                        deviceXmlFile ;
   ValueTree                   root ;           // persistent static config   (STORE::STORAGE_ID node)
   ValueTree                   clips ;          // persistent volatile config (STORE::CLIPS_ID node)
+  ValueTree                   compilations ;   // persistent volatile config (STORE::COMPILATIONS_ID node)
   std::unique_ptr<XmlElement> deviceStateXml ; // Juce AudioDeviceManager state
 } ;

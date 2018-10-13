@@ -46,9 +46,10 @@ const StringArray STORE::RootKeys()            { return StringArray::fromLines(R
                                                                                ROOT_TRANSIENT_IDS                 ) ; }
 
 // storage nodes
-const Identifier STORE::STORAGE_ID    = "audio-tag-too-config" ;
-const Identifier STORE::DEVICE_XML_ID = "audio-tag-too-device-config" ;
-const Identifier STORE::CLIPS_ID      = "clips" ;
+const Identifier STORE::STORAGE_ID      = "audio-tag-too-config" ;
+const Identifier STORE::DEVICE_XML_ID   = "audio-tag-too-device-config" ;
+const Identifier STORE::CLIPS_ID        = "clips" ;
+const Identifier STORE::COMPILATIONS_ID = "compilations" ;
 
 // root IDs
 const Identifier STORE::CONFIG_VERSION_KEY = "config-version" ;
