@@ -82,6 +82,10 @@ private:
   WildcardFileFilter                       audioFileFilter ;
   TimeSliceThread                          workerThread ;
   FileBrowserComponent*                    fileBrowser ;
+  TreeView*                                clipsTreeview ;
+  TreeViewItem*                            clips ;
+  TreeView*                                compilationsTreeview ;
+  TreeViewItem*                            compilations ;
   String                                   projectFilename ;
   String                                   audioFilename ;
   AudioFormatManager                       formatManager ;
