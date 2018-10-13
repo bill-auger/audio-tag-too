@@ -60,8 +60,8 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 
 #ifdef CONTROLLER_OWNS_STORAGE
-  void initialize(ValueTree&           storage        , NamedValueSet& features ,
-                  AudioThumbnailCache& thumbnailCache                           ) ;
+  void initialize(ValueTree&     clips    , ValueTree&           compilations  ,
+                  NamedValueSet& features , AudioThumbnailCache& thumbnailCache) ;
 #else // CONTROLLER_OWNS_STORAGE
   void initialize(NamedValueSet& features , AudioThumbnailCache& thumbnailCache) ;
 #endif // CONTROLLER_OWNS_STORAGE
@@ -92,7 +92,8 @@ private:
 #ifndef CONTROLLER_OWNS_STORAGE
   std::unique_ptr<AudioTagTooStore>        storage ;
 #else // CONTROLLER_OWNS_STORAGE
-  ValueTree                                storage ;
+  ValueTree                                clips ;
+  ValueTree                                compilations ;
 #endif // CONTROLLER_OWNS_STORAGE
 
   // getters/setters
@@ -104,21 +105,21 @@ private:
   bool createClip           (void) ;
 
   // event handlers
-  void paintOverChildren     (Graphics& g)                                override ;
-  void prepareToPlay         (int samples_per_block , double sample_rate) override ;
-  void getNextAudioBlock     (const AudioSourceChannelInfo& buffer)       override ;
-  void releaseResources      (void)                                       override ;
-  void buttonClicked         (Button* a_button)                           override ;
-  void selectionChanged      (void)                                       override ;
-  void changeListenerCallback(ChangeBroadcaster* source)                  override ;
+  void paintOverChildren         (Graphics& g)                                                 override ;
+  void prepareToPlay             (int samples_per_block , double sample_rate)                  override ;
+  void getNextAudioBlock         (const AudioSourceChannelInfo& buffer)                        override ;
+  void releaseResources          (void)                                                        override ;
+  void buttonClicked             (Button* a_button)                                            override ;
+  void selectionChanged          (void)                                                        override ;
+  void changeListenerCallback    (ChangeBroadcaster* source)                                   override ;
+  void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& node                   ) override ;
+  void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& node     , int prev_idx) override ;
+  void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx , int curr_idx) override ;
 
   // unhandled ValueTree::Listener events
-  void valueTreeRedirected       (ValueTree&                                                     ) override {}
-  void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node                   ) override {}
-  void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override {}
-  void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override {}
-  void valueTreePropertyChanged  (ValueTree& , const Identifier&                                 ) override {}
-  void valueTreeParentChanged    (ValueTree&                                                     ) override {}
+  void valueTreePropertyChanged(ValueTree& /*node*/ , const Identifier& /*key*/) override {}
+  void valueTreeParentChanged  (ValueTree& /*node*/                            ) override {}
+  void valueTreeRedirected     (ValueTree& /*node*/                            ) override {}
 
   // unhandled FileBrowserListener events
   void fileClicked       (const File&, const MouseEvent&) override {}

@@ -152,13 +152,12 @@ MainContent::MainContent ()
 #ifndef CONTROLLER_OWNS_STORAGE
   this->deviceManager   .addChangeListener(this->storage.get()) ;
 #endif // CONTROLLER_OWNS_STORAGE
-  this->clipWaveform   ->addChangeListener(this) ;
-  this->transportSource .addChangeListener(this) ;
-  this->fileBrowser    ->addListener      (this) ;
+  this->clipWaveform        ->addChangeListener(this) ;
+  this->transportSource      .addChangeListener(this) ;
+  this->fileBrowser         ->addListener      (this) ;
 #ifndef CONTROLLER_OWNS_STORAGE
-  this->storage->root   .addListener      (this) ;
-#else // CONTROLLER_OWNS_STORAGE
-  this->storage         .addListener      (this) ;
+  this->storage->clips       .addListener      (this) ;
+  this->storage->compilations.addListener      (this) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
   setOpaque(true) ;
@@ -190,12 +189,15 @@ MainContent::~MainContent()
   this->transportSource .removeChangeListener(this) ;
   this->fileBrowser    ->removeListener      (this) ;
 #ifndef CONTROLLER_OWNS_STORAGE
-  this->storage->root   .removeListener      (this) ;
+  this->storage->clips       .removeListener (this) ;
+  this->storage->compilations.removeListener (this) ;
 
   this->storage = nullptr ;
 #else // CONTROLLER_OWNS_STORAGE
   if (AudioTagToo::IsInitialized)
-  this->storage         .removeListener      (this) ;
+  this->clips           .removeListener      (this) ;
+  if (AudioTagToo::IsInitialized)
+  this->compilations    .removeListener      (this) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
     //[/Destructor_pre]
@@ -264,10 +266,11 @@ void MainContent::resized()
 /* setup/teardown */
 
 #ifdef CONTROLLER_OWNS_STORAGE
-void MainContent::initialize(ValueTree&           storage         , NamedValueSet& features ,
-                             AudioThumbnailCache& thumbnail_cache                           )
+void MainContent::initialize(ValueTree&     clips    , ValueTree&           compilations   ,
+                             NamedValueSet& features , AudioThumbnailCache& thumbnail_cache)
 {
-  this->storage           = storage ;
+  this->clips             = clips ;
+  this->compilations      = compilations ;
 #else // CONTROLLER_OWNS_STORAGE
 void MainContent::initialize(NamedValueSet& features , AudioThumbnailCache& thumbnail_cache)
 {
@@ -287,9 +290,11 @@ void MainContent::initialize(NamedValueSet& features , AudioThumbnailCache& thum
 
 #ifdef CONTROLLER_OWNS_STORAGE
   this->deviceManager.addChangeListener(AudioTagToo::Store.get()) ;
-  this->storage      .addListener      (this) ;
+  this->clips        .addListener      (this) ;
+  this->compilations .addListener      (this) ;
 #else // CONTROLLER_OWNS_STORAGE
-  this->storage->root.addListener      (this) ;
+  this->storage->clips        .addListener(this) ;
+  this->storage->compilations .addListener(this) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
   this->fullWaveform->startTimerHz(course_fps) ;
@@ -444,6 +449,21 @@ void MainContent::changeListenerCallback(ChangeBroadcaster* source)
 
     this->tabPanel->setCurrentTabIndex(tab_pane_idx) ;
   }
+}
+
+void MainContent::valueTreeChildAdded(ValueTree& parent_node , ValueTree& node)
+{
+DBG("MainContent::valueTreeChildAdded() parent_node=" + parent_node.getType() + " node=" + node.getType()) ;
+}
+
+void MainContent::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& node , int prev_idx)
+{
+DBG("MainContent::valueTreeChildRemoved() parent_node=" + parent_node.getType() + " node=" + node.getType() + " prev_idx=" + String(prev_idx)) ;
+}
+
+void MainContent::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_idx , int curr_idx)
+{
+DBG("MainContent::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
 }
 
 //[/MiscUserCode]

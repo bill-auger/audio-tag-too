@@ -138,7 +138,7 @@ DEBUG_TRACE_INIT_PHASE_4
 
   // initialze GUI
 #ifdef CONTROLLER_OWNS_STORAGE
-  Gui->initialize(Store->root , Features , Store->thumbnailCache) ;
+  Gui->initialize(Store->clips , Store->compilations , Features , Store->thumbnailCache) ;
   Window->restoreWindowStateFromString(STRING(Store->root[STORE::WINDOW_STATE_KEY])) ;
 #else // CONTROLLER_OWNS_STORAGE
   Gui->initialize(Features , Store->thumbnailCache) ;

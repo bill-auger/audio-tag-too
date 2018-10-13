@@ -102,7 +102,9 @@ private:
   File                        deviceFile ;
   File                        peaksCacheFile ;
   File                        storageTempFile ; // temporary file-out staging
-  ValueTree                   root ;            // persistent static config (STORE::STORAGE_ID node)
+  ValueTree                   root ;            // persistent static config   (STORE::STORAGE_ID node)
+  ValueTree                   clips ;           // persistent volatile config (STORE::CLIPS_ID node)
+  ValueTree                   compilations ;    // persistent volatile config (STORE::COMPILATIONS_ID node)
   std::unique_ptr<XmlElement> deviceStateXml ;  // persistent Juce AudioDeviceManager state
   AudioThumbnailCache         thumbnailCache ;  // persistent Juce AudioThumbnail peaks cache
 } ;
