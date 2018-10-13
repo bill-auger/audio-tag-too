@@ -87,7 +87,6 @@ MainContent::MainContent ()
     clipButton.reset (new TextButton (String()));
     addAndMakeVisible (clipButton.get());
     clipButton->setButtonText (TRANS("Clip"));
-    clipButton->addListener (this);
 
     tailButton.reset (new TextButton (String()));
     addAndMakeVisible (tailButton.get());
@@ -115,28 +114,12 @@ MainContent::MainContent ()
   this->storage.reset(new AudioTagTooStore()) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
-  this->fullWaveform->setName(GUI::FULL_WAVEFORM_ID) ;
-  this->clipWaveform->setName(GUI::CLIP_WAVEFORM_ID) ;
   this->waveforms.push_back(this->fullWaveform.get()) ;
   this->waveforms.push_back(this->clipWaveform.get()) ;
 
-  this->tabPanel->setColour(TabbedComponent::backgroundColourId , GUI::TABPANEL_BG_COLOR) ;
-  this->tabPanel->setColour(TabbedComponent::outlineColourId    , GUI::TABPANEL_FG_COLOR) ;
-  this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxBackgroundColourId , GUI::FILEPATH_BG_COLOR   ) ;
-  this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxTextColourId       , GUI::FILEPATH_FG_COLOR   ) ;
-  this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxArrowColourId      , GUI::FILEPATH_ARROW_COLOR) ;
-  this->fileBrowser->setColour(FileBrowserComponent::filenameBoxBackgroundColourId    , GUI::FILENAME_BG_COLOR   ) ;
-  this->fileBrowser->setColour(FileBrowserComponent::filenameBoxTextColourId          , GUI::FILENAME_FG_COLOR   ) ;
-
   FileListComponent* file_list = static_cast<FileListComponent*>(this->fileBrowser->getDisplayComponent()         ) ;
-  file_list->setColour(ListBox::backgroundColourId                                , GUI::BROWSER_BG_COLOR         ) ;
-  file_list->setColour(ListBox::textColourId                                      , Colour(0xFF2020FF)) ; // nfg
-  file_list->setColour(DirectoryContentsDisplayComponent::textColourId 		        , GUI::BROWSER_FG_COLOR         ) ;
-  file_list->setColour(DirectoryContentsDisplayComponent::highlightColourId	      , GUI::BROWSER_SELECTED_BG_COLOR) ;
-  file_list->setColour(DirectoryContentsDisplayComponent::highlightedTextColourId	, GUI::BROWSER_SELECTED_FG_COLOR) ;
-
-  this->clipsTreeview       ->setRootItem(this->clips        = new TreeViewItem()) ;
-  this->compilationsTreeview->setRootItem(this->compilations = new TreeViewItem()) ;
+  this->clips        = new ClipsTreeViewItem("GUI::CLIPS_TREEVIEW_ID"       ) ;
+  this->compilations = new ClipsTreeViewItem("GUI::COMPILATIONS_TREEVIEW_ID") ;
 
     //[/UserPreSize]
 
@@ -145,15 +128,34 @@ MainContent::MainContent ()
 
     //[Constructor] You can add your own custom stuff here..
 
+  this->fullWaveform->setName(GUI::FULL_WAVEFORM_ID) ;
+  this->clipWaveform->setName(GUI::CLIP_WAVEFORM_ID) ;
+
+  this->tabPanel->setColour(TabbedComponent::backgroundColourId , GUI::TABPANEL_BG_COLOR) ;
+  this->tabPanel->setColour(TabbedComponent::outlineColourId    , GUI::TABPANEL_FG_COLOR) ;
+  this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxBackgroundColourId , GUI::FILEPATH_BG_COLOR   ) ;
+  this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxTextColourId       , GUI::FILEPATH_FG_COLOR   ) ;
+  this->fileBrowser->setColour(FileBrowserComponent::currentPathBoxArrowColourId      , GUI::FILEPATH_ARROW_COLOR) ;
+  this->fileBrowser->setColour(FileBrowserComponent::filenameBoxBackgroundColourId    , GUI::FILENAME_BG_COLOR   ) ;
+  this->fileBrowser->setColour(FileBrowserComponent::filenameBoxTextColourId          , GUI::FILENAME_FG_COLOR   ) ;
+  file_list->setColour(ListBox::backgroundColourId                                , GUI::BROWSER_BG_COLOR         ) ;
+  file_list->setColour(ListBox::textColourId                                      , Colour(0xFF2020FF)) ; // nfg
+  file_list->setColour(DirectoryContentsDisplayComponent::textColourId 		        , GUI::BROWSER_FG_COLOR         ) ;
+  file_list->setColour(DirectoryContentsDisplayComponent::highlightColourId	      , GUI::BROWSER_SELECTED_BG_COLOR) ;
+  file_list->setColour(DirectoryContentsDisplayComponent::highlightedTextColourId	, GUI::BROWSER_SELECTED_FG_COLOR) ;
+
+  this->clipsTreeview       ->setRootItem(this->clips       ) ;
+  this->compilationsTreeview->setRootItem(this->compilations) ;
+
   this->formatManager    .registerBasicFormats() ;
   this->audioSourcePlayer.setSource(&transportSource) ;
 
-  this->headButton     ->addListener      (this) ;
-  this->transportButton->addListener      (this) ;
-  this->clipButton     ->addListener      (this) ;
-  this->tailButton     ->addListener      (this) ;
-  this->deviceManager   .addAudioCallback (&audioSourcePlayer) ;
-  this->deviceManager   .addChangeListener(this) ;
+  this->headButton          ->addListener      (this) ;
+  this->transportButton     ->addListener      (this) ;
+  this->clipButton          ->addListener      (this) ;
+  this->tailButton          ->addListener      (this) ;
+  this->deviceManager        .addAudioCallback (&audioSourcePlayer) ;
+  this->deviceManager        .addChangeListener(this) ;
 #ifndef CONTROLLER_OWNS_STORAGE
   this->deviceManager   .addChangeListener(this->storage.get()) ;
 #endif // CONTROLLER_OWNS_STORAGE
@@ -219,6 +221,10 @@ MainContent::~MainContent()
 
 
     //[Destructor]. You can add your own custom destruction code here..
+
+  this->clips        = nullptr ;
+  this->compilations = nullptr ;
+
     //[/Destructor]
 }
 
@@ -361,8 +367,7 @@ void MainContent::setTailMarker()
     for (Waveform* waveform : this->waveforms) waveform->resetPosition() ;
 }
 
-
-bool MainContent::createClip()
+void MainContent::createClip()
 {
 #ifndef CONTROLLER_OWNS_STORAGE
   this->storage->createClip(this->audioFilename               ,

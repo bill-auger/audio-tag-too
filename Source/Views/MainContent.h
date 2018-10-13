@@ -105,7 +105,7 @@ private:
   void updateTransportButton(void) ;
   void setHeadMarker        (void) ;
   void setTailMarker        (void) ;
-  bool createClip           (void) ;
+  void createClip           (void) ;
 
   // event handlers
   void paintOverChildren         (Graphics& g)                                                 override ;
@@ -120,14 +120,57 @@ private:
   void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx , int curr_idx) override ;
 
   // unhandled ValueTree::Listener events
-  void valueTreePropertyChanged(ValueTree& /*node*/ , const Identifier& /*key*/) override {}
-  void valueTreeParentChanged  (ValueTree& /*node*/                            ) override {}
-  void valueTreeRedirected     (ValueTree& /*node*/                            ) override {}
+  void valueTreePropertyChanged(ValueTree& , const Identifier&) override {}
+  void valueTreeParentChanged  (ValueTree&                    ) override {}
+  void valueTreeRedirected     (ValueTree&                    ) override {}
 
   // unhandled FileBrowserListener events
   void fileClicked       (const File&, const MouseEvent&) override {}
   void fileDoubleClicked (const File&)                    override {}
   void browserRootChanged(const File&)                    override {}
+
+  class ClipsTreeViewItem : public TreeViewItem
+  {
+  public:
+
+    ClipsTreeViewItem(const String& id) : id(id) {}
+
+    String getUniqueName       () const override { return id   ; }
+    bool   mightContainSubItems()       override { return true ; }
+    int    getItemHeight       () const override { return 22   ; }
+
+    void paintItem(Graphics& g , int width , int height) override
+    {
+      g.setFont(Font(height * 0.7f , Font::bold)) ;
+      g.setColour(GUI::FILENAME_FG_COLOR) ;
+      g.drawText(id , 2 , 0 , width - 2 , height , Justification::centredLeft , true) ;
+    }
+
+    void itemOpennessChanged(bool is_open) override
+    {
+DBG("ClipsTreeViewItem itemOpennessChanged()=" + String(is_open ? "is_open" : "is_closed")) ;
+/*
+        if (isNowOpen)
+        {
+            if (getNumSubItems() == 0)
+                for (auto command : owner.getCommandManager().getCommandsInCategory (categoryName))
+                    if (owner.shouldCommandBeIncluded (command))
+                        addSubItem (new MappingItem (owner, command));
+        }
+        else
+        {
+            clearSubItems();
+        }
+*/
+    }
+
+
+  private:
+
+    String id ;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipsTreeViewItem)
+  } ;
 
     //[/UserVariables]
 
