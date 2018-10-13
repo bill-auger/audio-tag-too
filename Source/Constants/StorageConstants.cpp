@@ -53,9 +53,11 @@ const Identifier STORE::COMPILATIONS_ID = "compilations" ;
 
 // root IDs
 const Identifier STORE::CONFIG_VERSION_KEY = "config-version" ;
-const Identifier STORE::FILENAME_KEY       = "master-filename";
-const Identifier STORE::BEGIN_TIME_KEY     = "begin-time" ;
-const Identifier STORE::END_TIME_KEY       = "end-time" ;
+
+// clips/compilations IDs
+const Identifier STORE::FILENAME_KEY   = "master-filename";
+const Identifier STORE::BEGIN_TIME_KEY = "begin-time" ;
+const Identifier STORE::END_TIME_KEY   = "end-time" ;
 
 // root defaults
 const int STORE::CONFIG_VERSION = 1 ;

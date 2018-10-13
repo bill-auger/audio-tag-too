@@ -44,6 +44,7 @@
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/MediaConstants.h"
+#include "../Constants/StorageConstants.h"
 
 //[/Headers]
 
@@ -106,18 +107,17 @@ MainContent::MainContent ()
 
     //[UserPreSize]
 
-  this->app                  = JUCEApplication::getInstance() ;
-  this->fileBrowser          = static_cast<FileBrowserComponent*>(this->tabPanel->getTabContentComponent(GUI::FILE_BROWSER_IDX)) ;
-  this->clipsTreeview        = static_cast<TreeView*            >(this->tabPanel->getTabContentComponent(GUI::CLIPS_IDX       )) ;
-  this->compilationsTreeview = static_cast<TreeView*            >(this->tabPanel->getTabContentComponent(GUI::COMPILATIONS_IDX)) ;
-  this->storage.reset(new AudioTagTooStore()) ;
+  this->app                    = JUCEApplication::getInstance() ;
+  this->fileBrowser            = static_cast<FileBrowserComponent*>(this->tabPanel   ->getTabContentComponent(GUI::FILE_BROWSER_IDX)) ;
+  FileListComponent* file_list = static_cast<FileListComponent*   >(this->fileBrowser->getDisplayComponent()                        ) ;
+  this->clipsTreeview          = static_cast<TreeView*            >(this->tabPanel   ->getTabContentComponent(GUI::CLIPS_IDX       )) ;
+  this->compilationsTreeview   = static_cast<TreeView*            >(this->tabPanel   ->getTabContentComponent(GUI::COMPILATIONS_IDX)) ;
+  this->clips       .reset(new ClipsTreeViewItem(String::empty)) ;
+  this->compilations.reset(new ClipsTreeViewItem(String::empty)) ;
+  this->storage     .reset(new AudioTagTooStore()) ;
 
   this->waveforms.push_back(this->fullWaveform.get()) ;
   this->waveforms.push_back(this->clipWaveform.get()) ;
-
-  FileListComponent* file_list = static_cast<FileListComponent*>(this->fileBrowser->getDisplayComponent()         ) ;
-  this->clips        = new ClipsTreeViewItem("GUI::CLIPS_TREEVIEW_ID"       ) ;
-  this->compilations = new ClipsTreeViewItem("GUI::COMPILATIONS_TREEVIEW_ID") ;
 
     //[/UserPreSize]
 
@@ -142,22 +142,26 @@ MainContent::MainContent ()
   file_list->setColour(DirectoryContentsDisplayComponent::highlightColourId	      , GUI::BROWSER_SELECTED_BG_COLOR) ;
   file_list->setColour(DirectoryContentsDisplayComponent::highlightedTextColourId	, GUI::BROWSER_SELECTED_FG_COLOR) ;
 
-  this->clipsTreeview       ->setRootItem(this->clips       ) ;
-  this->compilationsTreeview->setRootItem(this->compilations) ;
+  this->clipsTreeview       ->setRootItem(this->clips       .get()) ;
+  this->compilationsTreeview->setRootItem(this->compilations.get()) ;
+  this->clipsTreeview       ->setRootItemVisible(false) ;
+  this->compilationsTreeview->setRootItemVisible(false) ;
 
   this->formatManager    .registerBasicFormats() ;
   this->audioSourcePlayer.setSource(&transportSource) ;
 
-  this->headButton     ->addListener      (this);
-  this->transportButton->addListener      (this);
-  this->tailButton     ->addListener      (this);
-  this->deviceManager   .addAudioCallback (&audioSourcePlayer) ;
-  this->deviceManager   .addChangeListener(this) ;
-  this->clipWaveform   ->addChangeListener(this) ;
-  this->transportSource .addChangeListener(this) ;
-  this->fileBrowser    ->addListener      (this) ;
-  this->storage->clips  .addListener      (this) ;
-  this->storage->clips  .addListener      (this) ;
+  this->headButton          ->addListener      (this);
+  this->transportButton     ->addListener      (this);
+  this->tailButton          ->addListener      (this);
+  this->deviceManager        .addAudioCallback (&audioSourcePlayer) ;
+  this->deviceManager        .addChangeListener(this) ;
+  this->clipWaveform        ->addChangeListener(this) ;
+  this->transportSource      .addChangeListener(this) ;
+  this->fileBrowser         ->addListener      (this) ;
+  this->storage->clips       .addListener      (this) ;
+  this->storage->compilations.addListener      (this) ;
+
+  if (!this->storage->initialize()) ; // trigger ValueTree events
 
   // initialize stored state
   this->storage->initialize() ;
@@ -260,86 +264,7 @@ void MainContent::resized()
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-void MainContent::paintOverChildren(Graphics& g)
-{
-  if (this->clipWaveform->getZoomFactor() == 1.0) return ;
-
-  Rectangle<int> full_wave_head_bounds = getLocalArea(this->fullWaveform.get() , this->fullWaveform->getHeadMarkerBounds()) ;
-  Rectangle<int> full_wave_tail_bounds = getLocalArea(this->fullWaveform.get() , this->fullWaveform->getTailMarkerBounds()) ;
-  Rectangle<int> clip_wave_tail_bounds = getLocalArea(this->clipWaveform.get() , this->clipWaveform->getTailMarkerBounds()) ;
-  Rectangle<int> clip_wave_head_bounds = getLocalArea(this->clipWaveform.get() , this->clipWaveform->getHeadMarkerBounds()) ;
-  Point<int>     full_wave_head_bl     = full_wave_head_bounds.getBottomLeft () ;
-  Point<int>     full_wave_tail_br     = full_wave_tail_bounds.getBottomRight() ;
-  Point<int>     clip_wave_tail_tr     = clip_wave_tail_bounds.getTopRight   () ;
-  Point<int>     clip_wave_head_tl     = clip_wave_head_bounds.getTopLeft    () ;
-
-  Path seam ;
-  g.setColour(GUI::WAVE_SELECTED_COLOR) ;
-//   bezier splines
-//   seam.startNewSubPath(           (float)full_wave_head_bl.getX() , (float)full_wave_head_bl.getY()) ;
-//   seam.quadraticTo(0.0f,  150.0f, (float)clip_wave_head_tl.getX() , (float)clip_wave_head_tl.getY()) ;
-//   seam.lineTo(                    (float)clip_wave_tail_tr.getX() , (float)clip_wave_tail_tr.getY()) ;
-//   seam.quadraticTo(0.0f,  150.0f, (float)full_wave_tail_br.getX() , (float)full_wave_tail_br.getY()) ;
-//   seam.closeSubPath() ;
-  seam.addQuadrilateral(full_wave_head_bl.getX() , full_wave_head_bl.getY() ,
-                        full_wave_tail_br.getX() , full_wave_tail_br.getY() ,
-                        clip_wave_tail_tr.getX() , clip_wave_tail_tr.getY() ,
-                        clip_wave_head_tl.getX() , clip_wave_head_tl.getY() ) ;
-  g.fillPath(seam) ;
-
-  g.setColour(GUI::GUI::HEAD_COLOR) ;
-  g.drawDashedLine(Line<float>(full_wave_head_bl.getX() , full_wave_head_bl.getY() ,
-                               clip_wave_head_tl.getX() , clip_wave_head_tl.getY() ) ,
-                   GUI::DASH_LENGTHS , GUI::N_DASH_LENGTHS                           ) ;
-
-  g.setColour(GUI::GUI::TAIL_COLOR) ;
-  g.drawDashedLine(Line<float>(full_wave_tail_br.getX() , full_wave_tail_br.getY() ,
-                               clip_wave_tail_tr.getX() , clip_wave_tail_tr.getY() ) ,
-                   GUI::DASH_LENGTHS , GUI::N_DASH_LENGTHS                           ) ;
-}
-
-void MainContent::prepareToPlay(int samples_per_block , double sample_rate)
-{
-    // This function will be called when the audio device is started, or when
-    // its settings (i.e. sample rate, block size, etc) are changed.
-
-    // You can use this function to initialise any resources you might need,
-    // but be careful - it will be called on the audio thread, not the GUI thread.
-
-    // For more details, see the help for AudioProcessor::prepareToPlay()
-}
-
-void MainContent::getNextAudioBlock(const AudioSourceChannelInfo& buffer)
-{
-    // Your audio-processing code goes here!
-
-    // For more details, see the help for AudioProcessor::getNextAudioBlock()
-
-    // Right now we are not producing any data, in which case we need to clear the buffer
-    // (to prevent the output of random noise)
-    buffer.clearActiveBufferRegion() ;
-}
-
-void MainContent::releaseResources()
-{
-    // This will be called when the audio device stops, or when it is being
-    // restarted due to a setting change.
-
-    // For more details, see the help for AudioProcessor::releaseResources()
-}
-
-void MainContent::valueTreeChildAdded(ValueTree& parent_node , ValueTree& node)
-{
-DBG("MainContent::valueTreeChildAdded() parent_node=" + parent_node.getType() + " node=" + node.getType()) ;
-}
-void MainContent::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& node , int prev_idx)
-{
-DBG("MainContent::valueTreeChildRemoved() parent_node=" + parent_node.getType() + " node=" + node.getType() + " prev_idx=" + String(prev_idx)) ;
-}
-void MainContent::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_idx , int curr_idx)
-{
-DBG("MainContent::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
-}
+/* getters/setters */
 
 void MainContent::processCliParams()
 {
@@ -359,14 +284,6 @@ void MainContent::processCliParams()
                             ((int_value = cli_params[token_idx + 1].getIntValue()) >  0)  ) ;
   this->courseFps        = GUI::COURSE_FPS ;
   this->fineFps          = (is_valid_fine_fps) ? int_value : GUI::FINE_FPS ;
-}
-
-void MainContent::buttonClicked(Button* a_button)
-{
-  if      (a_button == this->headButton     .get()) setHeadMarker() ;
-  else if (a_button == this->transportButton.get()) toggleTransport() ;
-  else if (a_button == this->clipButton     .get()) createClip() ;
-  else if (a_button == this->tailButton     .get()) setTailMarker() ;
 }
 
 void MainContent::loadUrl(File audio_file)
@@ -430,6 +347,85 @@ void MainContent::createClip()
                             this->fullWaveform->getHeadTime() ) ;
 }
 
+
+/* event handlers */
+
+void MainContent::paintOverChildren(Graphics& g)
+{
+  if (this->clipWaveform->getZoomFactor() == 1.0) return ;
+
+  Rectangle<int> full_wave_head_bounds = getLocalArea(this->fullWaveform.get() , this->fullWaveform->getHeadMarkerBounds()) ;
+  Rectangle<int> full_wave_tail_bounds = getLocalArea(this->fullWaveform.get() , this->fullWaveform->getTailMarkerBounds()) ;
+  Rectangle<int> clip_wave_tail_bounds = getLocalArea(this->clipWaveform.get() , this->clipWaveform->getTailMarkerBounds()) ;
+  Rectangle<int> clip_wave_head_bounds = getLocalArea(this->clipWaveform.get() , this->clipWaveform->getHeadMarkerBounds()) ;
+  Point<int>     full_wave_head_bl     = full_wave_head_bounds.getBottomLeft () ;
+  Point<int>     full_wave_tail_br     = full_wave_tail_bounds.getBottomRight() ;
+  Point<int>     clip_wave_tail_tr     = clip_wave_tail_bounds.getTopRight   () ;
+  Point<int>     clip_wave_head_tl     = clip_wave_head_bounds.getTopLeft    () ;
+
+  Path seam ;
+  g.setColour(GUI::WAVE_SELECTED_COLOR) ;
+//   bezier splines
+//   seam.startNewSubPath(           (float)full_wave_head_bl.getX() , (float)full_wave_head_bl.getY()) ;
+//   seam.quadraticTo(0.0f,  150.0f, (float)clip_wave_head_tl.getX() , (float)clip_wave_head_tl.getY()) ;
+//   seam.lineTo(                    (float)clip_wave_tail_tr.getX() , (float)clip_wave_tail_tr.getY()) ;
+//   seam.quadraticTo(0.0f,  150.0f, (float)full_wave_tail_br.getX() , (float)full_wave_tail_br.getY()) ;
+//   seam.closeSubPath() ;
+  seam.addQuadrilateral(full_wave_head_bl.getX() , full_wave_head_bl.getY() ,
+                        full_wave_tail_br.getX() , full_wave_tail_br.getY() ,
+                        clip_wave_tail_tr.getX() , clip_wave_tail_tr.getY() ,
+                        clip_wave_head_tl.getX() , clip_wave_head_tl.getY() ) ;
+  g.fillPath(seam) ;
+
+  g.setColour(GUI::GUI::HEAD_COLOR) ;
+  g.drawDashedLine(Line<float>(full_wave_head_bl.getX() , full_wave_head_bl.getY() ,
+                               clip_wave_head_tl.getX() , clip_wave_head_tl.getY() ) ,
+                   GUI::DASH_LENGTHS , GUI::N_DASH_LENGTHS                           ) ;
+
+  g.setColour(GUI::GUI::TAIL_COLOR) ;
+  g.drawDashedLine(Line<float>(full_wave_tail_br.getX() , full_wave_tail_br.getY() ,
+                               clip_wave_tail_tr.getX() , clip_wave_tail_tr.getY() ) ,
+                   GUI::DASH_LENGTHS , GUI::N_DASH_LENGTHS                           ) ;
+}
+
+void MainContent::buttonClicked(Button* a_button)
+{
+  if      (a_button == this->headButton     .get()) setHeadMarker() ;
+  else if (a_button == this->transportButton.get()) toggleTransport() ;
+  else if (a_button == this->clipButton     .get()) createClip() ;
+  else if (a_button == this->tailButton     .get()) setTailMarker() ;
+}
+
+void MainContent::prepareToPlay(int samples_per_block , double sample_rate)
+{
+    // This function will be called when the audio device is started, or when
+    // its settings (i.e. sample rate, block size, etc) are changed.
+
+    // You can use this function to initialise any resources you might need,
+    // but be careful - it will be called on the audio thread, not the GUI thread.
+
+    // For more details, see the help for AudioProcessor::prepareToPlay()
+}
+
+void MainContent::getNextAudioBlock(const AudioSourceChannelInfo& buffer)
+{
+    // Your audio-processing code goes here!
+
+    // For more details, see the help for AudioProcessor::getNextAudioBlock()
+
+    // Right now we are not producing any data, in which case we need to clear the buffer
+    // (to prevent the output of random noise)
+    buffer.clearActiveBufferRegion() ;
+}
+
+void MainContent::releaseResources()
+{
+    // This will be called when the audio device stops, or when it is being
+    // restarted due to a setting change.
+
+    // For more details, see the help for AudioProcessor::releaseResources()
+}
+
 void MainContent::selectionChanged() { loadUrl(this->fileBrowser->getSelectedFile(0)) ; }
 
 void MainContent::changeListenerCallback(ChangeBroadcaster* source)
@@ -451,6 +447,79 @@ void MainContent::changeListenerCallback(ChangeBroadcaster* source)
 
     this->tabPanel->setCurrentTabIndex(tab_pane_idx) ;
   }
+}
+
+void MainContent::valueTreeRedirected(ValueTree& parent_node)
+{
+  while (this->clips->getNumSubItems() > 0) this->clips->removeSubItem(0) ;
+
+  createMasterItem(parent_node) ;
+}
+
+void MainContent::valueTreeChildAdded(ValueTree& parent_node , ValueTree& new_node)
+{
+  bool is_master_node = parent_node             == this->storage->clips ;
+  bool is_clip_node   = parent_node.getParent() == this->storage->clips ;
+
+  if      (is_master_node) createMasterItem(new_node) ;
+  else if (is_clip_node  ) createClipItem  (parent_node , new_node) ;
+}
+
+void MainContent::createMasterItem(ValueTree master_node)
+{
+  int           master_idx      = this->storage->clips.indexOf(master_node) ;
+  TreeViewItem* new_master_item = newMasterItem(master_node) ;
+
+  for (int clip_n = 0 ; clip_n < master_node.getNumChildren() ; ++clip_n)
+    new_master_item->addSubItem(newClipItem(master_node.getChild(clip_n)) , -1) ;
+  this->clips->addSubItem(new_master_item , master_idx) ;
+}
+
+TreeViewItem* MainContent::newMasterItem(ValueTree master_node)
+{
+  String        master_label = STRING(master_node[STORE::FILENAME_KEY]) ;
+  TreeViewItem* new_master   = new ClipsTreeViewItem(master_label) ;
+
+  return new_master ;
+}
+
+void MainContent::createClipItem(ValueTree master_node , ValueTree clip_node)
+{
+  int           master_idx             = this->storage->clips.indexOf(master_node) ;
+  TreeViewItem* master_item            = this->clips->getSubItem(master_idx) ;
+  bool          does_master_item_exist = master_item != nullptr ;
+
+  if (!does_master_item_exist)
+  {
+    master_item = newMasterItem(master_node) ;
+    this->clips->addSubItem(master_item , master_idx) ;
+  }
+
+  int clip_idx = master_node.indexOf(clip_node) ;
+  master_item->addSubItem(newClipItem(clip_node) , clip_idx) ;
+}
+
+TreeViewItem* MainContent::newClipItem(ValueTree clip_node)
+{
+  String        clip_label  = STRING(clip_node[STORE::BEGIN_TIME_KEY]) + " - " +
+                              STRING(clip_node[STORE::END_TIME_KEY  ]) ;
+  String        file_label  = STRING(clip_node[STORE::FILENAME_KEY  ]) ;
+  String        begin_label = STRING(clip_node[STORE::BEGIN_TIME_KEY]) ;
+  String        end_label   = STRING(clip_node[STORE::END_TIME_KEY  ]) ;
+  TreeViewItem* new_clip    = new ClipsTreeViewItem("clip_label") ;
+  new_clip   ->addSubItem(new ClipsTreeViewItem("file_label ") , 0) ;
+  new_clip   ->addSubItem(new ClipsTreeViewItem("begin_label") , 1) ;
+  new_clip   ->addSubItem(new ClipsTreeViewItem("end_label  ") , 2) ;
+
+  return new_clip ;
+}
+void MainContent::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& deleted_node , int prev_idx)
+{
+DBG("MainContent::valueTreeChildRemoved() parent_node=" + parent_node.getType() + " deleted_node=" + deleted_node.getType() + " prev_idx=" + String(prev_idx)) ;
+}
+void MainContent::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_idx , int curr_idx)
+{
+DBG("MainContent::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
 }
 
 //[/MiscUserCode]

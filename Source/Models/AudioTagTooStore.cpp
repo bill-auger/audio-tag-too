@@ -55,7 +55,7 @@ void AudioTagTooStore::teardown() { listen(false) ; storeConfig(this->deviceStat
 
 void AudioTagTooStore::verifyConfig()
 {
-  // verify or reset stored configuration
+  // verify stored configuration or reset from defaults
   bool was_storage_found   = this->root.isValid() ;
   bool is_root_valid       = this->root.hasType(STORE::STORAGE_ID) ;
   bool has_canonical_nodes = !hasDuplicatedNodes(this->root) ;
@@ -75,10 +75,12 @@ void AudioTagTooStore::verifyConfig()
     this->root.removeProperty(STORE::CONFIG_VERSION_KEY , nullptr) ;
   }
 
+DEBUG_TRACE_VERIFY_STORED_CONFIG
+
   this->clips        = this->root.getOrCreateChildWithName(STORE::CLIPS_ID        , nullptr) ;
   this->compilations = this->root.getOrCreateChildWithName(STORE::COMPILATIONS_ID , nullptr) ;
 
-DEBUG_TRACE_VERIFY_STORED_CONFIG
+createClip(String("audio_filename") , 0.1 , 2.3) ;
 }
 
 void AudioTagTooStore::verifyRoot()
@@ -377,7 +379,7 @@ DEBUG_TRACE_SET_CONFIG
     setProperty(config_node , key , value) ;
 }
 
-void AudioTagTooStore::createClip(String& audio_filename , double begin_time , double end_time)
+void AudioTagTooStore::createClip(String audio_filename , double begin_time , double end_time)
 {
   Identifier master_id = STORE::FilterId(audio_filename) ;
   Identifier clip_id   = STORE::FilterId(audio_filename     + '-' +

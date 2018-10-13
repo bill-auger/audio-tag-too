@@ -100,6 +100,8 @@ public:
 
   // root IDs
   static const Identifier CONFIG_VERSION_KEY ;
+
+  // clips/compilations IDs
   static const Identifier FILENAME_KEY ;
   static const Identifier BEGIN_TIME_KEY ;
   static const Identifier END_TIME_KEY ;
