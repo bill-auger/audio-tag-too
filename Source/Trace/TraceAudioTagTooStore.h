@@ -52,18 +52,23 @@
                                   " begin_time="    + String(begin_time) +                     \
                                   " end_time="      + String(end_time  ) ) ;                   }
 
-  #define DEBUG_TRACE_VERIFY_STORED_CONFIG                                                      \
-    String not_found_msg = "stored config not found - restoring defaults" ;                     \
-    String invalid_msg   = "stored config invalid - restoring defaults" ;                       \
-    String corrupt_msg   = "stored config corrupt - pruning duplicated nodes" ;                 \
-    String upgraded_msg  = "upgrading config version from v" + String(stored_version) +         \
-                           " to v"                           + String(STORE::CONFIG_VERSION) ;  \
-    String success_msg   = "stored config parsed successfully v" + String(stored_version) ;     \
-    Trace::TraceStore("looking for stored config at " + this->storageFile.getFullPathName()) ;  \
-    Trace::TraceStore((!was_storage_found  ) ? not_found_msg :                                  \
-                      (!is_root_valid      ) ? invalid_msg   :                                  \
-                      (!has_canonical_nodes) ? corrupt_msg   :                                  \
-                      (!do_versions_match  ) ? upgraded_msg  : success_msg)                     ;
+  #define DEBUG_TRACE_VERIFY_STORED_CONFIG                                                     \
+    String not_found_msg = "stored config not found - restoring defaults" ;                    \
+    String invalid_msg   = "stored config invalid - restoring defaults" ;                      \
+    String corrupt_msg   = "stored config corrupt - pruning duplicated nodes" ;                \
+    String upgraded_msg  = "upgrading config version from v" + String(stored_version) +        \
+                           " to v"                           + String(STORE::CONFIG_VERSION) ; \
+    String success_msg   = "stored config parsed successfully v" + String(stored_version) ;    \
+    int    n_masters     = this->clips.getNumChildren() ;                                      \
+    int    n_clips       = 0 ; for (int master_n = 0 ; master_n < n_masters ; ++master_n)      \
+           n_clips      += this->clips.getChild(master_n).getNumChildren() ;                   \
+    String no_clips_msg  = String(n_clips) + " clips declared on" +                            \
+                           String(n_masters) + " master sources"  ;                            \
+    Trace::TraceStore("looking for stored config at " + this->storageFile.getFullPathName()) ; \
+    Trace::TraceStore((!was_storage_found  ) ? not_found_msg :                                 \
+                      (!is_root_valid      ) ? invalid_msg   :                                 \
+                      (!has_canonical_nodes) ? corrupt_msg   :                                 \
+                      (!do_versions_match  ) ? upgraded_msg  : success_msg)                    ;
 
   #define DEBUG_TRACE_VERIFY_MISSING_NODE    \
     Trace::TraceMissingNode(store , node_id) ;

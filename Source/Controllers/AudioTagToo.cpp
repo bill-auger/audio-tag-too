@@ -139,7 +139,7 @@ DEBUG_TRACE_INIT_PHASE_4
 
   // initialze GUI
 #ifdef CONTROLLER_OWNS_STORAGE
-  Gui->initialize(Store->root , Features) ;
+  Gui->initialize(Store->clips , Store->compilations , Features) ;
   Window->restoreWindowStateFromString(STRING(Store->root[STORE::WINDOW_STATE_KEY])) ;
 #else // CONTROLLER_OWNS_STORAGE
   Gui->initialize(Features) ;

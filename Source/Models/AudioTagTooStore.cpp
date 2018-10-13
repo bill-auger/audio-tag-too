@@ -93,7 +93,47 @@ ValueTree AudioTagTooStore::getChildNodeById(ValueTree root_store , Identifier n
 
 bool AudioTagTooStore::createClip(String audio_filename , double begin_time , double end_time)
 {
-  return true ;
+  Identifier master_id         = STORE::FilterId(audio_filename) ;
+  Identifier clip_id           = STORE::FilterId(audio_filename     + '-' +
+                                                 String(begin_time) + '-' +
+                                                 String(end_time  )       ) ;
+  ValueTree  master_node       = this->clips.getChildWithName(master_id) ;
+  bool       is_duplicate_clip = master_node.getChildWithName(clip_id).isValid() ;
+  bool       is_new_master     = !master_node.isValid() ;
+  String     master_filename   = STRING(master_node[STORE::FILENAME_KEY]) ;
+  bool       is_id_collision   = !is_new_master && master_filename != audio_filename ;
+  master_node                  = (is_new_master) ? ValueTree(master_id) : master_node ;
+  String     master_label_text = File(audio_filename).getFileName() ;
+  String     clip_label_text   = String(begin_time , 6) + " - " + String(end_time , 6) ;
+  ValueTree  clip_node         = ValueTree(clip_id) ;
+  bool       is_valid          = !is_id_collision && !is_duplicate_clip ;
+
+DEBUG_TRACE_CREATE_CLIP
+
+  if (is_valid)
+  {
+    setProperty(clip_node , STORE::LABEL_TEXT_KEY , clip_label_text) ;
+    setProperty(clip_node , STORE::FILENAME_KEY   , audio_filename ) ;
+    setProperty(clip_node , STORE::BEGIN_TIME_KEY , begin_time     ) ;
+    setProperty(clip_node , STORE::END_TIME_KEY   , end_time       ) ;
+    master_node.appendChild(clip_node , nullptr) ;
+
+    if (is_new_master)
+    {
+      setProperty(master_node , STORE::LABEL_TEXT_KEY , master_label_text) ;
+      setProperty(master_node , STORE::FILENAME_KEY   , audio_filename   ) ;
+      this->clips.appendChild(master_node , nullptr) ;
+    }
+
+    STORE::IdComparator<ValueTree&> id_comparator ;
+    this->clips.sort(id_comparator , nullptr , false) ;
+    master_node.sort(id_comparator , nullptr , false) ;
+
+DEBUG_TRACE_DUMP_STORE(master_node , "master_node")
+  }
+  else if (is_id_collision) AudioTagToo::Warning(GUI::ID_COLLISION_ERROR_MSG) ;
+
+  return is_valid ;
 }
 
 
@@ -122,6 +162,9 @@ void AudioTagTooStore::verifyConfig()
 
     this->root.removeProperty(STORE::CONFIG_VERSION_KEY , nullptr) ;
   }
+
+  this->clips        = this->root.getOrCreateChildWithName(STORE::CLIPS_ID        , nullptr) ;
+  this->compilations = this->root.getOrCreateChildWithName(STORE::COMPILATIONS_ID , nullptr) ;
 
 DEBUG_TRACE_VERIFY_STORED_CONFIG
 }

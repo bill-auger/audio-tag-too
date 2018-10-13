@@ -29,8 +29,24 @@
 |*| STORAGE_ID:
 |*| {
 |*|   // config root
-|*|   CONFIG_VERSION_KEY : an_int   ,
-|*|   WINDOW_STATE_KEY   : a_string
+|*|   CONFIG_VERSION_KEY : an_int                                         ,
+|*|   WINDOW_STATE_KEY   : a_string                                       ,
+|*|   CLIPS_ID           : [ a-clip-id:        a_clip_node        , ... ] , // clip-id nodes as below
+|*|   COMPILATIONS_ID    : [ a-compilation-id: a_compilation_node , ... ]   // compilation-id nodes as below
+|*| }
+|*|
+|*| // AudioTagTooStore->clips
+|*| clip-id:
+|*| {
+|*|   FILENAME_KEY   : a_string , // master audio file from which this clip was derived
+|*|   BEGIN_TIME_KEY : a_double , // beginning time offset relative to the master audio file
+|*|   END_TIME_KEY   : a_double   // ending time offset relative to the master audio file
+|*| }
+|*|
+|*| // AudioTagTooStore->compilations
+|*| compilation-id:
+|*| {
+|*|   // TODO: (ordered list of clip-id nodes)
 |*| }
 \*/
 
@@ -62,10 +78,18 @@ public:
   // storage nodes
   static const Identifier STORAGE_ID ;
   static const Identifier DEVICE_XML_ID ;
+  static const Identifier CLIPS_ID ;
+  static const Identifier COMPILATIONS_ID ;
 
   // root IDs
   static const Identifier CONFIG_VERSION_KEY ;
   static const Identifier WINDOW_STATE_KEY ;
+
+  // clips/compilations IDs
+  static const Identifier LABEL_TEXT_KEY ;
+  static const Identifier FILENAME_KEY ;
+  static const Identifier BEGIN_TIME_KEY ;
+  static const Identifier END_TIME_KEY ;
 
   // root defaults
   static const String STORAGE_DIRNAME ;
