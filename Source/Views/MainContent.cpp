@@ -43,6 +43,7 @@
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/MediaConstants.h"
+#include "../Constants/StorageConstants.h"
 #include "../Controllers/AudioTagToo.h"
 #ifdef CONTROLLER_OWNS_STORAGE
 #include "../Models/AudioTagTooStore.h"
@@ -107,19 +108,18 @@ MainContent::MainContent ()
 
     //[UserPreSize]
 
+  this->fileBrowser            = static_cast<FileBrowserComponent*>(this->tabPanel   ->getTabContentComponent(GUI::FILE_BROWSER_IDX)) ;
+  FileListComponent* file_list = static_cast<FileListComponent*   >(this->fileBrowser->getDisplayComponent()                        ) ;
+  this->clipsTreeview          = static_cast<TreeView*            >(this->tabPanel   ->getTabContentComponent(GUI::CLIPS_IDX       )) ;
+  this->compilationsTreeview   = static_cast<TreeView*            >(this->tabPanel   ->getTabContentComponent(GUI::COMPILATIONS_IDX)) ;
+  this->clips       .reset(new ClipsTreeViewItem(String::empty)) ;
+  this->compilations.reset(new ClipsTreeViewItem(String::empty)) ;
 #ifndef CONTROLLER_OWNS_STORAGE
-  this->fileBrowser          = static_cast<FileBrowserComponent*>(this->tabPanel->getTabContentComponent(GUI::FILE_BROWSER_IDX)) ;
-  this->clipsTreeview        = static_cast<TreeView*            >(this->tabPanel->getTabContentComponent(GUI::CLIPS_IDX       )) ;
-  this->compilationsTreeview = static_cast<TreeView*            >(this->tabPanel->getTabContentComponent(GUI::COMPILATIONS_IDX)) ;
-  this->storage.reset(new AudioTagTooStore()) ;
+  this->storage     .reset(new AudioTagTooStore()) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
   this->waveforms.push_back(this->fullWaveform.get()) ;
   this->waveforms.push_back(this->clipWaveform.get()) ;
-
-  FileListComponent* file_list = static_cast<FileListComponent*>(this->fileBrowser->getDisplayComponent()         ) ;
-  this->clips        = new ClipsTreeViewItem("GUI::CLIPS_TREEVIEW_ID"       ) ;
-  this->compilations = new ClipsTreeViewItem("GUI::COMPILATIONS_TREEVIEW_ID") ;
 
     //[/UserPreSize]
 
@@ -144,8 +144,10 @@ MainContent::MainContent ()
   file_list->setColour(DirectoryContentsDisplayComponent::highlightColourId	      , GUI::BROWSER_SELECTED_BG_COLOR) ;
   file_list->setColour(DirectoryContentsDisplayComponent::highlightedTextColourId	, GUI::BROWSER_SELECTED_FG_COLOR) ;
 
-  this->clipsTreeview       ->setRootItem(this->clips       ) ;
-  this->compilationsTreeview->setRootItem(this->compilations) ;
+  this->clipsTreeview       ->setRootItem(this->clips       .get()) ;
+  this->compilationsTreeview->setRootItem(this->compilations.get()) ;
+  this->clipsTreeview       ->setRootItemVisible(false) ;
+  this->compilationsTreeview->setRootItemVisible(false) ;
 
   this->formatManager    .registerBasicFormats() ;
   this->audioSourcePlayer.setSource(&transportSource) ;
@@ -388,6 +390,55 @@ void MainContent::createClip()
 #endif // CONTROLLER_OWNS_STORAGE
 }
 
+void MainContent::createMasterItem(ValueTree master_node)
+{
+  int           master_idx      = this->storage->clips.indexOf(master_node) ;
+  TreeViewItem* new_master_item = newMasterItem(master_node) ;
+
+  for (int clip_n = 0 ; clip_n < master_node.getNumChildren() ; ++clip_n)
+    new_master_item->addSubItem(newClipItem(master_node.getChild(clip_n)) , -1) ;
+  this->clips->addSubItem(new_master_item , master_idx) ;
+}
+
+TreeViewItem* MainContent::newMasterItem(ValueTree master_node)
+{
+  String        master_label = STRING(master_node[STORE::FILENAME_KEY]) ;
+  TreeViewItem* new_master   = new ClipsTreeViewItem(master_label) ;
+
+  return new_master ;
+}
+
+void MainContent::createClipItem(ValueTree master_node , ValueTree clip_node)
+{
+  int           master_idx             = this->storage->clips.indexOf(master_node) ;
+  TreeViewItem* master_item            = this->clips->getSubItem(master_idx) ;
+  bool          does_master_item_exist = master_item != nullptr ;
+
+  if (!does_master_item_exist)
+  {
+    master_item = newMasterItem(master_node) ;
+    this->clips->addSubItem(master_item , master_idx) ;
+  }
+
+  int clip_idx = master_node.indexOf(clip_node) ;
+  master_item->addSubItem(newClipItem(clip_node) , clip_idx) ;
+}
+
+TreeViewItem* MainContent::newClipItem(ValueTree clip_node)
+{
+  String        clip_label  = STRING(clip_node[STORE::BEGIN_TIME_KEY]) + " - " +
+                              STRING(clip_node[STORE::END_TIME_KEY  ]) ;
+  String        file_label  = STRING(clip_node[STORE::FILENAME_KEY  ]) ;
+  String        begin_label = STRING(clip_node[STORE::BEGIN_TIME_KEY]) ;
+  String        end_label   = STRING(clip_node[STORE::END_TIME_KEY  ]) ;
+  TreeViewItem* new_clip    = new ClipsTreeViewItem("clip_label") ;
+  new_clip   ->addSubItem(new ClipsTreeViewItem("file_label ") , 0) ;
+  new_clip   ->addSubItem(new ClipsTreeViewItem("begin_label") , 1) ;
+  new_clip   ->addSubItem(new ClipsTreeViewItem("end_label  ") , 2) ;
+
+  return new_clip ;
+}
+
 
 /* event handlers */
 
@@ -429,9 +480,9 @@ void MainContent::paintOverChildren(Graphics& g)
                    GUI::DASH_LENGTHS , GUI::N_DASH_LENGTHS                           ) ;
 }
 
-void MainContent::prepareToPlay (int samplesPerBlockExpected, double sampleRate) { }
+void MainContent::prepareToPlay(int samplesPerBlockExpected, double sampleRate) { }
 
-void MainContent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFill) { }
+void MainContent::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill) { }
 
 void MainContent::releaseResources() { }
 
@@ -461,9 +512,20 @@ void MainContent::changeListenerCallback(ChangeBroadcaster* source)
   }
 }
 
-void MainContent::valueTreeChildAdded(ValueTree& parent_node , ValueTree& node)
+void MainContent::valueTreeRedirected(ValueTree& parent_node)
 {
-DBG("MainContent::valueTreeChildAdded() parent_node=" + parent_node.getType() + " node=" + node.getType()) ;
+  while (this->clips->getNumSubItems() > 0) this->clips->removeSubItem(0) ;
+
+  createMasterItem(parent_node) ;
+}
+
+void MainContent::valueTreeChildAdded(ValueTree& parent_node , ValueTree& new_node)
+{
+  bool is_master_node = parent_node             == this->storage->clips ;
+  bool is_clip_node   = parent_node.getParent() == this->storage->clips ;
+
+  if      (is_master_node) createMasterItem(new_node) ;
+  else if (is_clip_node  ) createClipItem  (parent_node , new_node) ;
 }
 
 void MainContent::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& node , int prev_idx)

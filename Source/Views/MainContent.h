@@ -83,9 +83,9 @@ private:
   TimeSliceThread                          workerThread ;
   FileBrowserComponent*                    fileBrowser ;
   TreeView*                                clipsTreeview ;
-  TreeViewItem*                            clips ;
+  std::unique_ptr<TreeViewItem>            clips ;
   TreeView*                                compilationsTreeview ;
-  TreeViewItem*                            compilations ;
+  std::unique_ptr<TreeViewItem>            compilations ;
   String                                   projectFilename ;
   String                                   audioFilename ;
   AudioFormatManager                       formatManager ;
@@ -101,55 +101,61 @@ private:
 #endif // CONTROLLER_OWNS_STORAGE
 
   // getters/setters
-  void loadUrl              (File audio_url) ;
-  void toggleTransport      (void) ;
-  void updateTransportButton(void) ;
-  void setHeadMarker        (void) ;
-  void setTailMarker        (void) ;
-  void createClip           (void) ;
+  void          loadUrl              (File audio_url) ;
+  void          toggleTransport      (void) ;
+  void          updateTransportButton(void) ;
+  void          setHeadMarker        (void) ;
+  void          setTailMarker        (void) ;
+  void          createClip           (void) ;
+  void          createMasterItem     (ValueTree master_node) ;
+  TreeViewItem* newMasterItem        (ValueTree master_node) ;
+  void          createClipItem       (ValueTree master_node , ValueTree clip_node) ;
+  TreeViewItem* newClipItem          (ValueTree clip_node) ;
 
   // event handlers
-  void paintOverChildren         (Graphics& g)                                                 override ;
-  void prepareToPlay             (int samples_per_block , double sample_rate)                  override ;
-  void getNextAudioBlock         (const AudioSourceChannelInfo& buffer)                        override ;
-  void releaseResources          (void)                                                        override ;
-  void buttonClicked             (Button* a_button)                                            override ;
-  void selectionChanged          (void)                                                        override ;
-  void changeListenerCallback    (ChangeBroadcaster* source)                                   override ;
-  void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& node                   ) override ;
-  void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& node     , int prev_idx) override ;
-  void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx , int curr_idx) override ;
+  void paintOverChildren         (Graphics& g)                                                     override ;
+  void prepareToPlay             (int samples_per_block , double sample_rate)                      override ;
+  void getNextAudioBlock         (const AudioSourceChannelInfo& buffer)                            override ;
+  void releaseResources          (void)                                                            override ;
+  void buttonClicked             (Button* a_button)                                                override ;
+  void selectionChanged          (void)                                                            override ;
+  void changeListenerCallback    (ChangeBroadcaster* source)                                       override ;
+  void valueTreeRedirected       (ValueTree&                                                     ) override ;
+  void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node                   ) override ;
+  void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
+  void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override ;
 
   // unhandled ValueTree::Listener events
   void valueTreePropertyChanged(ValueTree& , const Identifier&) override {}
   void valueTreeParentChanged  (ValueTree&                    ) override {}
-  void valueTreeRedirected     (ValueTree&                    ) override {}
 
   // unhandled FileBrowserListener events
-  void fileClicked       (const File&, const MouseEvent&) override {}
-  void fileDoubleClicked (const File&)                    override {}
-  void browserRootChanged(const File&)                    override {}
+  void fileClicked       (const File& , const MouseEvent&) override {}
+  void fileDoubleClicked (const File&                    ) override {}
+  void browserRootChanged(const File&                    ) override {}
+
 
   class ClipsTreeViewItem : public TreeViewItem
   {
   public:
 
-    ClipsTreeViewItem(const String& id) : id(id) {}
+    ClipsTreeViewItem(String _label) : label(_label) { }
 
-    String getUniqueName       () const override { return id   ; }
-    bool   mightContainSubItems()       override { return true ; }
-    int    getItemHeight       () const override { return 22   ; }
+//     String     getUniqueName       () const override { return id   ; }
+    bool       mightContainSubItems()       override { return true ; }
+    int        getItemHeight       () const override { return 22   ; }
+//     Component* createItemComponent ()       override { return new Label(id) ; }
 
     void paintItem(Graphics& g , int width , int height) override
     {
       g.setFont(Font(height * 0.7f , Font::bold)) ;
       g.setColour(GUI::FILENAME_FG_COLOR) ;
-      g.drawText(id , 2 , 0 , width - 2 , height , Justification::centredLeft , true) ;
+      g.drawText(this->label , 2 , 0 , width - 2 , height , Justification::centredLeft , true) ;
     }
 
     void itemOpennessChanged(bool is_open) override
     {
-DBG("ClipsTreeViewItem itemOpennessChanged()=" + String(is_open ? "is_open" : "is_closed")) ;
+DBG("ClipsTreeViewItem::itemOpennessChanged()=" + String(is_open ? "is_open" : "is_closed")) ;
 /*
         if (isNowOpen)
         {
@@ -168,7 +174,8 @@ DBG("ClipsTreeViewItem itemOpennessChanged()=" + String(is_open ? "is_open" : "i
 
   private:
 
-    String id ;
+    String label ;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipsTreeViewItem)
   } ;
