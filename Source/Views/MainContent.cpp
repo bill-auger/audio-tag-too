@@ -148,7 +148,7 @@ MainContent::MainContent ()
   this->clipWaveform   ->addChangeListener(this) ;
   this->transportSource .addChangeListener(this) ;
   this->fileBrowser    ->addListener      (this) ;
-  this->storage->root  ->addListener      (this) ;
+  this->storage->clips  .addListener      (this) ;
 
   // initialize stored state
   this->storage->initialize() ;
@@ -313,6 +313,19 @@ void MainContent::releaseResources()
     // restarted due to a setting change.
 
     // For more details, see the help for AudioProcessor::releaseResources()
+}
+
+void MainContent::valueTreeChildAdded       (ValueTree& parent_node , ValueTree& node)
+{
+DBG("MainContent::valueTreeChildAdded() parent_node=" + parent_node.getType() + " node=" + node.getType()) ;
+}
+void MainContent::valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& node , int prev_idx)
+{
+DBG("MainContent::valueTreeChildRemoved() parent_node=" + parent_node.getType() + " node=" + node.getType() + " prev_idx=" + String(prev_idx)) ;
+}
+void MainContent::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_idx , int curr_idx)
+{
+DBG("MainContent::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
 }
 
 void MainContent::processCliParams()

@@ -38,6 +38,33 @@
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+
+
+/*\ NOTES:
+|*|  the application data model is implemented in the AudioTagTooStore class
+|*|      as JUCE ValueTrees with a JUCE binary file-out for persistence (STORAGE_FILENAME)
+\*/
+
+/*\ SCHEMA:
+|*|
+|*| // AudioTagTooStore->root
+|*| STORAGE_ID:
+|*| {
+|*|   // config root
+|*|   CONFIG_VERSION_KEY : an_int                         ,
+|*|   CLIPS_ID           : [ a-clip-id: a_clip_node , ... ] // clip-id nodes as below
+|*| }
+|*|
+|*| // AudioTagTooStore->clips
+|*| clip-id:
+|*| {
+|*|   FILENAME_KEY   : a_string , // master audio file from which this clip was derived
+|*|   BEGIN_TIME_KEY : a_double , // beginning time offset relative to the master audio file
+|*|   END_TIME_KEY   : a_double   // ending time offset relative to the master audio file
+|*| }
+\*/
+
+
 #include "AppConstants.h"
 
 
@@ -61,6 +88,7 @@ public:
   // storage nodes
   static const Identifier STORAGE_ID ;
   static const Identifier DEVICE_XML_ID ;
+  static const Identifier CLIPS_ID ;
 
   // root IDs
   static const Identifier CONFIG_VERSION_KEY ;

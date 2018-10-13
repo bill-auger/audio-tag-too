@@ -75,6 +75,8 @@ void AudioTagTooStore::verifyConfig()
     this->root.removeProperty(STORE::CONFIG_VERSION_KEY , nullptr) ;
   }
 
+  this->clips = this->root.getOrCreateChildWithName(STORE::CLIPS_ID , nullptr) ;
+
 DEBUG_TRACE_VERIFY_STORED_CONFIG
 }
 
@@ -376,16 +378,34 @@ DEBUG_TRACE_SET_CONFIG
 
 void AudioTagTooStore::createClip(String& audio_filename , double begin_time , double end_time)
 {
-DBG("AudioTagTooStore::createClip() audio_filename=" + audio_filename     +
-                                  " begin_time="     + String(begin_time) +
-                                  " end_time="       + String(end_time)   ) ;
+  Identifier master_id = STORE::FilterId(audio_filename) ;
+  Identifier clip_id   = STORE::FilterId(audio_filename     + '-' +
+                                         String(begin_time) + '-' +
+                                         String(end_time  )       ) ;
 
-  Identifier clip_id = STORE::FilterId(audio_filename     + '-' +
-                                       String(begin_time) + '-' +
-                                       String(end_time  ) + '-' ) ;
-  ValueTree clip = ValueTree(clip_id) ;
-  setProperty(clip , STORE::FILENAME_KEY   , audio_filename) ;
-  setProperty(clip , STORE::BEGIN_TIME_KEY , begin_time    ) ;
-  setProperty(clip , STORE::END_TIME_KEY   , end_time      ) ;
-  this->root.addChild(clip , -1 , nullptr) ;
+  ValueTree master_store    = this->clips.getChildWithName(master_id) ;
+  bool      is_new_master   = !master_store.isValid() ;
+  var       master_filename = master_store.getProperty(STORE::FILENAME_KEY) ;
+  bool      is_id_collision = !is_new_master && STRING(master_filename) != audio_filename ;
+
+DEBUG_TRACE_CREATE_CLIP
+
+  if (!is_id_collision)
+  {
+    // create new clip (creating and appending a new master to the tree if necessary)
+    master_store         = this->clips.getOrCreateChildWithName(master_id , nullptr) ;
+    ValueTree clip_store = ValueTree(clip_id) ;
+
+    // set clip properties and append it to the master source entry
+    setProperty(clip_store , STORE::FILENAME_KEY   , audio_filename) ;
+    setProperty(clip_store , STORE::BEGIN_TIME_KEY , begin_time    ) ;
+    setProperty(clip_store , STORE::END_TIME_KEY   , end_time      ) ;
+    master_store.appendChild(clip_store , nullptr) ;
+
+    // sort masters and clips
+    STORE::IdComparator<ValueTree&> id_comparator ;
+    this->clips .sort(id_comparator , nullptr , false) ;
+    master_store.sort(id_comparator , nullptr , false) ;
+  }
+  else return ; // TODO: collision alert
 }
