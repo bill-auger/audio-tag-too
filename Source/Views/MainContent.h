@@ -24,6 +24,7 @@
 //[Headers]     -- You can add your own extra header files here --
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#include "../Constants/StorageConstants.h"
 
 
 class AudioTagTooStore ;
@@ -100,16 +101,19 @@ private:
 #endif // CONTROLLER_OWNS_STORAGE
 
   // getters/setters
-  void          loadUrl              (File audio_url) ;
-  void          toggleTransport      (void) ;
-  void          updateTransportButton(void) ;
-  void          setHeadMarker        (void) ;
-  void          setTailMarker        (void) ;
-  void          createClip           (void) ;
-  void          createMasterItem     (ValueTree master_node) ;
-  TreeViewItem* newMasterItem        (ValueTree master_node) ;
-  void          createClipItem       (ValueTree master_node , ValueTree clip_node) ;
-  TreeViewItem* newClipItem          (ValueTree clip_node) ;
+  void loadUrl              (File audio_url) ;
+  void toggleTransport      (void) ;
+  void updateTransportButton(void) ;
+  void setHeadMarker        (void) ;
+  void setTailMarker        (void) ;
+  void createClip           (void) ;
+
+  // model helpers
+  TreeViewItem* getViewItemFor  (ValueTree root_store) ;
+  TreeViewItem* newMasterItem   (ValueTree master_node) ;
+  TreeViewItem* newClipItem     (ValueTree clip_node) ;
+  void          createMasterItem(ValueTree root_store , ValueTree master_node) ;
+  void          createClipItem  (ValueTree root_store , ValueTree clip_node) ;
 
   // event handlers
   void paintOverChildren         (Graphics& g)                                                     override ;
@@ -119,7 +123,7 @@ private:
   void buttonClicked             (Button* a_button)                                                override ;
   void selectionChanged          (void)                                                            override ;
   void changeListenerCallback    (ChangeBroadcaster* source)                                       override ;
-  void valueTreeRedirected       (ValueTree&                                                     ) override ;
+  void valueTreeRedirected       (ValueTree& root_store                                          ) override ;
   void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node                   ) override ;
   void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
   void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override ;
@@ -134,49 +138,43 @@ private:
   void browserRootChanged(const File&                    ) override {}
 
 
-  class ClipsTreeViewItem : public TreeViewItem
+  class ClipItem : public TreeViewItem , private Label::Listener
   {
   public:
 
-    ClipsTreeViewItem(String _label) : label(_label) { }
+    ClipItem(String _item_id   , String _label , ValueTree _store = ValueTree::invalid) :
+             item_id(_item_id) , label(_label) , store(_store)                          { }
 
-//     String     getUniqueName       () const override { return id   ; }
-    bool       mightContainSubItems()       override { return true ; }
-    int        getItemHeight       () const override { return 22   ; }
-//     Component* createItemComponent ()       override { return new Label(id) ; }
 
-    void paintItem(Graphics& g , int width , int height) override
+    // TreeViewItem implementation
+    String     getUniqueName       () const override { return this->item_id         ; }
+    bool       mightContainSubItems()       override { return this->store.isValid() ; }
+    int        getItemHeight       () const override { return 24                    ; }
+    Component* createItemComponent ()       override
     {
-      g.setFont(Font(height * 0.7f , Font::bold)) ;
-      g.setColour(GUI::FILENAME_FG_COLOR) ;
-      g.drawText(this->label , 2 , 0 , width - 2 , height , Justification::centredLeft , true) ;
+      Label* item_label = new Label(this->item_id , this->label) ;
+
+      item_label->setEditable(this->store.isValid()) ;
+      item_label->addListener(this) ;
+
+      return item_label ;
     }
 
-    void itemOpennessChanged(bool is_open) override
+    // Label event handler
+    void labelTextChanged(Label* a_label)
     {
-DBG("ClipsTreeViewItem::itemOpennessChanged()=" + String(is_open ? "is_open" : "is_closed")) ;
-/*
-        if (isNowOpen)
-        {
-            if (getNumSubItems() == 0)
-                for (auto command : owner.getCommandManager().getCommandsInCategory (categoryName))
-                    if (owner.shouldCommandBeIncluded (command))
-                        addSubItem (new MappingItem (owner, command));
-        }
-        else
-        {
-            clearSubItems();
-        }
-*/
+      this->store.setProperty(STORE::LABEL_TEXT_KEY , a_label->getText() , nullptr) ;
     }
 
 
   private:
 
-    String label ;
+    String    item_id ;
+    String    label ;
+    ValueTree store ;
 
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipsTreeViewItem)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)
   } ;
 
     //[/UserVariables]

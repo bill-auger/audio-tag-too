@@ -52,6 +52,9 @@
                                   " begin_time="    + String(begin_time) +                     \
                                   " end_time="      + String(end_time  ) ) ;                   }
 
+  #define DEBUG_PRIME_CLIPS_STORAGE if (DEBUG_PRIME_STORAGE)              \
+    createClip(String("/path/to/dummy_audio_file") , 0.123456 , 6.543210) ;
+
   #define DEBUG_TRACE_VERIFY_STORED_CONFIG                                                     \
     String not_found_msg = "stored config not found - restoring defaults" ;                    \
     String invalid_msg   = "stored config invalid - restoring defaults" ;                      \

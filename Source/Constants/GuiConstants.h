@@ -44,6 +44,8 @@ public:
   static const uint16 WINDOW_H ;
   static const Colour WINDOW_BG_COLOR ;
   static const int    TITLEBAR_BTNS ;
+  static const int    N_DASH_LENGTHS = 2 ; // ASSERT: number of floats defiend in DASH_LENGTHS
+  static const float  DASH_LENGTHS[N_DASH_LENGTHS] ;
 
   // Waveform
   static const uint16 CACHE_N_THUMBS ;
@@ -80,6 +82,11 @@ public:
   static const Colour BROWSER_SELECTED_BG_COLOR ;
   static const Colour BROWSER_SELECTED_FG_COLOR ;
 
+  // ClipItem
+  static const String FILE_ITEM_LABEL ;
+  static const String BEGIN_ITEM_LABEL ;
+  static const String END_ITEM_LABEL ;
+
   // Alert
   enum         AlertType { ALERT_TYPE_WARNING , ALERT_TYPE_ERROR } ;
   static const String    MODAL_WARNING_TITLE ;
@@ -89,4 +96,5 @@ public:
   static const String DEVICE_ERROR_MSG ;
   static const String FILESYSTEM_WRITE_ERROR_MSG ;
   static const String STORAGE_WRITE_ERROR_MSG ;
+  static const String ID_COLLISION_ERROR_MSG ;
 } ;

@@ -167,8 +167,6 @@ DEBUG_TRACE_VERIFY_STORED_CONFIG
 
   this->clips        = this->root.getOrCreateChildWithName(STORE::CLIPS_ID        , nullptr) ;
   this->compilations = this->root.getOrCreateChildWithName(STORE::COMPILATIONS_ID , nullptr) ;
-
-createClip(String("audio_filename") , 0.1 , 2.3) ;
 }
 
 void AudioTagTooStore::verifyRoot()
@@ -322,7 +320,7 @@ bool AudioTagTooStore::storeConfig(XmlElement* device_state_xml)
 DEBUG_TRACE_STORE_CONFIG
 
   // prepare storage directory
-  File temp_file = this->storageFile.getSiblingFile(STORE::STORAGE_FILENAME + ".temp") ;
+  File temp_file = this->storageFile.getSiblingFile(APP::APP_CMD + ".temp") ;
   if (temp_file.create().failed() || !temp_file.deleteFile())
   {
     AudioTagToo::Error(GUI::FILESYSTEM_WRITE_ERROR_MSG) ;
@@ -332,7 +330,7 @@ DEBUG_TRACE_STORE_CONFIG
 
 DEBUG_TRACE_DUMP_STORE(this->root , "root")
 
-  if (this->root.isValid())
+  if (this->root.isValid() && this->clips.isValid() && this->compilations.isValid())
   {
 #ifdef STORAGE_IS_BINARY
 

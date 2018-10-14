@@ -45,7 +45,7 @@ class AudioTagTooStore : private ChangeListener      ,
 
 public:
 
-  AudioTagTooStore(void) ;
+  AudioTagTooStore (void) ;
   ~AudioTagTooStore(void) ;
 
 
@@ -60,9 +60,9 @@ public:
 private:
 
   // validations
-  void verifyConfig() ;
-  void verifyRoot  () ;
-  void sanitizeRoot() ;
+  void verifyConfig(void) ;
+  void verifyRoot  (void) ;
+  void sanitizeRoot(void) ;
 
   // validation/sanitization helpers
   void verifyChildNode      (ValueTree store , Identifier node_id) ;
