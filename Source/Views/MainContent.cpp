@@ -45,6 +45,7 @@
 #include "../Constants/GuiConstants.h"
 #include "../Constants/MediaConstants.h"
 #include "../Constants/StorageConstants.h"
+#include "../Trace/TraceMainContent.h"
 
 //[/Headers]
 
@@ -161,7 +162,7 @@ MainContent::MainContent ()
   this->storage->clips       .addListener      (this) ;
   this->storage->compilations.addListener      (this) ;
 
-  if (!this->storage->initialize()) ; // trigger ValueTree events
+  if (!this->storage->initialize()) ;
 
   // initialize stored state
   this->storage->initialize() ;
@@ -348,6 +349,66 @@ void MainContent::createClip()
 }
 
 
+/* model helpers */
+
+TreeViewItem* MainContent::newMasterItem(ValueTree master_node)
+{
+  String        master_label = STRING(master_node[STORE::FILENAME_KEY]) ;
+  TreeViewItem* new_master   = new ClipsTreeViewItem(master_label) ;
+
+DEBUG_TRACE_NEW_MASTER_ITEM
+Trace::DumpStore(master_node , "master_node") ;
+
+  return new_master ;
+}
+
+TreeViewItem* MainContent::newClipItem(ValueTree clip_node)
+{
+  String        clip_label  = STRING(clip_node[STORE::BEGIN_TIME_KEY]) + " - " +
+                              STRING(clip_node[STORE::END_TIME_KEY  ]) ;
+  String        file_label  = STRING(clip_node[STORE::FILENAME_KEY  ]) ;
+  String        begin_label = STRING(clip_node[STORE::BEGIN_TIME_KEY]) ;
+  String        end_label   = STRING(clip_node[STORE::END_TIME_KEY  ]) ;
+  TreeViewItem* new_clip    = new ClipsTreeViewItem("clip_label") ;
+  new_clip->addSubItem(new ClipsTreeViewItem("file_label " , false) , 0) ;
+  new_clip->addSubItem(new ClipsTreeViewItem("begin_label" , false) , 1) ;
+  new_clip->addSubItem(new ClipsTreeViewItem("end_label  " , false) , 2) ;
+
+DEBUG_TRACE_NEW_CLIP_ITEM
+
+  return new_clip ;
+}
+
+void MainContent::createMasterItem(ValueTree master_node)
+{
+  int           master_idx  = this->storage->clips.indexOf(master_node) ;
+  TreeViewItem* master_item = newMasterItem(master_node) ;
+
+  for (int clip_n = 0 ; clip_n < master_node.getNumChildren() ; ++clip_n)
+    master_item->addSubItem(newClipItem(master_node.getChild(clip_n)) , -1) ;
+  this->clips->addSubItem(master_item , master_idx) ;
+
+DEBUG_TRACE_CREATE_MASTER_ITEM
+}
+
+void MainContent::createClipItem(ValueTree master_node , ValueTree clip_node)
+{
+  int           master_idx             = this->storage->clips.indexOf(master_node) ;
+  TreeViewItem* master_item            = this->clips->getSubItem(master_idx) ;
+  bool          does_master_item_exist = master_item != nullptr ;
+
+  if (!does_master_item_exist)
+  {
+    master_item = newMasterItem(master_node) ;
+    this->clips->addSubItem(master_item , master_idx) ;
+  }
+  int clip_idx = master_node.indexOf(clip_node) ;
+  master_item->addSubItem(newClipItem(clip_node) , clip_idx) ;
+
+DEBUG_TRACE_CREATE_CLIP_ITEM
+}
+
+
 /* event handlers */
 
 void MainContent::paintOverChildren(Graphics& g)
@@ -513,6 +574,7 @@ TreeViewItem* MainContent::newClipItem(ValueTree clip_node)
 
   return new_clip ;
 }
+
 void MainContent::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& deleted_node , int prev_idx)
 {
 DBG("MainContent::valueTreeChildRemoved() parent_node=" + parent_node.getType() + " deleted_node=" + deleted_node.getType() + " prev_idx=" + String(prev_idx)) ;

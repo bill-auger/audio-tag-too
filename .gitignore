@@ -49,6 +49,7 @@
 !Source/Trace/Trace.h
 !Source/Trace/TraceAudioTagTooStore.h
 !Source/Trace/TraceMain.h
+!Source/Trace/TraceMainContent.h
 !Source/Trace/TraceWaveform.h
 
 !Source/Views/
