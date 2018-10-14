@@ -45,7 +45,7 @@ class AudioTagTooStore : private ChangeListener      ,
 
 public:
 
-  AudioTagTooStore(void) ;
+  AudioTagTooStore (void) ;
   ~AudioTagTooStore(void) ;
 
 

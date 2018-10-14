@@ -55,6 +55,9 @@ public:
   static void        ResetAudio      (void) ;
   static ValueTree   CreateClip      (String audio_filename , double begin_time , double end_time) ;
 
+  // helpers
+  static String DurationString(double duration) ;
+
 
 private:
 

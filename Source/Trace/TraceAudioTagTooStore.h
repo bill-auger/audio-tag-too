@@ -27,6 +27,9 @@
 
 #if DEBUG_TRACE
 
+  #define DEBUG_PRIME_CLIPS_STORAGE if (DEBUG_PRIME_STORAGE)              \
+    createClip(String("/path/to/dummy_audio_file") , 0.123456 , 6.543210) ;
+
   #define DEBUG_TRACE_SET_PROPERTY                                                                 \
     if (!node.isValid()) Trace::TraceError("request to set property on invalid tree - ignoring") ;
 
@@ -73,8 +76,8 @@
                       (!is_root_valid      ) ? invalid_msg   :                                 \
                       (!has_canonical_nodes) ? corrupt_msg   :                                 \
                       (!do_versions_match  ) ? upgraded_msg  : success_msg) ;                  \
-    Trace::TraceStore(String(n_clips  ) + " clips declared on" +                               \
-                      String(n_masters) + " master sources"    )                             ; \
+    Trace::TraceStore(String(n_clips  ) + " clips declared from " +                            \
+                      String(n_masters) + " master sources"       )                            ;
 
   #define DEBUG_TRACE_VERIFY_MISSING_NODE    \
     Trace::TraceMissingNode(store , node_id) ;
@@ -120,6 +123,7 @@
 
 #else // DEBUG_TRACE
 
+  #define DEBUG_PRIME_CLIPS_STORAGE           ;
   #define DEBUG_TRACE_SET_PROPERTY            ;
   #define DEBUG_TRACE_SET_CONFIG              ;
   #define DEBUG_TRACE_CREATE_CLIP             ;

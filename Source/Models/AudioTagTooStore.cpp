@@ -46,6 +46,8 @@ AudioTagTooStore::AudioTagTooStore() : thumbnailCache(GUI::CACHE_N_THUMBS)
   // create shared config ValueTree from persistent storage or defaults
   loadConfig() ; verifyConfig() ;
 
+DEBUG_PRIME_CLIPS_STORAGE
+
 #ifndef CONTROLLER_OWNS_STORAGE
   listen(true) ;
 #endif // CONTROLLER_OWNS_STORAGE
