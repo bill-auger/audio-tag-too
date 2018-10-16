@@ -234,7 +234,7 @@ bool AudioTagTooStore::storeConfig(XmlElement* device_state_xml)
 DEBUG_TRACE_STORE_CONFIG
 
   // prepare storage directory
-  File temp_file = this->storageFile.getSiblingFile(STORE::STORAGE_FILENAME + ".temp") ;
+  File temp_file = this->storageFile.getSiblingFile(APP::APP_CMD + ".temp") ;
   if (temp_file.create().failed() || !temp_file.deleteFile())
   {
 #ifdef HAS_MAIN_CONTROLLER
@@ -248,7 +248,7 @@ DEBUG_TRACE_STORE_CONFIG
 
 DEBUG_TRACE_DUMP_STORE(this->root , "root")
 
-  if (this->root.isValid())
+  if (this->root.isValid() && this->clips.isValid() && this->compilations.isValid())
   {
 #ifdef STORAGE_IS_BINARY
 
@@ -309,7 +309,7 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
     {
       if (device_state_xml != this->deviceStateXml.get()) delete device_state_xml ;
 #ifdef HAS_MAIN_CONTROLLER
-      JuceBoilerplate::Error(GUI::STORAGE_WRITE_ERROR_MSG + "audio device configuration") ;
+      AudioTagToo::Error(GUI::STORAGE_WRITE_ERROR_MSG + "audio device configuration") ;
 #else // HAS_MAIN_CONTROLLER
       Trace::TraceError(GUI::STORAGE_WRITE_ERROR_MSG + "audio device configuration") ;
 #endif // HAS_MAIN_CONTROLLER
@@ -400,11 +400,11 @@ bool AudioTagTooStore::createClip(String audio_filename , double begin_time , do
 
 DEBUG_TRACE_CREATE_CLIP
 
-  bool is_valid = !is_id_collision                                                 &&
-                  setProperty(master_store , STORE::FILENAME_KEY , audio_filename) &&
-                  setProperty(clip_store , STORE::FILENAME_KEY   , audio_filename) &&
-                  setProperty(clip_store , STORE::BEGIN_TIME_KEY , begin_time    ) &&
-                  setProperty(clip_store , STORE::END_TIME_KEY   , end_time      )  ;
+  bool is_valid = !is_id_collision                                                   &&
+                  setProperty(master_store , STORE::FILENAME_KEY   , audio_filename) &&
+                  setProperty(clip_store   , STORE::FILENAME_KEY   , audio_filename) &&
+                  setProperty(clip_store   , STORE::BEGIN_TIME_KEY , begin_time    ) &&
+                  setProperty(clip_store   , STORE::END_TIME_KEY   , end_time      )  ;
 
   if (is_valid)
   {
@@ -415,7 +415,7 @@ DEBUG_TRACE_CREATE_CLIP
     this->clips .sort(id_comparator , nullptr , false) ;
     master_store.sort(id_comparator , nullptr , false) ;
 
-DEBUG_TRACE_DUMP_CREATE_CLIP
+// DEBUG_TRACE_DUMP_STORE(master_store , "master_store")
   }
 
   return is_valid ;

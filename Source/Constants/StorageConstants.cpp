@@ -58,6 +58,7 @@ const Identifier STORE::CONFIG_VERSION_KEY = "config-version" ;
 const Identifier STORE::FILENAME_KEY   = "master-filename";
 const Identifier STORE::BEGIN_TIME_KEY = "begin-time" ;
 const Identifier STORE::END_TIME_KEY   = "end-time" ;
+const Identifier STORE::ITEM_ID_KEY    = "item_id" ;
 
 // root defaults
 const int STORE::CONFIG_VERSION = 1 ;

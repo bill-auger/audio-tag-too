@@ -105,6 +105,7 @@ public:
   static const Identifier FILENAME_KEY ;
   static const Identifier BEGIN_TIME_KEY ;
   static const Identifier END_TIME_KEY ;
+  static const Identifier ITEM_ID_KEY ;
 
   // root defaults
   static const String STORAGE_DIRNAME ;

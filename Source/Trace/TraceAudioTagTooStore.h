@@ -128,8 +128,6 @@
                                   " begin_time="    + String(begin_time) +                   \
                                   " end_time="      + String(end_time  ) ) ;                 }
 
-  #define DEBUG_TRACE_DUMP_CREATE_CLIP Trace::DumpStore(master_store , "master_store") ;
-
 #else // DEBUG_TRACE
 
   #define DEBUG_PRIME_CLIPS_STORAGE           ;
@@ -147,6 +145,5 @@
   #define DEBUG_TRACE_SET_PROPERTY            ;
   #define DEBUG_TRACE_SET_CONFIG              ;
   #define DEBUG_TRACE_CREATE_CLIP             ;
-  #define DEBUG_TRACE_DUMP_CREATE_CLIP        ;
 
 #endif // DEBUG_TRACE

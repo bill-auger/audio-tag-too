@@ -93,11 +93,17 @@ private:
   void createClip           (void) ;
 
   // model helpers
-  TreeViewItem* getViewItemFor  (ValueTree root_store) ;
-  TreeViewItem* newMasterItem   (ValueTree master_node) ;
-  TreeViewItem* newClipItem     (ValueTree clip_node) ;
-  void          createMasterItem(ValueTree root_store , ValueTree master_node) ;
-  void          createClipItem  (ValueTree root_store , ValueTree clip_node) ;
+  TreeViewItem* getViewItemFor      (ValueTree root_store) ;
+/*
+  bool          isClipsNode         (ValueTree parent_node) ;
+  bool          isCompilationsNode  (ValueTree parent_node) ;
+  bool          isMasterNode        (ValueTree parent_node) ;
+  bool          isClipNode          (ValueTree parent_node) ;
+*/
+  TreeViewItem* newMasterItem       (ValueTree master_node) ;
+  TreeViewItem* newClipItem         (ValueTree clip_node) ;
+  void          createMasterItem    (ValueTree root_store , ValueTree master_node) ;
+  void          createClipItem      (ValueTree root_store , ValueTree clip_node) ;
 
   // event handlers
   void paintOverChildren         (Graphics& g)                                                     override ;
@@ -126,10 +132,10 @@ private:
   {
   public:
 
-    ClipItem(String _label , bool _accepts_sub_items = true      ) :
-             label(_label) , accepts_sub_items(_accepts_sub_items) { }
+    ClipItem(String _item_id   , String _label , bool _accepts_sub_items = true      ) :
+             item_id(_item_id) , label(_label) , accepts_sub_items(_accepts_sub_items) { }
 
-    String     getUniqueName       () const override { return this->label             ; }
+    String     getUniqueName       () const override { return this->item_id           ; }
     bool       mightContainSubItems()       override { return this->accepts_sub_items ; }
     int        getItemHeight       () const override { return 22                      ; }
 //     Component* createItemComponent ()       override { return new Label(id) ; }
@@ -162,6 +168,7 @@ DBG("ClipsTreeViewItem::itemOpennessChanged()=" + String(is_open ? "is_open" : "
 
   private:
 
+    String item_id ;
     String label ;
     bool   accepts_sub_items ;
 
