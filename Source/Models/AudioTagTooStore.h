@@ -81,9 +81,9 @@ private:
 
   // getters/setters
   bool isKnownProperty(ValueTree node        , const Identifier& key) ;
-  void setProperty    (ValueTree node        , const Identifier& key , const var value) ;
-  void setConfig      (ValueTree config_node , const Identifier& key , const var value) ;
-  void createClip     (String audio_filename , double begin_time , double end_time) ;
+  bool setProperty    (ValueTree node        , const Identifier& key , const var value) ;
+  bool setConfig      (ValueTree config_node , const Identifier& key , const var value) ;
+  bool createClip     (String audio_filename , double begin_time , double end_time) ;
 
   // configuration/persistence
   File                        storageFile ;

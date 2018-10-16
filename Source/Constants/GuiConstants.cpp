@@ -72,6 +72,11 @@ const Colour GUI::BROWSER_FG_COLOR          = Colour(0xFFFFFFFF) ;
 const Colour GUI::BROWSER_SELECTED_BG_COLOR = Colour(0xFF404040) ;
 const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 
+// ClipItem
+const String GUI::FILE_ITEM_LABEL  = "Source: " ;
+const String GUI::BEGIN_ITEM_LABEL = "Beginning: " ;
+const String GUI::ENT_ITEM_LABEL   = "Ending: " ;
+
 // user messages
 const String GUI::DEVICE_ERROR_TITLE         = "Audio Device Error" ;
 const String GUI::DEVICE_ERROR_MSG           = "Audio Device Error\n\nCan not find a usable audio playback device" ;

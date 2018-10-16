@@ -28,6 +28,9 @@
 
 /* persistence */
 
+  #define DEBUG_PRIME_CLIPS_STORAGE if (DEBUG_PRIME_STORAGE)              \
+    createClip(String("/path/to/dummy_audio_file") , 0.123456 , 6.543210) ;
+
   #define DEBUG_TRACE_VERIFY_STORED_CONFIG                                                     \
     String not_found_msg = "stored config not found - restoring defaults" ;                    \
     String invalid_msg   = "stored config invalid - restoring defaults" ;                      \
@@ -106,25 +109,30 @@
     bool      is_unknown_node  = config_node != this->root ;                               \
     String    invalid_tree_msg = "request to set property on invalid tree - ignoring" ;    \
     String    disabled_key_msg = "request to set disabled property - ignoring" ;           \
-    String    change_msg       = ((!is_unknown_key) ? ""                               :   \
-                                  (is_unknown_node) ? "unknown node '" + node_id + "'" :   \
+    String    change           = Trace::TraceSetValue(config_node , key , value) ;         \
+    String    change_msg       = (!is_unknown_key ) ? change                           :   \
+                                 ((is_unknown_node) ? "unknown node '" + node_id + "'" :   \
                                                       "unknown key '"  + key_str + "'" ) + \
-                                 ((!is_unknown_key) ? "" : " - (ignoring) "            ) + \
-                                 Trace::TraceSetValue(config_node , key , value) ;         \
+                                                      " - (ignoring) " ;                   \
     if      (!config_node.isValid()) Trace::TraceError  (invalid_tree_msg) ;               \
     else if (MAIN_CONTROLLER_GUARD ) Trace::TraceError  (disabled_key_msg) ;               \
     else if (!is_unknown_key       ) Trace::TraceStoreVb(change_msg      ) ;               \
     else                             Trace::TraceError  (change_msg      )                 ;
 
-  #define DEBUG_TRACE_CREATE_CLIP String master_msg = "master: '" + master_id + "'" ;                       \
-    if        (is_id_collision) Trace::TraceStore("error creating " + master_msg + " - ID collision") ;     \
-    else { if (is_new_master  ) Trace::TraceStore("created " + master_msg) ;                                \
-           Trace::TraceStore  ("creating clip: '" + clip_id + "' derived from " + master_msg) ;             \
-           Trace::TraceStoreVb("audio_filename=" + audio_filename + " begin_time=" + String(begin_time) +   \
-                                                                    " end_time="   + String(end_time  ) ) ; }
+  #define DEBUG_TRACE_CREATE_CLIP String master_msg = "master: '" + master_id + "'" ;        \
+    if        (is_id_collision) Trace::TraceWarning("ID collision creating " + master_msg) ; \
+    else { if (is_new_master  ) Trace::TraceStore("created " + master_msg) ;                 \
+           Trace::TraceStore ("creating clip: '" + clip_id + "'") ;                          \
+           Trace::TraceNoPrefix("derived from " + master_msg) ;                              \
+           Trace::TraceNoPrefixVb("audio_filename=" + audio_filename     +                   \
+                                  " begin_time="    + String(begin_time) +                   \
+                                  " end_time="      + String(end_time  ) ) ;                 }
+
+  #define DEBUG_TRACE_DUMP_CREATE_CLIP Trace::DumpStore(master_store , "master_store") ;
 
 #else // DEBUG_TRACE
 
+  #define DEBUG_PRIME_CLIPS_STORAGE           ;
   #define DEBUG_TRACE_VERIFY_STORED_CONFIG    ;
   #define DEBUG_TRACE_VERIFY_MISSING_NODE     ;
   #define DEBUG_TRACE_VERIFY_MISSING_PROPERTY ;
@@ -137,8 +145,8 @@
   #define DEBUG_TRACE_LISTEN                  ;
   #define DEBUG_TRACE_CONFIG_TREE_CHANGED     ;
   #define DEBUG_TRACE_SET_PROPERTY            ;
-  #define DEBUG_TRACE_STORE_SET_VALUE         ;
-  #define DEBUG_TRACE_GUI_SET_VALUE           ;
+  #define DEBUG_TRACE_SET_CONFIG              ;
   #define DEBUG_TRACE_CREATE_CLIP             ;
+  #define DEBUG_TRACE_DUMP_CREATE_CLIP        ;
 
 #endif // DEBUG_TRACE

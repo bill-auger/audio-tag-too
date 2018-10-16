@@ -93,10 +93,11 @@ private:
   void createClip           (void) ;
 
   // model helpers
+  TreeViewItem* getViewItemFor  (ValueTree root_store) ;
   TreeViewItem* newMasterItem   (ValueTree master_node) ;
   TreeViewItem* newClipItem     (ValueTree clip_node) ;
-  void          createMasterItem(ValueTree master_node) ;
-  void          createClipItem  (ValueTree master_node , ValueTree clip_node) ;
+  void          createMasterItem(ValueTree root_store , ValueTree master_node) ;
+  void          createClipItem  (ValueTree root_store , ValueTree clip_node) ;
 
   // event handlers
   void paintOverChildren         (Graphics& g)                                                     override ;
@@ -106,7 +107,7 @@ private:
   void buttonClicked             (Button* a_button)                                                override ;
   void selectionChanged          (void)                                                            override ;
   void changeListenerCallback    (ChangeBroadcaster* source)                                       override ;
-  void valueTreeRedirected       (ValueTree&                                                     ) override ;
+  void valueTreeRedirected       (ValueTree& root_store                                          ) override ;
   void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node                   ) override ;
   void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
   void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override ;
@@ -121,16 +122,16 @@ private:
   void browserRootChanged(const File&                    ) override {}
 
 
-  class ClipsTreeViewItem : public TreeViewItem
+  class ClipItem : public TreeViewItem
   {
   public:
 
-    ClipsTreeViewItem(String _label , bool _allow_sub_items = true)   :
-                      label(_label) , allow_sub_items(_allow_sub_items) { }
+    ClipItem(String _label , bool _accepts_sub_items = true      ) :
+             label(_label) , accepts_sub_items(_accepts_sub_items) { }
 
-    String     getUniqueName       () const override { return this->label           ; }
-    bool       mightContainSubItems()       override { return this->allow_sub_items ; }
-    int        getItemHeight       () const override { return 22                    ; }
+    String     getUniqueName       () const override { return this->label             ; }
+    bool       mightContainSubItems()       override { return this->accepts_sub_items ; }
+    int        getItemHeight       () const override { return 22                      ; }
 //     Component* createItemComponent ()       override { return new Label(id) ; }
 
     void paintItem(Graphics& g , int width , int height) override
@@ -162,10 +163,10 @@ DBG("ClipsTreeViewItem::itemOpennessChanged()=" + String(is_open ? "is_open" : "
   private:
 
     String label ;
-    bool   allow_sub_items ;
+    bool   accepts_sub_items ;
 
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipsTreeViewItem)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)
   } ;
 
     //[/UserVariables]

@@ -43,6 +43,8 @@ bool AudioTagTooStore::initialize()
   // create shared config ValueTree from persistent storage or defaults
   loadConfig() ; verifyConfig() ;
 
+DEBUG_PRIME_CLIPS_STORAGE
+
   listen(true) ;
 
   return true ;
@@ -79,8 +81,6 @@ DEBUG_TRACE_VERIFY_STORED_CONFIG
 
   this->clips        = this->root.getOrCreateChildWithName(STORE::CLIPS_ID        , nullptr) ;
   this->compilations = this->root.getOrCreateChildWithName(STORE::COMPILATIONS_ID , nullptr) ;
-
-createClip(String("audio_filename") , 0.1 , 2.3) ;
 }
 
 void AudioTagTooStore::verifyRoot()
@@ -356,30 +356,35 @@ bool AudioTagTooStore::isKnownProperty(ValueTree node , const Identifier& key)
                                 false                           ;
 }
 
-void AudioTagTooStore::setProperty(ValueTree node  , const Identifier& key ,
+bool AudioTagTooStore::setProperty(ValueTree node  , const Identifier& key ,
                                    const var value                         )
 {
+  bool is_valid = node.isValid() ;
+
 DEBUG_TRACE_SET_PROPERTY
 
-  if (node.isValid()) node.setProperty(key , value , nullptr) ;
+  if (is_valid) node.setProperty(key , value , nullptr) ;
+
+  return is_valid ;
 }
 
-void AudioTagTooStore::setConfig(ValueTree config_node , const Identifier& key ,
+bool AudioTagTooStore::setConfig(ValueTree config_node , const Identifier& key ,
                                  const var value                               )
 {
 DEBUG_TRACE_SET_CONFIG
 
   // validate mutating of critical configuration
-  if (!config_node.isValid() || !isKnownProperty(config_node , key)) return ;
-
+  bool is_valid = config_node.isValid() && isKnownProperty(config_node , key) ;
 #ifdef HAS_MAIN_CONTROLLER
-
-  if (!AudioTagToo::IsInitialized || !AudioTagToo::DisabledFeatures.contains(key))
+  is_valid ||= !AudioTagToo::IsInitialized || !AudioTagToo::DisabledFeatures.contains(key) ;
 #endif // HAS_MAIN_CONTROLLER
-    setProperty(config_node , key , value) ;
+
+  if (is_valid) setProperty(config_node , key , value) ;
+
+  return is_valid ;
 }
 
-void AudioTagTooStore::createClip(String audio_filename , double begin_time , double end_time)
+bool AudioTagTooStore::createClip(String audio_filename , double begin_time , double end_time)
 {
   Identifier master_id = STORE::FilterId(audio_filename) ;
   Identifier clip_id   = STORE::FilterId(audio_filename     + '-' +
@@ -390,25 +395,28 @@ void AudioTagTooStore::createClip(String audio_filename , double begin_time , do
   bool      is_new_master   = !master_store.isValid() ;
   var       master_filename = master_store.getProperty(STORE::FILENAME_KEY) ;
   bool      is_id_collision = !is_new_master && STRING(master_filename) != audio_filename ;
+  master_store              = (is_new_master) ? ValueTree(master_id) : master_store ;
+  ValueTree clip_store      = ValueTree(clip_id) ;
 
 DEBUG_TRACE_CREATE_CLIP
 
-  if (!is_id_collision)
+  bool is_valid = !is_id_collision                                                 &&
+                  setProperty(master_store , STORE::FILENAME_KEY , audio_filename) &&
+                  setProperty(clip_store , STORE::FILENAME_KEY   , audio_filename) &&
+                  setProperty(clip_store , STORE::BEGIN_TIME_KEY , begin_time    ) &&
+                  setProperty(clip_store , STORE::END_TIME_KEY   , end_time      )  ;
+
+  if (is_valid)
   {
-    // create new clip (creating and appending a new master to the tree if necessary)
-    master_store         = this->clips.getOrCreateChildWithName(master_id , nullptr) ;
-    ValueTree clip_store = ValueTree(clip_id) ;
-
-    // set clip properties and append it to the master source entry
-    setProperty(clip_store , STORE::FILENAME_KEY   , audio_filename) ;
-    setProperty(clip_store , STORE::BEGIN_TIME_KEY , begin_time    ) ;
-    setProperty(clip_store , STORE::END_TIME_KEY   , end_time      ) ;
     master_store.appendChild(clip_store , nullptr) ;
+    this->clips.appendChild(master_store , nullptr) ;
 
-    // sort masters and clips
     STORE::IdComparator<ValueTree&> id_comparator ;
     this->clips .sort(id_comparator , nullptr , false) ;
     master_store.sort(id_comparator , nullptr , false) ;
+
+DEBUG_TRACE_DUMP_CREATE_CLIP
   }
-  else return ; // TODO: collision alert
+
+  return is_valid ;
 }

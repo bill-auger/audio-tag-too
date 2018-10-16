@@ -80,6 +80,11 @@ public:
   static const Colour BROWSER_SELECTED_BG_COLOR ;
   static const Colour BROWSER_SELECTED_FG_COLOR ;
 
+  // clips/compilations TreeViewItems
+  static const String FILE_ITEM_LABEL ;
+  static const String BEGIN_ITEM_LABEL ;
+  static const String ENT_ITEM_LABEL ;
+
   // user messages
   static const String DEVICE_ERROR_TITLE ;
   static const String DEVICE_ERROR_MSG ;
