@@ -93,17 +93,11 @@ private:
   void createClip           (void) ;
 
   // model helpers
-  TreeViewItem* getViewItemFor      (ValueTree root_store) ;
-/*
-  bool          isClipsNode         (ValueTree parent_node) ;
-  bool          isCompilationsNode  (ValueTree parent_node) ;
-  bool          isMasterNode        (ValueTree parent_node) ;
-  bool          isClipNode          (ValueTree parent_node) ;
-*/
-  TreeViewItem* newMasterItem       (ValueTree master_node) ;
-  TreeViewItem* newClipItem         (ValueTree clip_node) ;
-  void          createMasterItem    (ValueTree root_store , ValueTree master_node) ;
-  void          createClipItem      (ValueTree root_store , ValueTree clip_node) ;
+  TreeViewItem* getViewItemFor  (ValueTree root_store) ;
+  TreeViewItem* newMasterItem   (ValueTree master_node) ;
+  TreeViewItem* newClipItem     (ValueTree clip_node) ;
+  void          createMasterItem(ValueTree root_store , ValueTree master_node) ;
+  void          createClipItem  (ValueTree root_store , ValueTree clip_node) ;
 
   // event handlers
   void paintOverChildren         (Graphics& g)                                                     override ;
