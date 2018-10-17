@@ -55,6 +55,11 @@ public:
 
   JUCEApplication* app ;
 
+
+  void setStatusL(String statusText) ;
+  void setStatusC(String statusText) ;
+  void setStatusR(String statusText) ;
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;

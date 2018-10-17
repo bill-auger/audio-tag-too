@@ -76,9 +76,6 @@
     Trace::TraceNoPrefix("at index "        + String(master_idx) +               \
                          " of root store '" + root_id + "'"      )               ;
 
-  #define DEBUG_TRACE_DEVICE_STATE_CHANGED                                                           \
-    Trace::TraceState("audio device state changed: " + String((is_device_ready) ? "ready" : "idle")) ;
-
   #define DEBUG_TRACE_STORAGE_REDIRECTED                                               \
     int n_masters = root_store.getNumChildren() ; int n_clips = 0 ;                    \
     for (int master_n = 0 ; master_n < n_masters  ; ++master_n)                        \
@@ -131,7 +128,6 @@
   #define DEBUG_TRACE_NEW_CLIP_ITEM         ;
   #define DEBUG_TRACE_CREATE_MASTER_ITEM    ;
   #define DEBUG_TRACE_CREATE_CLIP_ITEM      ;
-  #define DEBUG_TRACE_DEVICE_STATE_CHANGED  ;
   #define DEBUG_TRACE_STORAGE_REDIRECTED    ;
   #define DEBUG_TRACE_STORAGE_CHILD_ADDED   ;
   #define DEBUG_TRACE_STORAGE_CHILD_REMOVED ;

@@ -29,7 +29,8 @@
   It holds the runtime configuration via shared value holders
       and handles persistence via XML or JUCE binary storage.
 */
-class AudioTagTooStore : ValueTree::Listener
+class AudioTagTooStore : private ChangeListener      ,
+                         private ValueTree::Listener
 {
   friend class MainContent ;
 
@@ -70,6 +71,7 @@ private:
 
   // event handlers
   void listen                  (bool should_listen) ;
+  void changeListenerCallback  (ChangeBroadcaster* source) ;
   void valueTreePropertyChanged(ValueTree& node , const Identifier& key) override ;
 
   // unhandled ValueTree::Listener events

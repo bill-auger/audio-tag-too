@@ -156,6 +156,7 @@ MainContent::MainContent ()
   this->tailButton          ->addListener      (this);
   this->deviceManager        .addAudioCallback (&audioSourcePlayer) ;
   this->deviceManager        .addChangeListener(this) ;
+  this->deviceManager        .addChangeListener(this->storage.get()) ;
   this->clipWaveform        ->addChangeListener(this) ;
   this->transportSource      .addChangeListener(this) ;
   this->fileBrowser         ->addListener      (this) ;
@@ -193,6 +194,7 @@ MainContent::~MainContent()
   this->tailButton          ->removeListener      (this);
   this->deviceManager        .removeAudioCallback (&audioSourcePlayer) ;
   this->deviceManager        .removeChangeListener(this) ;
+  this->deviceManager        .removeChangeListener(this->storage.get()) ;
   this->clipWaveform        ->removeChangeListener(this) ;
   this->transportSource      .removeChangeListener(this) ;
   this->fileBrowser         ->removeListener      (this) ;
@@ -231,7 +233,7 @@ void MainContent::paint (Graphics& g)
     g.fillAll (Colour (0xff101010));
 
     {
-        float x = static_cast<float> ((getWidth() / 2) - ((getWidth() - 16) / 2)), y = 8.0f, width = static_cast<float> (getWidth() - 16), height = static_cast<float> (getHeight() - 56);
+        float x = static_cast<float> ((getWidth() / 2) - ((getWidth() - 16) / 2)), y = 8.0f, width = static_cast<float> (getWidth() - 16), height = static_cast<float> (getHeight() - 64);
         Colour fillColour = Colour (0xff202020);
         Colour strokeColour = Colours::white;
         //[UserPaintCustomArguments] Customize the painting arguments here..
@@ -258,8 +260,8 @@ void MainContent::resized()
     transportButton->setBounds (((getWidth() / 2) - ((getWidth() - 32) / 2)) + (getWidth() - 32) / 2 - 100, ((16 + 120 - -8) + 120 - -8) + 0, 100, 24);
     clipButton->setBounds (((getWidth() / 2) - ((getWidth() - 32) / 2)) + (getWidth() - 32) / 2, ((16 + 120 - -8) + 120 - -8) + 0, 100, 24);
     tailButton->setBounds (((getWidth() / 2) - ((getWidth() - 32) / 2)) + (getWidth() - 32) / 2 + 100, ((16 + 120 - -8) + 120 - -8) + 0, 100, 24);
-    tabPanel->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, getHeight() - 358);
-    statusbar->setBounds ((getWidth() / 2) - ((getWidth() - 16) / 2), getHeight() - 8 - 32, getWidth() - 16, 32);
+    tabPanel->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, getHeight() - 366);
+    statusbar->setBounds ((getWidth() / 2) - ((getWidth() - 16) / 2), getHeight() - 8 - 40, getWidth() - 16, 40);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -269,6 +271,12 @@ void MainContent::resized()
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
 /* getters/setters */
+
+void MainContent::setStatusL(String statusText) { this->statusbar->setStatusL(statusText) ; }
+
+void MainContent::setStatusC(String statusText) { this->statusbar->setStatusC(statusText) ; }
+
+void MainContent::setStatusR(String statusText) { this->statusbar->setStatusR(statusText) ; }
 
 void MainContent::processCliParams()
 {
@@ -532,13 +540,6 @@ void MainContent::changeListenerCallback(ChangeBroadcaster* source)
                            (File(this->projectFilename).exists()) ? GUI::COMPILATIONS_IDX    :
                            (File(this->audioFilename  ).exists()) ? GUI::CLIPS_IDX           :
                                                                     GUI::FILE_BROWSER_IDX    ;
-
-DEBUG_TRACE_DEVICE_STATE_CHANGED
-
-    if (is_device_ready) this->storage->storeConfig(this->deviceManager.createStateXml()) ;
-    else                 AlertWindow::showMessageBox(AlertWindow::WarningIcon ,
-                                                     GUI::DEVICE_ERROR_TITLE  ,
-                                                     GUI::DEVICE_ERROR_MSG    ) ;
 
     this->tabPanel->setCurrentTabIndex(tab_pane_idx) ;
   }

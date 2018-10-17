@@ -24,8 +24,27 @@
 
 // disable standard features
 #ifdef DEBUG
-  #define DISABLE_MEDIA 0
+  #define QUIT_BEFORE_MAIN_LOOP 0
+  #define QUIT_AFTER_MAIN_LOOP  0
+  #define DISABLE_MEDIA         0
+  #define SUPRESS_ALERTS        0
 #endif // DEBUG
+
+
+#if QUIT_BEFORE_MAIN_LOOP
+  #define DEBUG_QUIT_BEFORE_MAIN_LOOP                                              \
+    Trace::TraceEvent("forced quit per 'QUIT_BEFORE_MAIN_LOOP'") ; quit() ; return ;
+#else // QUIT_BEFORE_MAIN_LOOP
+  #define DEBUG_QUIT_BEFORE_MAIN_LOOP ;
+#endif // QUIT_BEFORE_MAIN_LOOP
+
+#if QUIT_AFTER_MAIN_LOOP
+  #define DEBUG_QUIT_AFTER_MAIN_LOOP                                                  \
+    String quit_msg = "forced quit per 'DEBUG_QUIT_AFTER_MAIN_LOOP'" ;                \
+    if (timer_id == APP::TIMER_LO_ID) { Trace::TraceEvent(quit_msg) ; quit() ; } else
+#else // QUIT_AFTER_MAIN_LOOP
+  #define DEBUG_QUIT_AFTER_MAIN_LOOP ;
+#endif // QUIT_AFTER_MAIN_LOOP
 
 
 #include "../../JuceLibraryCode/JuceHeader.h"
@@ -49,6 +68,13 @@ public:
   static const String VALID_ID_CHARS ;
   static const String FILTER_CHARS ;
   static const String REPLACE_CHARS ;
+
+  // timers
+  static const int        N_TIMERS     = 3 ; // ASSERT: number of *_TIMER_IDs defined below
+  static const int        TIMER_HI_ID  = 1 ; static const int        TIMER_HI_IVL  = 125 ;
+  static const int        TIMER_MED_ID = 2 ; static const int        TIMER_MED_IVL = 500 ;
+  static const int        TIMER_LO_ID  = 3 ; static const int        TIMER_LO_IVL  = 2000 ;
+  static const Array<int> TIMER_IDS ;        static const Array<int> TIMER_IVLS ;
 
   // CLI params
   static const String CLI_HELP_TOKEN ;

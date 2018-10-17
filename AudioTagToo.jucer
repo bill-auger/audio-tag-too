@@ -20,6 +20,7 @@
               file="Source/Constants/StorageConstants.cpp"/>
       </GROUP>
       <GROUP id="{A8664DA2-7E22-44C8-FB46-7E41D252C2EE}" name="Controllers">
+        <FILE id="Ogm9Oz" name="AudioTagToo.cpp" compile="1" resource="0" file="Source/Controllers/AudioTagToo.cpp"/>
         <FILE id="cp26CJ" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       </GROUP>
       <GROUP id="{E9EA4621-DD2E-354B-071C-2A1C46F6694E}" name="Models">
@@ -31,6 +32,7 @@
         <FILE id="X1J7e9" name="Trace.cpp" compile="1" resource="0" file="Source/Trace/Trace.cpp"/>
       </GROUP>
       <GROUP id="{415C92D0-6DB5-561E-5112-51D267588674}" name="Views">
+        <FILE id="yQDChz" name="Alert.cpp" compile="1" resource="0" file="Source/Views/Alert.cpp"/>
         <FILE id="Y76Tzw" name="MainContent.cpp" compile="1" resource="0" file="Source/Views/MainContent.cpp"/>
         <FILE id="Cxr1BM" name="Statusbar.cpp" compile="1" resource="0" file="Source/Views/Statusbar.cpp"/>
         <FILE id="M3PK9P" name="Waveform.cpp" compile="1" resource="0" file="Source/Views/Waveform.cpp"/>

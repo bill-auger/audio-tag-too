@@ -40,6 +40,12 @@ const String APP::CLI_VERSION_TOKEN = "--version" ;
 const String APP::CLI_DIR_TOKEN     = "--dir" ;
 const String APP::CLI_FPS_TOKEN     = "--fps" ;
 
+// timers
+int timer_ids[]  = { APP::TIMER_HI_ID  , APP::TIMER_MED_ID  , APP::TIMER_LO_ID  } ;
+int timer_ivls[] = { APP::TIMER_HI_IVL , APP::TIMER_MED_IVL , APP::TIMER_LO_IVL } ;
+const Array<int> APP::TIMER_IDS  = Array<int>(timer_ids  , N_TIMERS) ;
+const Array<int> APP::TIMER_IVLS = Array<int>(timer_ivls , N_TIMERS) ;
+
 // runtime constants
 #define APP_CMD_PAD String("").paddedLeft(' ' , APP_CMD.length())
 const StringArray APP::CLI_USAGE_MSG = StringArray::fromLines(

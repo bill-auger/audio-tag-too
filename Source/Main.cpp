@@ -21,11 +21,13 @@
 
 #include "Constants/AppConstants.h"
 #include "Constants/GuiConstants.h"
+#include "Controllers/AudioTagToo.h"
+#include "Views/Alert.h"
 #include "Views/MainContent.h"
 #include "Trace/TraceMain.h"
 
 
-class AudioTagTooApplication : public JUCEApplication
+class AudioTagTooApplication : public JUCEApplication , private MultiTimer
 {
 public:
 
@@ -34,11 +36,13 @@ public:
 
   void initialise(const String& cli_args) override
   {
+    StringArray cli_params = JUCEApplicationBase::getCommandLineParameterArray() ;
+
 DEBUG_TRACE_INIT_VERSION
 
     this->mainWindow.reset(new MainWindow()) ;
 
-    if (true /*AudioTagToo::Init()*/)
+    if (AudioTagToo::Initialize(this , this->mainWindow->mainContent , cli_params))
     {
 #ifdef JUCE_LINUX
       // create desktop launch file
@@ -58,13 +62,33 @@ DEBUG_TRACE_INIT_VERSION
         delete icon_stream ;
       }
 #endif // JUCE_LINUX
+
+      // start main loop timers
+      startTimers() ;
     }
-    else { setApplicationReturnValue(255) ; quit() ; }
+    else if (Alert::AreAnyPending()) { setApplicationReturnValue(255) ; startTimers() ; }
+    else                             { setApplicationReturnValue(255) ; quit() ; }
+  }
+
+  void startTimers()
+  {
+DEBUG_QUIT_BEFORE_MAIN_LOOP // NOTE: may call quit()
+
+    for (int timer_n = 0 ; timer_n < APP::N_TIMERS ; ++timer_n)
+      startTimer(APP::TIMER_IDS[timer_n] , APP::TIMER_IVLS[timer_n]) ;
+  }
+
+  void stopTimers()
+  {
+    for (int timer_n = 0 ; timer_n > APP::N_TIMERS ; ++timer_n)
+      stopTimer(APP::TIMER_IDS[timer_n]) ;
   }
 
   void shutdown() override
   {
 DEBUG_TRACE_SHUTDOWN_IN
+
+    stopTimers() ; AudioTagToo::Shutdown() ;
 
     this->mainWindow = nullptr ;
 
@@ -80,6 +104,10 @@ DEBUG_TRACE_SHUTDOWN_OUT
 
   class MainWindow : public DocumentWindow
   {
+    friend class AudioTagToo ;
+    friend class AudioTagTooApplication ;
+
+
   public:
 
     MainWindow() : DocumentWindow(APP::APP_NAME , GUI::WINDOW_BG_COLOR , GUI::TITLEBAR_BTNS)
@@ -119,7 +147,17 @@ DEBUG_TRACE_SHUTDOWN_OUT
 
 private:
 
-    std::unique_ptr<MainWindow> mainWindow ;
+
+
+  void timerCallback(int timer_id) override
+  {
+DEBUG_QUIT_AFTER_MAIN_LOOP // NOTE: may call quit()
+
+      AudioTagToo::HandleTimer(timer_id) ;
+  }
+
+
+  std::unique_ptr<MainWindow> mainWindow ;
 } ;
 
 

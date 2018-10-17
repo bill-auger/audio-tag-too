@@ -37,6 +37,8 @@
 !Source/Constants/StorageConstants.h
 
 !Source/Controllers/
+!Source/Controllers/AudioTagToo.cpp
+!Source/Controllers/AudioTagToo.h
 
 !Source/Models/
 !Source/Models/AudioTagTooStore.cpp
@@ -47,12 +49,16 @@
 !Source/Trace/
 !Source/Trace/Trace.cpp
 !Source/Trace/Trace.h
+!Source/Trace/TraceAlert.h
+!Source/Trace/TraceAudioTagToo.h
 !Source/Trace/TraceAudioTagTooStore.h
 !Source/Trace/TraceMain.h
 !Source/Trace/TraceMainContent.h
 !Source/Trace/TraceWaveform.h
 
 !Source/Views/
+!Source/Views/Alert.cpp
+!Source/Views/Alert.h
 !Source/Views/MainContent.cpp
 !Source/Views/MainContent.h
 !Source/Views/Statusbar.cpp

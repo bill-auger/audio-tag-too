@@ -24,6 +24,7 @@
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/StorageConstants.h"
+#include "../Controllers/AudioTagToo.h"
 #include "../Trace/TraceAudioTagTooStore.h"
 
 
@@ -45,7 +46,9 @@ bool AudioTagTooStore::initialize()
 
 DEBUG_PRIME_CLIPS_STORAGE
 
+#ifndef CONTROLLER_OWNS_STORAGE
   listen(true) ;
+#endif // CONTROLLER_OWNS_STORAGE
 
   return true ;
 }
@@ -237,11 +240,7 @@ DEBUG_TRACE_STORE_CONFIG
   File temp_file = this->storageFile.getSiblingFile(APP::APP_CMD + ".temp") ;
   if (temp_file.create().failed() || !temp_file.deleteFile())
   {
-#ifdef HAS_MAIN_CONTROLLER
     AudioTagToo::Error(GUI::FILESYSTEM_WRITE_ERROR_MSG) ;
-#else // HAS_MAIN_CONTROLLER
-    Trace::TraceError(GUI::FILESYSTEM_WRITE_ERROR_MSG) ;
-#endif // HAS_MAIN_CONTROLLER
 
     return false ;
   }
@@ -265,11 +264,7 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
     }
     else
     {
-  #ifdef HAS_MAIN_CONTROLLER
       AudioTagToo::Error(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
-  #else // HAS_MAIN_CONTROLLER
-      Trace::TraceError(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
-  #endif // HAS_MAIN_CONTROLLER
       delete storage_stream ;
 
       return false ;
@@ -283,11 +278,7 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
       delete storage_xml ;
     else
     {
-#ifdef HAS_MAIN_CONTROLLER
       AudioTagToo::Error(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
-#else // HAS_MAIN_CONTROLLER
-      Trace::TraceError(GUI::STORAGE_WRITE_ERROR_MSG + "application configuration") ;
-#endif // HAS_MAIN_CONTROLLER
       delete storage_xml ;
 
       return false ;
@@ -308,11 +299,7 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
     else
     {
       if (device_state_xml != this->deviceStateXml.get()) delete device_state_xml ;
-#ifdef HAS_MAIN_CONTROLLER
       AudioTagToo::Error(GUI::STORAGE_WRITE_ERROR_MSG + "audio device configuration") ;
-#else // HAS_MAIN_CONTROLLER
-      Trace::TraceError(GUI::STORAGE_WRITE_ERROR_MSG + "audio device configuration") ;
-#endif // HAS_MAIN_CONTROLLER
 
       return false ;
     }
@@ -326,9 +313,7 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
 
 void AudioTagTooStore::listen(bool should_listen)
 {
-#ifdef HAS_MAIN_CONTROLLER
   if (!AudioTagToo::IsInitialized) return ;
-#endif // HAS_MAIN_CONTROLLER
 
 DEBUG_TRACE_LISTEN
 
@@ -336,13 +321,22 @@ DEBUG_TRACE_LISTEN
   else               { this->root.removeListener(this) ; }
 }
 
+void AudioTagTooStore::changeListenerCallback(ChangeBroadcaster* source)
+{
+  if (source == &(AudioTagToo::Gui->deviceManager))
+  {
+    bool is_device_ready = AudioTagToo::Gui->deviceManager.getCurrentAudioDevice() != nullptr ;
+
+    if (is_device_ready) storeConfig(AudioTagToo::Gui->deviceManager.createStateXml()) ;
+    else                 AudioTagToo::Warning(GUI::DEVICE_ERROR_MSG) ;
+  }
+}
+
 void AudioTagTooStore::valueTreePropertyChanged(ValueTree& node , const Identifier& key)
 {
 DEBUG_TRACE_CONFIG_TREE_CHANGED
 
-#ifdef HAS_MAIN_CONTROLLER
-  AudioTagToo::HandleConfigChanged(key) ;
-#endif // HAS_MAIN_CONTROLLER
+  if (isKnownProperty(node , key)) AudioTagToo::HandleConfigChanged(key) ;
 }
 
 
@@ -374,12 +368,10 @@ bool AudioTagTooStore::setConfig(ValueTree config_node , const Identifier& key ,
 DEBUG_TRACE_SET_CONFIG
 
   // validate mutating of critical configuration
-  bool is_valid = config_node.isValid() && isKnownProperty(config_node , key) ;
-#ifdef HAS_MAIN_CONTROLLER
-  is_valid ||= !AudioTagToo::IsInitialized || !AudioTagToo::DisabledFeatures.contains(key) ;
-#endif // HAS_MAIN_CONTROLLER
+  bool is_valid   = config_node.isValid() && isKnownProperty(config_node , key) ;
+  bool is_allowed = !AudioTagToo::IsInitialized || !AudioTagToo::DisabledFeatures.contains(key) ;
 
-  if (is_valid) setProperty(config_node , key , value) ;
+  if (is_valid && is_allowed) setProperty(config_node , key , value) ;
 
   return is_valid ;
 }
@@ -414,11 +406,7 @@ bool AudioTagTooStore::createClip(String audio_filename , double begin_time , do
 
 DEBUG_TRACE_CREATE_CLIP
 
-#ifdef HAS_MAIN_CONTROLLER
   if (is_id_collision) AudioTagToo::Warning(GUI::ID_COLLISION_ERROR_MSG) ;
-#else // HAS_MAIN_CONTROLLER
-  if (is_id_collision) Trace::TraceError(GUI::ID_COLLISION_ERROR_MSG) ;
-#endif // HAS_MAIN_CONTROLLER
 
   bool is_valid = !is_id_collision                                                     &&
                   setProperty(master_node , STORE::LABEL_TEXT_KEY , master_label_text) &&

@@ -19,6 +19,7 @@
 \*/
 
 
+#include "AppConstants.h"
 #include "GuiConstants.h"
 
 
@@ -78,8 +79,11 @@ const String GUI::FILE_ITEM_LABEL  = "Source: " ;
 const String GUI::BEGIN_ITEM_LABEL = "Beginning: " ;
 const String GUI::END_ITEM_LABEL   = "Ending: " ;
 
+// AudioTagTooAlert
+const String GUI::MODAL_WARNING_TITLE = APP::APP_NAME + " Warning" ;
+const String GUI::MODAL_ERROR_TITLE   = APP::APP_NAME + " Error" ;
+
 // user messages
-const String GUI::DEVICE_ERROR_TITLE         = "Audio Device Error" ;
 const String GUI::DEVICE_ERROR_MSG           = "Audio Device Error\n\nCan not find a usable audio playback device" ;
 const String GUI::FILESYSTEM_WRITE_ERROR_MSG = "I/O Error\n\nCan not write to filesystem" ;
 const String GUI::STORAGE_WRITE_ERROR_MSG    = "I/O Error\n\nCan not write: " ;

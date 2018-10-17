@@ -87,8 +87,12 @@ public:
   static const String BEGIN_ITEM_LABEL ;
   static const String END_ITEM_LABEL ;
 
+  // AudioTagTooAlert
+  enum         AlertType { ALERT_TYPE_WARNING , ALERT_TYPE_ERROR } ;
+  static const String    MODAL_WARNING_TITLE ;
+  static const String    MODAL_ERROR_TITLE ;
+
   // user messages
-  static const String DEVICE_ERROR_TITLE ;
   static const String DEVICE_ERROR_MSG ;
   static const String FILESYSTEM_WRITE_ERROR_MSG ;
   static const String STORAGE_WRITE_ERROR_MSG ;
