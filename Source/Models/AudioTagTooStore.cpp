@@ -327,6 +327,8 @@ void AudioTagTooStore::changeListenerCallback(ChangeBroadcaster* source)
   {
     bool is_device_ready = AudioTagToo::Gui->deviceManager.getCurrentAudioDevice() != nullptr ;
 
+DEBUG_TRACE_DEVICE_STATE_CHANGED
+
     if (is_device_ready) storeConfig(AudioTagToo::Gui->deviceManager.createStateXml()) ;
     else                 AudioTagToo::Warning(GUI::DEVICE_ERROR_MSG) ;
   }

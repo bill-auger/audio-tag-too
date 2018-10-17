@@ -24,6 +24,7 @@
 #ifdef CONTROLLER_OWNS_STORAGE
 #include "../Constants/StorageConstants.h"
 #endif // CONTROLLER_OWNS_STORAGE
+#include "../Trace/TraceAudioTagToo.h"
 #include "../Views/Alert.h"
 
 
@@ -84,10 +85,14 @@ bool AudioTagToo::Initialize(JUCEApplicationBase* main_app   , MainContent* main
   App = main_app ;
   Gui = main_content ;
 
+DEBUG_TRACE_INIT_PHASE_1
+
   // load persistent configuration
 #ifdef CONTROLLER_OWNS_STORAGE
   if ((Store = new AudioTagTooStore()) == nullptr) return false ;
 #endif // CONTROLLER_OWNS_STORAGE
+
+DEBUG_TRACE_INIT_PHASE_2
 
   // finalize initialization
   IsInitialized = true ;
@@ -97,12 +102,16 @@ bool AudioTagToo::Initialize(JUCEApplicationBase* main_app   , MainContent* main
   Store->listen(true) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
+DEBUG_TRACE_INIT_PHASE_3
+
   return IsInitialized ;
 }
 
 void AudioTagToo::Shutdown()
 {
   Alert::Display() ; Alert::Alerts.clear() ;
+
+DEBUG_TRACE_SHUTDOWN_PHASE_1
 
   // shutdown storage
 #ifdef CONTROLLER_OWNS_STORAGE

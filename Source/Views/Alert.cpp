@@ -20,6 +20,7 @@
 
 
 #include "Alert.h"
+#include "../Trace/TraceAlert.h"
 
 
 /* Alert private class variables */
@@ -32,6 +33,8 @@ bool              Alert::IsAlertModal = false ;
 
 void Alert::Push(GUI::AlertType message_type , String message_text)
 {
+DEBUG_TRACE_ALERT
+
 #ifndef SUPRESS_ALERTS
   Alerts.add(new Alert(message_type , message_text)) ;
 #endif // SUPRESS_ALERTS
@@ -61,6 +64,8 @@ void Alert::Display()
                                             message_text             ) ; break ;
     default:                      IsAlertModal = false ;                 break ;
   }
+
+DEBUG_TRACE_DISPLAY_ALERT
 }
 
 void Alert::ShowAsync(AlertWindow::AlertIconType icon , String title , String text)

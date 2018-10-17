@@ -166,7 +166,6 @@ void Trace::DumpItemsTree(TreeViewItem* root_item , String tree_desc)
 void Trace::WriteNodeToXml(ValueTree node , String node_desc)
 {
 #if DEBUG_WRITE_XML
-
   XmlElement* xml         = node.createXml() ;
   File        storage_dir = APP::AppdataDir().getChildFile(STORE::STORAGE_DIRNAME) ;
   File        dump_file   = storage_dir      .getChildFile("store-dump-" + node_desc + ".xml") ;

@@ -91,22 +91,20 @@
 
   #define DEBUG_TRACE_CONFIG_TREE_CHANGED Trace::TraceTreeChanged(node , key) ;
 
+  #define DEBUG_TRACE_DEVICE_STATE_CHANGED                                                           \
+    Trace::TraceState("audio device state changed: " + String((is_device_ready) ? "ready" : "idle")) ;
+
   #define DEBUG_TRACE_SET_PROPERTY                                                                 \
     if (!node.isValid()) Trace::TraceError("request to set property on invalid tree - ignoring") ;
 
-  // 'HAS_MAIN_CONTROLLER' switches can simply be removed if controller exists
-  //                       or if such guards are not needed
-  #ifdef HAS_MAIN_CONTROLLER
-    #define MAIN_CONTROLLER_GUARD (AudioTagToo::IsInitialized && AudioTagToo::DisabledFeatures.contains(key))
-  #else // HAS_MAIN_CONTROLLER
-    #define MAIN_CONTROLLER_GUARD (true)
-  #endif // HAS_MAIN_CONTROLLER
   #define DEBUG_TRACE_SET_CONFIG                                                           \
     ValueTree parent_node      = config_node.getParent() ;                                 \
     String    node_id          = STRING(config_node.getType()) ;                           \
     String    key_str          = STRING(key) ;                                             \
     bool      is_unknown_key   = !isKnownProperty(config_node , key) ;                     \
     bool      is_unknown_node  = config_node != this->root ;                               \
+    bool      is_disabled      = AudioTagToo::IsInitialized                 &&             \
+                                 AudioTagToo::DisabledFeatures.contains(key) ;             \
     String    invalid_tree_msg = "request to set property on invalid tree - ignoring" ;    \
     String    disabled_key_msg = "request to set disabled property - ignoring" ;           \
     String    change           = Trace::TraceSetValue(config_node , key , value) ;         \
@@ -115,7 +113,7 @@
                                                       "unknown key '"  + key_str + "'" ) + \
                                                       " - (ignoring) " ;                   \
     if      (!config_node.isValid()) Trace::TraceError  (invalid_tree_msg) ;               \
-    else if (MAIN_CONTROLLER_GUARD ) Trace::TraceError  (disabled_key_msg) ;               \
+    else if (is_disabled           ) Trace::TraceError  (disabled_key_msg) ;               \
     else if (!is_unknown_key       ) Trace::TraceStoreVb(change_msg      ) ;               \
     else                             Trace::TraceError  (change_msg      )                 ;
 
@@ -142,6 +140,7 @@
   #define DEBUG_TRACE_STORE_CONFIG            ;
   #define DEBUG_TRACE_LISTEN                  ;
   #define DEBUG_TRACE_CONFIG_TREE_CHANGED     ;
+  #define DEBUG_TRACE_DEVICE_STATE_CHANGED    ;
   #define DEBUG_TRACE_SET_PROPERTY            ;
   #define DEBUG_TRACE_SET_CONFIG              ;
   #define DEBUG_TRACE_CREATE_CLIP             ;
