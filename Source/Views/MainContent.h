@@ -24,6 +24,7 @@
 //[Headers]     -- You can add your own extra header files here --
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#include "../Constants/StorageConstants.h"
 #include "../Models/AudioTagTooStore.h"
 #include "Statusbar.h"
 #include "Waveform.h"
@@ -122,49 +123,40 @@ private:
   void browserRootChanged(const File&                    ) override {}
 
 
-  class ClipItem : public TreeViewItem
+  class ClipItem : public TreeViewItem , private Label::Listener
   {
   public:
 
-    ClipItem(String _item_id   , String _label , bool _accepts_sub_items = true      ) :
-             item_id(_item_id) , label(_label) , accepts_sub_items(_accepts_sub_items) { }
+    ClipItem(String _item_id   , String _label , ValueTree _store = ValueTree::invalid) :
+             item_id(_item_id) , label(_label) , store(_store)                          { }
 
-    String     getUniqueName       () const override { return this->item_id           ; }
-    bool       mightContainSubItems()       override { return this->accepts_sub_items ; }
-    int        getItemHeight       () const override { return 22                      ; }
-//     Component* createItemComponent ()       override { return new Label(id) ; }
 
-    void paintItem(Graphics& g , int width , int height) override
+    // TreeViewItem implementation
+    String     getUniqueName       () const override { return this->item_id         ; }
+    bool       mightContainSubItems()       override { return this->store.isValid() ; }
+    int        getItemHeight       () const override { return 24                    ; }
+    Component* createItemComponent ()       override
     {
-      g.setFont(Font(height * 0.7f , Font::bold)) ;
-      g.setColour(GUI::FILENAME_FG_COLOR) ;
-      g.drawText(this->label , 2 , 0 , width - 2 , height , Justification::centredLeft , true) ;
+      Label* item_label = new Label(this->item_id , this->label) ;
+
+      item_label->setEditable(this->store.isValid()) ;
+      item_label->addListener(this) ;
+
+      return item_label ;
     }
 
-    void itemOpennessChanged(bool is_open) override
+    // Label event handler
+    void labelTextChanged(Label* a_label)
     {
-DBG("ClipsTreeViewItem::itemOpennessChanged()=" + String(is_open ? "is_open" : "is_closed")) ;
-/*
-        if (isNowOpen)
-        {
-            if (getNumSubItems() == 0)
-                for (auto command : owner.getCommandManager().getCommandsInCategory (categoryName))
-                    if (owner.shouldCommandBeIncluded (command))
-                        addSubItem (new MappingItem (owner, command));
-        }
-        else
-        {
-            clearSubItems();
-        }
-*/
+      this->store.setProperty(STORE::LABEL_TEXT_KEY , a_label->getText() , nullptr) ;
     }
 
 
   private:
 
-    String item_id ;
-    String label ;
-    bool   accepts_sub_items ;
+    String    item_id ;
+    String    label ;
+    ValueTree store ;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)

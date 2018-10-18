@@ -87,7 +87,6 @@ MainContent::MainContent ()
     clipButton.reset (new TextButton (String()));
     addAndMakeVisible (clipButton.get());
     clipButton->setButtonText (TRANS("Clip"));
-    clipButton->addListener (this);
 
     tailButton.reset (new TextButton (String()));
     addAndMakeVisible (tailButton.get());
@@ -153,6 +152,7 @@ MainContent::MainContent ()
 
   this->headButton          ->addListener      (this);
   this->transportButton     ->addListener      (this);
+  this->clipButton          ->addListener      (this);
   this->tailButton          ->addListener      (this);
   this->deviceManager        .addAudioCallback (&audioSourcePlayer) ;
   this->deviceManager        .addChangeListener(this) ;
@@ -187,14 +187,17 @@ MainContent::~MainContent()
   this->transportSource  .setSource(nullptr) ;
   this->audioSourcePlayer.setSource(nullptr) ;
 
-  this->headButton     ->removeListener      (this);
-  this->transportButton->removeListener      (this);
-  this->tailButton     ->removeListener      (this);
-  this->deviceManager   .removeAudioCallback (&audioSourcePlayer) ;
-  this->deviceManager   .removeChangeListener(this) ;
-  this->transportSource .removeChangeListener(this) ;
-  this->fileBrowser    ->removeListener      (this) ;
-  this->storage->root   .removeListener      (this) ;
+  this->headButton          ->removeListener      (this);
+  this->transportButton     ->removeListener      (this);
+  this->clipButton          ->removeListener      (this);
+  this->tailButton          ->removeListener      (this);
+  this->deviceManager        .removeAudioCallback (&audioSourcePlayer) ;
+  this->deviceManager        .removeChangeListener(this) ;
+  this->clipWaveform        ->removeChangeListener(this) ;
+  this->transportSource      .removeChangeListener(this) ;
+  this->fileBrowser         ->removeListener      (this) ;
+  this->storage->clips       .removeListener      (this) ;
+  this->storage->compilations.removeListener      (this) ;
 
   this->storage = nullptr ;
 
@@ -260,6 +263,7 @@ void MainContent::resized()
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -342,10 +346,9 @@ void MainContent::setTailMarker()
 
 void MainContent::createClip()
 {
-  if (!this->storage->createClip(this->audioFilename               ,
-                                 this->fullWaveform->getHeadTime() ,
-                                 this->fullWaveform->getHeadTime() ))
-    ; // TODO: collision alert
+  this->storage->createClip(this->audioFilename               ,
+                            this->fullWaveform->getHeadTime() ,
+                            this->fullWaveform->getTailTime() ) ;
 }
 
 
@@ -359,38 +362,40 @@ TreeViewItem* MainContent::getViewItemFor(ValueTree root_store)
 
 TreeViewItem* MainContent::newMasterItem(ValueTree master_node)
 {
-  String        master_id       = STRING(master_node.getType()) ;
-  String        master_filename = STRING(master_node[STORE::FILENAME_KEY]) ;
-  String        master_label    = File(master_filename).getFileName() ;
-  TreeViewItem* new_master      = new ClipItem(master_id , master_label) ;
+  String        master_id         = STRING(master_node.getType()) ;
+  String        master_filename   = STRING(master_node[STORE::FILENAME_KEY  ]) ;
+  String        master_label_text = STRING(master_node[STORE::LABEL_TEXT_KEY]) ;
+  TreeViewItem* master_item       = new ClipItem(master_id , master_label_text , master_node) ;
 
 DEBUG_TRACE_NEW_MASTER_ITEM
-// Trace::DumpStore(master_node , "master_node") ;
 
-  return new_master ;
+  return master_item ;
 }
 
 TreeViewItem* MainContent::newClipItem(ValueTree clip_node)
 {
-  String        clip_id     = STRING(clip_node.getType()) ;
-  String        file_id     = clip_id + "-filename" ;
-  String        begin_id    = clip_id + "-begin_time" ;
-  String        end_id      = clip_id + "-end_time" ;
-  String        filename    = STRING(       clip_node[STORE::FILENAME_KEY  ]) ;
-  String        begin_time  = String(double(clip_node[STORE::BEGIN_TIME_KEY]) , 6) ;
-  String        end_time    = String(double(clip_node[STORE::END_TIME_KEY  ]) , 6) ;
-  String        clip_label  = begin_time + " - " + end_time ;
-  String        file_label  = GUI::FILE_ITEM_LABEL  + filename ;
-  String        begin_label = GUI::BEGIN_ITEM_LABEL + begin_time ;
-  String        end_label   = GUI::ENT_ITEM_LABEL   + end_time ;
-  TreeViewItem* new_clip    = new ClipItem(clip_id  , clip_label) ;
-  new_clip->addSubItem(       new ClipItem(file_id  , file_label  , false) , 0) ;
-  new_clip->addSubItem(       new ClipItem(begin_id , begin_label , false) , 1) ;
-  new_clip->addSubItem(       new ClipItem(end_id   , end_label   , false) , 2) ;
+  String        clip_id          = STRING(clip_node.getType()) ;
+  String        file_id          = clip_id + "-filename" ;
+  String        begin_id         = clip_id + "-begin_time" ;
+  String        end_id           = clip_id + "-end_time" ;
+  String        filename         = STRING(       clip_node[STORE::FILENAME_KEY  ]) ;
+  String        begin_time       = String(double(clip_node[STORE::BEGIN_TIME_KEY]) , 6) ;
+  String        end_time         = String(double(clip_node[STORE::END_TIME_KEY  ]) , 6) ;
+  String        clip_label_text  = STRING(       clip_node[STORE::LABEL_TEXT_KEY]) ;
+  String        file_label_text  = GUI::FILE_ITEM_LABEL  + filename ;
+  String        begin_label_text = GUI::BEGIN_ITEM_LABEL + begin_time ;
+  String        end_label_text   = GUI::END_ITEM_LABEL   + end_time ;
+  TreeViewItem* clip_item        = new ClipItem(clip_id  , clip_label_text , clip_node) ;
+  TreeViewItem* filename_item    = new ClipItem(file_id  , file_label_text            ) ;
+  TreeViewItem* begin_time_item  = new ClipItem(begin_id , begin_label_text           ) ;
+  TreeViewItem* end_time_item    = new ClipItem(end_id   , end_label_text             ) ;
+  clip_item->addSubItem(filename_item   , 0) ;
+  clip_item->addSubItem(begin_time_item , 1) ;
+  clip_item->addSubItem(end_time_item   , 2) ;
 
 DEBUG_TRACE_NEW_CLIP_ITEM
 
-  return new_clip ;
+  return clip_item ;
 }
 
 void MainContent::createMasterItem(ValueTree root_store , ValueTree master_node)
@@ -406,7 +411,6 @@ void MainContent::createMasterItem(ValueTree root_store , ValueTree master_node)
 DEBUG_TRACE_CREATE_MASTER_ITEM
 
   for (int clip_n = 0 ; clip_n < master_node.getNumChildren() ; ++clip_n)
-//     master_item->addSubItem(newClipItem(master_node.getChild(clip_n)) , -1) ;
     createClipItem(root_store , master_node.getChild(clip_n)) ;
 }
 
@@ -548,38 +552,24 @@ DEBUG_TRACE_STORAGE_REDIRECTED
 
   if (root_item != nullptr)
   {
-    ValueTree master_node ;
-    ValueTree clip_node ;
+    while (root_item->getNumSubItems() > 0) root_item->removeSubItem(0) ; // clearSubItems()
 
-    while (root_item->getNumSubItems() > 0) root_item->removeSubItem(0) ;
-    // clearSubItems()
     for (int master_n = 0 ; master_n < root_store.getNumChildren() ; ++master_n)
-    {
-      master_node = root_store.getChild(master_n) ;
-      createMasterItem(root_store , master_node) ;
-
-      for (int clip_n = 0 ; clip_n < master_node.getNumChildren() ; ++clip_n)
-      {
-        clip_node = master_node.getChild(clip_n) ;
-        createClipItem(root_store , clip_node) ;
-      }
-    }
+      createMasterItem(root_store , root_store.getChild(master_n)) ;
   }
 }
 
 void MainContent::valueTreeChildAdded(ValueTree& parent_node , ValueTree& new_node)
 {
-  bool is_master_clips_node        = parent_node             == this->storage->clips ;
-  bool is_clip_clips_node          = parent_node.getParent() == this->storage->clips ;
-  bool is_master_compilations_node = parent_node             == this->storage->compilations ;
-  bool is_clip_compilations_node   = parent_node.getParent() == this->storage->compilations ;
+  bool is_master_node = parent_node             == this->storage->clips       ||
+                        parent_node             == this->storage->compilations ;
+  bool is_clip_node   = parent_node.getParent() == this->storage->clips       ||
+                        parent_node.getParent() == this->storage->compilations ;
 
 DEBUG_TRACE_STORAGE_CHILD_ADDED
 
-  if      (is_master_clips_node       ) createMasterItem(this->storage->clips        , new_node) ;
-  else if (is_clip_clips_node         ) createClipItem  (this->storage->clips        , new_node) ;
-  else if (is_master_compilations_node) createMasterItem(this->storage->compilations , new_node) ;
-  else if (is_clip_compilations_node  ) createClipItem  (this->storage->compilations , new_node) ;
+  if      (is_master_node) createMasterItem(parent_node             , new_node) ;
+  else if (is_clip_node  ) createClipItem  (parent_node.getParent() , new_node) ;
 }
 
 void MainContent::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& deleted_node ,

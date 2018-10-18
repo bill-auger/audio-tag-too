@@ -55,6 +55,7 @@ const Identifier STORE::COMPILATIONS_ID = "compilations" ;
 const Identifier STORE::CONFIG_VERSION_KEY = "config-version" ;
 
 // clips/compilations IDs
+const Identifier STORE::LABEL_TEXT_KEY = "label-text";
 const Identifier STORE::FILENAME_KEY   = "master-filename";
 const Identifier STORE::BEGIN_TIME_KEY = "begin-time" ;
 const Identifier STORE::END_TIME_KEY   = "end-time" ;

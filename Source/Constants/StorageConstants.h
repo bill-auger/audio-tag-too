@@ -102,6 +102,7 @@ public:
   static const Identifier CONFIG_VERSION_KEY ;
 
   // clips/compilations IDs
+  static const Identifier LABEL_TEXT_KEY ;
   static const Identifier FILENAME_KEY ;
   static const Identifier BEGIN_TIME_KEY ;
   static const Identifier END_TIME_KEY ;

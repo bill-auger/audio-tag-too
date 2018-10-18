@@ -44,6 +44,8 @@ public:
   static const uint16 WINDOW_H ;
   static const Colour WINDOW_BG_COLOR ;
   static const int    TITLEBAR_BTNS ;
+  static const int    N_DASH_LENGTHS = 2 ; // ASSERT: number of floats defiend in DASH_LENGTHS
+  static const float  DASH_LENGTHS[N_DASH_LENGTHS] ;
 
   // Waveform
   static const uint16 CACHE_N_THUMBS ;
@@ -83,11 +85,12 @@ public:
   // clips/compilations TreeViewItems
   static const String FILE_ITEM_LABEL ;
   static const String BEGIN_ITEM_LABEL ;
-  static const String ENT_ITEM_LABEL ;
+  static const String END_ITEM_LABEL ;
 
   // user messages
   static const String DEVICE_ERROR_TITLE ;
   static const String DEVICE_ERROR_MSG ;
   static const String FILESYSTEM_WRITE_ERROR_MSG ;
   static const String STORAGE_WRITE_ERROR_MSG ;
+  static const String ID_COLLISION_ERROR_MSG ;
 } ;

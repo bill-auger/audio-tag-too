@@ -36,20 +36,20 @@ class AudioTagTooStore : ValueTree::Listener
 
 public:
 
-  ~AudioTagTooStore() ;
+  ~AudioTagTooStore(void) ;
 
 
 private:
 
   // initialization
-  AudioTagTooStore() ;
-  bool initialize() ;
-  void teardown() ;
+  AudioTagTooStore(void) ;
+  bool initialize(void) ;
+  void teardown(void) ;
 
   // validations
-  void verifyConfig() ;
-  void verifyRoot  () ;
-  void sanitizeRoot() ;
+  void verifyConfig(void) ;
+  void verifyRoot  (void) ;
+  void sanitizeRoot(void) ;
 
   // validation/sanitization helpers
   void verifyChildNode      (ValueTree store , Identifier node_id) ;
@@ -65,7 +65,7 @@ private:
   void sanitizeComboProperty(ValueTree store , Identifier key , StringArray options) ;
 
   // persistence
-  void loadConfig () ;
+  void loadConfig (void) ;
   bool storeConfig(XmlElement* device_state_xml) ;
 
   // event handlers
@@ -80,10 +80,11 @@ private:
   void valueTreeRedirected       (ValueTree& /*target_node*/                                                 ) override { }
 
   // getters/setters
-  bool isKnownProperty(ValueTree node        , const Identifier& key) ;
-  bool setProperty    (ValueTree node        , const Identifier& key , const var value) ;
-  bool setConfig      (ValueTree config_node , const Identifier& key , const var value) ;
-  bool createClip     (String audio_filename , double begin_time , double end_time) ;
+  bool      isKnownProperty (ValueTree node        , const Identifier& key) ;
+  bool      setProperty     (ValueTree node        , const Identifier& key , const var value) ;
+  bool      setConfig       (ValueTree config_node , const Identifier& key , const var value) ;
+  ValueTree getChildNodeById(ValueTree root_store , Identifier node_id) ;
+  bool      createClip      (String audio_filename , double begin_time , double end_time) ;
 
   // configuration/persistence
   File                        storageFile ;

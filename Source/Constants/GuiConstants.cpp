@@ -30,12 +30,13 @@ const uint8 GUI::STROKE_W  = 1 ;
 const float GUI::FONT_SIZE = 16.0 ;
 
 // MainContent
-const uint8  GUI::BORDERS_W        = 2 ;
-const uint8  GUI::TITLEBAR_H       = 24 ;
-const uint16 GUI::WINDOW_W         = 768 - BORDERS_W ;              // jucer 766
-const uint16 GUI::WINDOW_H         = 768 - BORDERS_W - TITLEBAR_H ; // jucer 742
-const Colour GUI::WINDOW_BG_COLOR  = Colour(0xFF404040) ;
-const int    GUI::TITLEBAR_BTNS    = DocumentWindow::allButtons ;
+const uint8  GUI::BORDERS_W                    = 2 ;
+const uint8  GUI::TITLEBAR_H                   = 24 ;
+const uint16 GUI::WINDOW_W                     = 768 - BORDERS_W ;              // jucer 766
+const uint16 GUI::WINDOW_H                     = 768 - BORDERS_W - TITLEBAR_H ; // jucer 742
+const Colour GUI::WINDOW_BG_COLOR              = Colour(0xFF404040) ;
+const int    GUI::TITLEBAR_BTNS                = DocumentWindow::allButtons ;
+const float  GUI::DASH_LENGTHS[N_DASH_LENGTHS] = { 8.0f , 8.0f } ;
 
 // Waveform
 const uint16 GUI::CACHE_N_THUMBS      = 512 ;
@@ -75,10 +76,11 @@ const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 // ClipItem
 const String GUI::FILE_ITEM_LABEL  = "Source: " ;
 const String GUI::BEGIN_ITEM_LABEL = "Beginning: " ;
-const String GUI::ENT_ITEM_LABEL   = "Ending: " ;
+const String GUI::END_ITEM_LABEL   = "Ending: " ;
 
 // user messages
 const String GUI::DEVICE_ERROR_TITLE         = "Audio Device Error" ;
 const String GUI::DEVICE_ERROR_MSG           = "Audio Device Error\n\nCan not find a usable audio playback device" ;
 const String GUI::FILESYSTEM_WRITE_ERROR_MSG = "I/O Error\n\nCan not write to filesystem" ;
 const String GUI::STORAGE_WRITE_ERROR_MSG    = "I/O Error\n\nCan not write: " ;
+const String GUI::ID_COLLISION_ERROR_MSG     = "ID Collision\n\nCan not create an entry for this file. The path/file name is ambiguous with another entry." ;

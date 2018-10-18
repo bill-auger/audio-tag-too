@@ -384,38 +384,60 @@ DEBUG_TRACE_SET_CONFIG
   return is_valid ;
 }
 
+ValueTree AudioTagTooStore::getChildNodeById(ValueTree root_store , Identifier node_id)
+{
+  ValueTree child_node ;
+
+  if ((child_node = root_store.getChildWithName(node_id)).isValid())
+    return child_node ;
+  else for (int master_n = 0 ; master_n < root_store.getNumChildren() ; ++master_n)
+    if ((child_node = root_store.getChild(master_n).getChildWithName(node_id)).isValid())
+      return child_node ;
+
+  return ValueTree::invalid ;
+}
+
 bool AudioTagTooStore::createClip(String audio_filename , double begin_time , double end_time)
 {
-  Identifier master_id = STORE::FilterId(audio_filename) ;
-  Identifier clip_id   = STORE::FilterId(audio_filename     + '-' +
-                                         String(begin_time) + '-' +
-                                         String(end_time  )       ) ;
-
-  ValueTree master_store    = this->clips.getChildWithName(master_id) ;
-  bool      is_new_master   = !master_store.isValid() ;
-  var       master_filename = master_store.getProperty(STORE::FILENAME_KEY) ;
-  bool      is_id_collision = !is_new_master && STRING(master_filename) != audio_filename ;
-  master_store              = (is_new_master) ? ValueTree(master_id) : master_store ;
-  ValueTree clip_store      = ValueTree(clip_id) ;
+  Identifier master_id         = STORE::FilterId(audio_filename) ;
+  Identifier clip_id           = STORE::FilterId(audio_filename     + '-' +
+                                                 String(begin_time) + '-' +
+                                                 String(end_time  )       ) ;
+  ValueTree  master_node       = this->clips.getChildWithName(master_id) ;
+  bool       is_new_master     = !master_node.isValid() ;
+  String     master_filename   = STRING(master_node[STORE::FILENAME_KEY]) ;
+  bool       is_id_collision   = !is_new_master && master_filename != audio_filename ;
+  master_node                  = (is_new_master) ? ValueTree(master_id) : master_node ;
+  String     master_label_text = File(audio_filename).getFileName() ;
+  String     clip_label_text   = String(begin_time , 6) + " - " + String(end_time , 6) ;
+  ValueTree  clip_node         = ValueTree(clip_id) ;
 
 DEBUG_TRACE_CREATE_CLIP
 
-  bool is_valid = !is_id_collision                                                   &&
-                  setProperty(master_store , STORE::FILENAME_KEY   , audio_filename) &&
-                  setProperty(clip_store   , STORE::FILENAME_KEY   , audio_filename) &&
-                  setProperty(clip_store   , STORE::BEGIN_TIME_KEY , begin_time    ) &&
-                  setProperty(clip_store   , STORE::END_TIME_KEY   , end_time      )  ;
+#ifdef HAS_MAIN_CONTROLLER
+  if (is_id_collision) AudioTagToo::Warning(GUI::ID_COLLISION_ERROR_MSG) ;
+#else // HAS_MAIN_CONTROLLER
+  if (is_id_collision) Trace::TraceError(GUI::ID_COLLISION_ERROR_MSG) ;
+#endif // HAS_MAIN_CONTROLLER
+
+  bool is_valid = !is_id_collision                                                     &&
+                  setProperty(master_node , STORE::LABEL_TEXT_KEY , master_label_text) &&
+                  setProperty(master_node , STORE::FILENAME_KEY   , audio_filename   ) &&
+                  setProperty(clip_node   , STORE::LABEL_TEXT_KEY , clip_label_text  ) &&
+                  setProperty(clip_node   , STORE::FILENAME_KEY   , audio_filename   ) &&
+                  setProperty(clip_node   , STORE::BEGIN_TIME_KEY , begin_time       ) &&
+                  setProperty(clip_node   , STORE::END_TIME_KEY   , end_time         )  ;
 
   if (is_valid)
   {
-    master_store.appendChild(clip_store , nullptr) ;
-    this->clips.appendChild(master_store , nullptr) ;
+    master_node.appendChild(clip_node   , nullptr) ;
+    this->clips.appendChild(master_node , nullptr) ;
 
     STORE::IdComparator<ValueTree&> id_comparator ;
-    this->clips .sort(id_comparator , nullptr , false) ;
-    master_store.sort(id_comparator , nullptr , false) ;
+    this->clips.sort(id_comparator , nullptr , false) ;
+    master_node.sort(id_comparator , nullptr , false) ;
 
-// DEBUG_TRACE_DUMP_STORE(master_store , "master_store")
+DEBUG_TRACE_DUMP_STORE(master_node , "master_node")
   }
 
   return is_valid ;
