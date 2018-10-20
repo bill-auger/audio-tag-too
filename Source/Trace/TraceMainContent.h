@@ -73,7 +73,8 @@
                          " master item '"       + master_item_id      + "'") ;      \
     Trace::TraceNoPrefix("for source '"         + master_id           + "'") ;      \
     Trace::TraceNoPrefix("at index "        + String(master_idx) +                  \
-                         " of root store '" + root_id + "'"      )                  ;
+                         " of root store '" + root_id + "'"      ) ;                \
+    DEBUG_TRACE_DUMP_ITEMS_TREE(root_item , STRING(root_store.getType()))
 
   #define DEBUG_TRACE_STORAGE_REDIRECTED                                               \
     int n_masters = root_store.getNumChildren() ; int n_clips = 0 ;                    \
