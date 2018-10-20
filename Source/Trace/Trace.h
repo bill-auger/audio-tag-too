@@ -23,6 +23,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+
 // enable debug/tracing features
 #ifdef DEBUG
   #define DEBUG_TRACE 1
