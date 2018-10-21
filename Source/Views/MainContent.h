@@ -138,46 +138,6 @@ private:
   void fileDoubleClicked (const File&                    ) override {}
   void browserRootChanged(const File&                    ) override {}
 
-
-  class ClipItem : public TreeViewItem , private Label::Listener
-  {
-  public:
-
-    ClipItem(String _item_id   , String _label , ValueTree _store = ValueTree::invalid) :
-             item_id(_item_id) , label(_label) , store(_store)                          { }
-
-
-    // TreeViewItem implementation
-    String     getUniqueName       () const override { return this->item_id         ; }
-    bool       mightContainSubItems()       override { return this->store.isValid() ; }
-    int        getItemHeight       () const override { return 24                    ; }
-    Component* createItemComponent ()       override
-    {
-      Label* item_label = new Label(this->item_id , this->label) ;
-
-      item_label->setEditable(this->store.isValid()) ;
-      item_label->addListener(this) ;
-
-      return item_label ;
-    }
-
-    // Label event handler
-    void labelTextChanged(Label* a_label)
-    {
-      this->store.setProperty(STORE::LABEL_TEXT_KEY , a_label->getText() , nullptr) ;
-    }
-
-
-  private:
-
-    String    item_id ;
-    String    label ;
-    ValueTree store ;
-
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)
-  } ;
-
     //[/UserVariables]
 
     //==============================================================================
