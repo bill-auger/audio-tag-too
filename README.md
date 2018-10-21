@@ -1,3 +1,8 @@
+* do note, this is in the alpha stage - the master branch is not a stable release and will be rebased  
+  also juce sources may not be in this repo  
+  put juce at relative location from AudioTagToo.jucer file ../juce/
+  the important path is ../juce/modules
+
 
 ### Building from Source
 

@@ -1,0 +1,30 @@
+language: cpp
+compiler: clang
+sudo:     required
+dist:     xenial
+
+git:
+  depth: 1
+
+branches:
+  except: master
+
+before_install:
+  - PROJECT_NAME='audio-tag-too'
+  - DEPS='libasound2-dev libcurl4-gnutls-dev
+          libfreetype6-dev libgtk-3-dev libwebkit2gtk-4.0-dev libx11-dev
+          libxcursor-dev libxinerama-dev libxrandr-dev'
+  - JUCE_VERSION='5.3.2'
+  - BUILD_DIR=$TRAVIS_BUILD_DIR/Builds/Makefile
+
+script:
+  - echo "building 64-bit $PROJECT_NAME"
+  - cd $BUILD_DIR
+  - sudo apt-get update -qq
+  - sudo apt-get install -y $DEPS
+  - git clone -b $JUCE_VERSION https://github.com/julianstorer/juce.git $TRAVIS_BUILD_DIR/../juce
+  - CONFIG=Release make
+
+after_script:
+  - echo "build stage ended"
+  - ls -l $BUILD_DIR/build/
