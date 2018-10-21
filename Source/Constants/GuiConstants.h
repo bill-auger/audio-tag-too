@@ -65,8 +65,7 @@ public:
 
   // TabbedComponent
   static const int FILE_BROWSER_IDX ;
-  static const int CLIPS_IDX ;
-  static const int COMPILATIONS_IDX ;
+  static const int CLIPS_TABLE_IDX ;
   static const int DEVICE_SELECTOR_IDX ;
 
   // FileBrowserComponent

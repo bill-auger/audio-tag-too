@@ -33,7 +33,7 @@
       </GROUP>
       <GROUP id="{415C92D0-6DB5-561E-5112-51D267588674}" name="Views">
         <FILE id="yQDChz" name="Alert.cpp" compile="1" resource="0" file="Source/Views/Alert.cpp"/>
-        <FILE id="ROnxy0" name="ClipItem.cpp" compile="1" resource="0" file="Source/Views/ClipItem.cpp"/>
+        <FILE id="eSgmpm" name="ClipsTable.cpp" compile="1" resource="0" file="Source/Views/ClipsTable.cpp"/>
         <FILE id="Y76Tzw" name="MainContent.cpp" compile="1" resource="0" file="Source/Views/MainContent.cpp"/>
         <FILE id="Cxr1BM" name="Statusbar.cpp" compile="1" resource="0" file="Source/Views/Statusbar.cpp"/>
         <FILE id="M3PK9P" name="Waveform.cpp" compile="1" resource="0" file="Source/Views/Waveform.cpp"/>

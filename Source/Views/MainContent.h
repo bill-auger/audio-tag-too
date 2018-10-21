@@ -5,9 +5,8 @@
 |*|  This file is part of the AudioTagToo program.
 |*|
 |*|  AudioTagToo is free software: you can redistribute it and/or modify
-|*|  it under the terms of the GNU General Public License as published by
-|*|  the Free Software Foundation, either version 3 of the License, or
-|*|  (at your option) any later version.
+|*|  it under the terms of the GNU General Public License version 3
+|*|  as published by the Free Software Foundation.
 |*|
 |*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +24,7 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Models/AudioTagTooStore.h"
+#include "ClipsTable.h"
 #include "Statusbar.h"
 #include "Waveform.h"
 
@@ -41,8 +41,7 @@
 class MainContent  : public AudioAppComponent,
                      private Button::Listener,
                      private FileBrowserListener,
-                     private ChangeListener,
-                     private ValueTree::Listener
+                     private ChangeListener
 {
 public:
     //==============================================================================
@@ -72,10 +71,7 @@ private:
   WildcardFileFilter                       audioFileFilter ;
   TimeSliceThread                          workerThread ;
   FileBrowserComponent*                    fileBrowser ;
-  TreeView*                                clipsTreeview ;
-  std::unique_ptr<TreeViewItem>            clips ;
-  TreeView*                                compilationsTreeview ;
-  std::unique_ptr<TreeViewItem>            compilations ;
+  ClipsTable*                              clipsTable ;
   File                                     workingDir ;
   String                                   projectFilename ;
   String                                   audioFilename ;
@@ -97,13 +93,6 @@ private:
   void setTailMarker        (void) ;
   void createClip           (void) ;
 
-  // model helpers
-  TreeViewItem* getViewItemFor  (ValueTree root_store) ;
-  TreeViewItem* newMasterItem   (ValueTree master_node) ;
-  TreeViewItem* newClipItem     (ValueTree clip_node) ;
-  void          createMasterItem(ValueTree root_store , ValueTree master_node) ;
-  void          createClipItem  (ValueTree root_store , ValueTree clip_node) ;
-
   // event handlers
   void paintOverChildren         (Graphics& g)                                                     override ;
   void prepareToPlay             (int samples_per_block , double sample_rate)                      override ;
@@ -112,19 +101,11 @@ private:
   void buttonClicked             (Button* a_button)                                                override ;
   void selectionChanged          (void)                                                            override ;
   void changeListenerCallback    (ChangeBroadcaster* source)                                       override ;
-  void valueTreeRedirected       (ValueTree& root_store                                          ) override ;
-  void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node                   ) override ;
-  void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
-  void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override ;
-
-  // unhandled ValueTree::Listener events
-  void valueTreePropertyChanged(ValueTree& , const Identifier&) override {}
-  void valueTreeParentChanged  (ValueTree&                    ) override {}
 
   // unhandled FileBrowserListener events
-  void fileClicked       (const File& , const MouseEvent&) override {}
-  void fileDoubleClicked (const File&                    ) override {}
-  void browserRootChanged(const File&                    ) override {}
+  void fileClicked       (const File& , const MouseEvent&) override { }
+  void fileDoubleClicked (const File&                    ) override { }
+  void browserRootChanged(const File&                    ) override { }
 
     //[/UserVariables]
 

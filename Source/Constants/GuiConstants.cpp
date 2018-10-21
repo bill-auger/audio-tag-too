@@ -57,9 +57,8 @@ const String GUI::NO_FILE_TEXT        = "(No audio file selected)" ;
 
 // TabbedComponent
 const int GUI::FILE_BROWSER_IDX    = 0 ;
-const int GUI::CLIPS_IDX           = 1 ;
-const int GUI::COMPILATIONS_IDX    = 2 ;
-const int GUI::DEVICE_SELECTOR_IDX = 3 ;
+const int GUI::CLIPS_TABLE_IDX     = 1 ;
+const int GUI::DEVICE_SELECTOR_IDX = 2 ;
 
 // FileBrowserComponent
 const Colour GUI::TABPANEL_BG_COLOR         = Colour(0xFF303030) ;

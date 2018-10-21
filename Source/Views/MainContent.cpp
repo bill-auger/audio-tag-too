@@ -5,9 +5,8 @@
 |*|  This file is part of the AudioTagToo program.
 |*|
 |*|  AudioTagToo is free software: you can redistribute it and/or modify
-|*|  it under the terms of the GNU General Public License as published by
-|*|  the Free Software Foundation, either version 3 of the License, or
-|*|  (at your option) any later version.
+|*|  it under the terms of the GNU General Public License version 3
+|*|  as published by the Free Software Foundation.
 |*|
 |*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -41,12 +40,10 @@
 */
 
 
-#include "ClipItem.h"
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/MediaConstants.h"
 #include "../Constants/StorageConstants.h"
-#include "../Trace/TraceMainContent.h"
 
 //[/Headers]
 
@@ -97,8 +94,7 @@ MainContent::MainContent ()
     addAndMakeVisible (tabPanel.get());
     tabPanel->setTabBarDepth (30);
     tabPanel->addTab (TRANS("Files"), Colour (0xff404040), new FileBrowserComponent ((FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles) , this->workingDir , &(this->audioFileFilter) , nullptr), true);
-    tabPanel->addTab (TRANS("Clips"), Colour (0xff404040), new TreeView(), true);
-    tabPanel->addTab (TRANS("Compilations"), Colour (0xff404040), new TreeView(), true);
+    tabPanel->addTab (TRANS("Clips"), Colour (0xff404040), new ClipsTable(), true);
     tabPanel->addTab (TRANS("Devices"), Colour (0xff404040), new AudioDeviceSelectorComponent (deviceManager , 0 , 0 , 2 , 2 , false , false , true , false), true);
     tabPanel->setCurrentTabIndex (0);
 
@@ -111,11 +107,8 @@ MainContent::MainContent ()
   this->app                    = JUCEApplication::getInstance() ;
   this->fileBrowser            = static_cast<FileBrowserComponent*>(this->tabPanel   ->getTabContentComponent(GUI::FILE_BROWSER_IDX)) ;
   FileListComponent* file_list = static_cast<FileListComponent*   >(this->fileBrowser->getDisplayComponent()                        ) ;
-  this->clipsTreeview          = static_cast<TreeView*            >(this->tabPanel   ->getTabContentComponent(GUI::CLIPS_IDX       )) ;
-  this->compilationsTreeview   = static_cast<TreeView*            >(this->tabPanel   ->getTabContentComponent(GUI::COMPILATIONS_IDX)) ;
-  this->clips       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ) , String::empty)) ;
-  this->compilations.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID) , String::empty)) ;
-  this->storage     .reset(new AudioTagTooStore()) ;
+  this->clipsTable             = static_cast<ClipsTable*          >(this->tabPanel   ->getTabContentComponent(GUI::CLIPS_TABLE_IDX )) ;
+  this->storage.reset(new AudioTagTooStore()) ;
 
   this->waveforms.push_back(this->fullWaveform.get()) ;
   this->waveforms.push_back(this->clipWaveform.get()) ;
@@ -143,11 +136,6 @@ MainContent::MainContent ()
   file_list->setColour(DirectoryContentsDisplayComponent::highlightColourId	      , GUI::BROWSER_SELECTED_BG_COLOR) ;
   file_list->setColour(DirectoryContentsDisplayComponent::highlightedTextColourId	, GUI::BROWSER_SELECTED_FG_COLOR) ;
 
-  this->clipsTreeview       ->setRootItem(this->clips       .get()) ;
-  this->compilationsTreeview->setRootItem(this->compilations.get()) ;
-  this->clipsTreeview       ->setRootItemVisible(false) ;
-  this->compilationsTreeview->setRootItemVisible(false) ;
-
   this->formatManager    .registerBasicFormats() ;
   this->audioSourcePlayer.setSource(&transportSource) ;
 
@@ -161,11 +149,12 @@ MainContent::MainContent ()
   this->clipWaveform        ->addChangeListener(this) ;
   this->transportSource      .addChangeListener(this) ;
   this->fileBrowser         ->addListener      (this) ;
-  this->storage->clips       .addListener      (this) ;
-  this->storage->compilations.addListener      (this) ;
+  this->storage->clips       .addListener      (this->clipsTable) ;
+  this->storage->compilations.addListener      (this->clipsTable) ;
 
   // initialize stored state
-  this->storage->initialize() ;
+  this->storage   ->initialize() ;
+  this->clipsTable->initialize(this->storage->clips , this->storage->compilations) ;
 
 #if ! DISABLE_MEDIA
   // start audio and worker threads
@@ -199,8 +188,8 @@ MainContent::~MainContent()
   this->clipWaveform        ->removeChangeListener(this) ;
   this->transportSource      .removeChangeListener(this) ;
   this->fileBrowser         ->removeListener      (this) ;
-  this->storage->clips       .removeListener      (this) ;
-  this->storage->compilations.removeListener      (this) ;
+  this->storage->clips       .removeListener      (this->clipsTable) ;
+  this->storage->compilations.removeListener      (this->clipsTable) ;
 
   this->storage = nullptr ;
 
@@ -218,10 +207,6 @@ MainContent::~MainContent()
 
 
     //[Destructor]. You can add your own custom destruction code here..
-
-  this->clips        = nullptr ;
-  this->compilations = nullptr ;
-
     //[/Destructor]
 }
 
@@ -361,95 +346,6 @@ void MainContent::createClip()
 }
 
 
-/* model helpers */
-
-TreeViewItem* MainContent::getViewItemFor(ValueTree root_store)
-{
-  return (root_store == this->storage->clips       ) ? this->clips.get()        :
-         (root_store == this->storage->compilations) ? this->compilations.get() : nullptr ;
-}
-
-TreeViewItem* MainContent::newMasterItem(ValueTree master_node)
-{
-  String        master_id         = STRING(master_node.getType()) ;
-  String        master_filename   = STRING(master_node[STORE::FILENAME_KEY  ]) ;
-  String        master_label_text = STRING(master_node[STORE::LABEL_TEXT_KEY]) ;
-  TreeViewItem* master_item       = new ClipItem(master_id , master_label_text , master_node) ;
-
-DEBUG_TRACE_NEW_MASTER_ITEM
-
-  return master_item ;
-}
-
-TreeViewItem* MainContent::newClipItem(ValueTree clip_node)
-{
-  String        clip_id          = STRING(clip_node.getType()) ;
-  String        file_id          = clip_id + "-filename" ;
-  String        begin_id         = clip_id + "-begin_time" ;
-  String        end_id           = clip_id + "-end_time" ;
-  String        filename         = STRING(       clip_node[STORE::FILENAME_KEY  ]) ;
-  String        begin_time       = String(double(clip_node[STORE::BEGIN_TIME_KEY]) , 6) ;
-  String        end_time         = String(double(clip_node[STORE::END_TIME_KEY  ]) , 6) ;
-  String        clip_label_text  = STRING(       clip_node[STORE::LABEL_TEXT_KEY]) ;
-  String        file_label_text  = GUI::FILE_ITEM_LABEL  + filename ;
-  String        begin_label_text = GUI::BEGIN_ITEM_LABEL + begin_time ;
-  String        end_label_text   = GUI::END_ITEM_LABEL   + end_time ;
-  TreeViewItem* clip_item        = new ClipItem(clip_id  , clip_label_text , clip_node) ;
-  TreeViewItem* filename_item    = new ClipItem(file_id  , file_label_text            ) ;
-  TreeViewItem* begin_time_item  = new ClipItem(begin_id , begin_label_text           ) ;
-  TreeViewItem* end_time_item    = new ClipItem(end_id   , end_label_text             ) ;
-  clip_item->addSubItem(filename_item   , 0) ;
-  clip_item->addSubItem(begin_time_item , 1) ;
-  clip_item->addSubItem(end_time_item   , 2) ;
-
-DEBUG_TRACE_NEW_CLIP_ITEM
-
-  return clip_item ;
-}
-
-void MainContent::createMasterItem(ValueTree root_store , ValueTree master_node)
-{
-  TreeViewItem* root_item   = getViewItemFor(root_store) ;
-  TreeViewItem* master_item = newMasterItem(master_node) ;
-  int           master_idx  = root_store.indexOf(master_node) ;
-
-  root_item->addSubItem(master_item , master_idx) ;
-  String master_item_id = master_item->getItemIdentifierString() ;
-  this->storage->setProperty(master_node , STORE::ITEM_ID_KEY , master_item_id) ;
-
-DEBUG_TRACE_CREATE_MASTER_ITEM
-
-  for (int clip_n = 0 ; clip_n < master_node.getNumChildren() ; ++clip_n)
-    createClipItem(root_store , master_node.getChild(clip_n)) ;
-}
-
-void MainContent::createClipItem(ValueTree root_store , ValueTree clip_node)
-{
-  TreeViewItem* root_item              = getViewItemFor(root_store) ;
-  ValueTree     master_node            = clip_node.getParent() ;
-  int           master_idx             = root_store.indexOf(master_node) ;
-  int           clip_idx               = master_node.indexOf(clip_node) ;
-  TreeViewItem* master_item            = root_item->getSubItem(master_idx) ;
-  TreeViewItem* clip_item              = newClipItem(clip_node) ;
-  String        master_item_id         = master_item->getItemIdentifierString() ;
-  bool          does_master_item_exist = master_item != nullptr ;
-
-  if (!does_master_item_exist)
-  {
-    master_item    = newMasterItem(master_node) ;
-    root_item->addSubItem(master_item , master_idx) ;
-    master_item_id = master_item->getItemIdentifierString() ;
-    this->storage->setProperty(master_node , STORE::ITEM_ID_KEY , master_item_id) ;
-  }
-
-  master_item->addSubItem(clip_item , clip_idx) ;
-  String clip_item_id = clip_item->getItemIdentifierString() ;
-  this->storage->setProperty(clip_node , STORE::ITEM_ID_KEY , clip_item_id) ;
-
-DEBUG_TRACE_CREATE_CLIP_ITEM
-}
-
-
 /* event handlers */
 
 void MainContent::paintOverChildren(Graphics& g)
@@ -537,59 +433,13 @@ void MainContent::changeListenerCallback(ChangeBroadcaster* source)
   else if (source == &(this->deviceManager  )  )
   {
     bool is_device_ready = this->deviceManager.getCurrentAudioDevice() != nullptr ;
-    int  tab_pane_idx    = (!is_device_ready                    ) ? GUI::DEVICE_SELECTOR_IDX :
-                           (File(this->projectFilename).exists()) ? GUI::COMPILATIONS_IDX    :
-                           (File(this->audioFilename  ).exists()) ? GUI::CLIPS_IDX           :
-                                                                    GUI::FILE_BROWSER_IDX    ;
+    int  tab_pane_idx    = (!is_device_ready                      ) ? GUI::DEVICE_SELECTOR_IDX :
+                           (File(this->projectFilename).exists() ||
+                            File(this->audioFilename  ).exists()  ) ? GUI::CLIPS_TABLE_IDX     :
+                                                                      GUI::FILE_BROWSER_IDX    ;
 
     this->tabPanel->setCurrentTabIndex(tab_pane_idx) ;
   }
-}
-
-void MainContent::valueTreeRedirected(ValueTree& root_store)
-{
-DEBUG_TRACE_STORAGE_REDIRECTED
-
-  TreeViewItem* root_item = getViewItemFor(root_store) ;
-
-  if (root_item != nullptr)
-  {
-    while (root_item->getNumSubItems() > 0) root_item->removeSubItem(0) ; // clearSubItems()
-
-    for (int master_n = 0 ; master_n < root_store.getNumChildren() ; ++master_n)
-      createMasterItem(root_store , root_store.getChild(master_n)) ;
-  }
-}
-
-void MainContent::valueTreeChildAdded(ValueTree& parent_node , ValueTree& new_node)
-{
-  bool is_master_node = parent_node             == this->storage->clips       ||
-                        parent_node             == this->storage->compilations ;
-  bool is_clip_node   = parent_node.getParent() == this->storage->clips       ||
-                        parent_node.getParent() == this->storage->compilations ;
-
-DEBUG_TRACE_STORAGE_CHILD_ADDED
-
-  if      (is_master_node) createMasterItem(parent_node             , new_node) ;
-  else if (is_clip_node  ) createClipItem  (parent_node.getParent() , new_node) ;
-}
-
-void MainContent::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& deleted_node ,
-                                        int        prev_idx                              )
-{
-  String        item_id      = STRING(deleted_node[STORE::ITEM_ID_KEY]) ;
-  TreeViewItem* deleted_item = this->clipsTreeview->findItemFromIdentifierString(item_id) ;
-  TreeViewItem* parent_item  = deleted_item->getParentItem() ;
-  int           deleted_idx  = deleted_item->getIndexInParent() ;
-
-DEBUG_TRACE_STORAGE_CHILD_REMOVED
-
-  if (parent_item != nullptr) parent_item->removeSubItem(deleted_idx) ;
-}
-
-void MainContent::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_idx , int curr_idx)
-{
-DBG("MainContent::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
 }
 
 //[/MiscUserCode]
@@ -605,7 +455,7 @@ DBG("MainContent::valueTreeChildOrderChanged() parent_node=" + parent_node.getTy
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="MainContent" componentName=""
-                 parentClasses="public AudioAppComponent, private Button::Listener, private FileBrowserListener, private ChangeListener, private ValueTree::Listener"
+                 parentClasses="public AudioAppComponent, private Button::Listener, private FileBrowserListener, private ChangeListener"
                  constructorParams="" variableInitialisers="audioFileFilter(MEDIA::IMPORT_WAVEFILE_MASK , &quot;*&quot; , MEDIA::IMPORT_WAVEFILE_DESC) , workerThread(APP::WORKER_THREAD_NAME)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="766" initialHeight="742">
@@ -644,9 +494,7 @@ BEGIN_JUCER_METADATA
     <TAB name="Files" colour="ff404040" useJucerComp="0" contentClassName="FileBrowserComponent"
          constructorParams="(FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles) , this-&gt;workingDir , &amp;(this-&gt;audioFileFilter) , nullptr"
          jucerComponentFile=""/>
-    <TAB name="Clips" colour="ff404040" useJucerComp="0" contentClassName="TreeView"
-         constructorParams="" jucerComponentFile=""/>
-    <TAB name="Compilations" colour="ff404040" useJucerComp="0" contentClassName="TreeView"
+    <TAB name="Clips" colour="ff404040" useJucerComp="0" contentClassName="ClipsTable"
          constructorParams="" jucerComponentFile=""/>
     <TAB name="Devices" colour="ff404040" useJucerComp="0" contentClassName="AudioDeviceSelectorComponent"
          constructorParams="deviceManager , 0 , 0 , 2 , 2 , false , false , true , false"
