@@ -41,6 +41,7 @@
 */
 
 
+#include "ClipItem.h"
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/MediaConstants.h"

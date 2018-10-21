@@ -59,6 +59,8 @@
 !Source/Views/
 !Source/Views/Alert.cpp
 !Source/Views/Alert.h
+!Source/Views/ClipItem.cpp
+!Source/Views/ClipItem.h
 !Source/Views/MainContent.cpp
 !Source/Views/MainContent.h
 !Source/Views/Statusbar.cpp

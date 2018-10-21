@@ -398,6 +398,7 @@ bool AudioTagTooStore::createClip(String audio_filename , double begin_time , do
                                                  String(begin_time) + '-' +
                                                  String(end_time  )       ) ;
   ValueTree  master_node       = this->clips.getChildWithName(master_id) ;
+  bool       is_duplicate_clip = master_node.getChildWithName(clip_id).isValid() ;
   bool       is_new_master     = !master_node.isValid() ;
   String     master_filename   = STRING(master_node[STORE::FILENAME_KEY]) ;
   bool       is_id_collision   = !is_new_master && master_filename != audio_filename ;
@@ -410,7 +411,7 @@ DEBUG_TRACE_CREATE_CLIP
 
   if (is_id_collision) AudioTagToo::Warning(GUI::ID_COLLISION_ERROR_MSG) ;
 
-  bool is_valid = !is_id_collision                                                     &&
+  bool is_valid = !is_id_collision && !is_duplicate_clip                               &&
                   setProperty(master_node , STORE::LABEL_TEXT_KEY , master_label_text) &&
                   setProperty(master_node , STORE::FILENAME_KEY   , audio_filename   ) &&
                   setProperty(clip_node   , STORE::LABEL_TEXT_KEY , clip_label_text  ) &&

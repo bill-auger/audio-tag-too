@@ -83,6 +83,7 @@ public:
   static const Colour BROWSER_SELECTED_FG_COLOR ;
 
   // clips/compilations TreeViewItems
+  static const int    TREE_ITEM_H ;
   static const String FILE_ITEM_LABEL ;
   static const String BEGIN_ITEM_LABEL ;
   static const String END_ITEM_LABEL ;

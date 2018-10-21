@@ -117,14 +117,15 @@
     else if (!is_unknown_key       ) Trace::TraceStoreVb(change_msg      ) ;               \
     else                             Trace::TraceError  (change_msg      )                 ;
 
-  #define DEBUG_TRACE_CREATE_CLIP String master_msg = "master: '" + master_id + "'" ;        \
-    if        (is_id_collision) Trace::TraceWarning("ID collision creating " + master_msg) ; \
-    else { if (is_new_master  ) Trace::TraceStore("created " + master_msg) ;                 \
-           Trace::TraceStore ("creating clip: '" + clip_id + "'") ;                          \
-           Trace::TraceNoPrefix("derived from " + master_msg) ;                              \
-           Trace::TraceNoPrefixVb("audio_filename=" + audio_filename     +                   \
-                                  " begin_time="    + String(begin_time) +                   \
-                                  " end_time="      + String(end_time  ) ) ;                 }
+  #define DEBUG_TRACE_CREATE_CLIP String master_msg = "master: '" + master_id + "'" ;          \
+    if        (is_duplicate_clip) Trace::TraceWarning("duplicate clip exists: " + clip_id) ;   \
+    else if   (is_id_collision  ) Trace::TraceWarning("ID collision creating " + master_msg) ; \
+    else { if (is_new_master    ) Trace::TraceStore("created " + master_msg) ;                 \
+           Trace::TraceStore ("creating clip: '" + clip_id + "'") ;                            \
+           Trace::TraceNoPrefix("derived from " + master_msg) ;                                \
+           Trace::TraceNoPrefixVb("audio_filename=" + audio_filename     +                     \
+                                  " begin_time="    + String(begin_time) +                     \
+                                  " end_time="      + String(end_time  ) ) ;                   }
 
 #else // DEBUG_TRACE
 
