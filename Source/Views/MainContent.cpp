@@ -40,6 +40,7 @@
   ==============================================================================
 */
 
+
 #include "../Constants/AppConstants.h"
 #include "../Constants/GuiConstants.h"
 #include "../Constants/MediaConstants.h"
@@ -48,9 +49,10 @@
 #ifdef CONTROLLER_OWNS_STORAGE
 #include "../Models/AudioTagTooStore.h"
 #endif // CONTROLLER_OWNS_STORAGE
+#include "../Trace/TraceMainContent.h"
+#include "ClipItem.h"
 #include "Statusbar.h"
 #include "Waveform.h"
-#include "../Trace/TraceMainContent.h"
 
 
 //[/Headers]
