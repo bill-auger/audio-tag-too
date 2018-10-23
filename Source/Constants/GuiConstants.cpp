@@ -73,7 +73,7 @@ const Colour GUI::BROWSER_FG_COLOR          = Colour(0xFFFFFFFF) ;
 const Colour GUI::BROWSER_SELECTED_BG_COLOR = Colour(0xFF404040) ;
 const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 
-// ClipItem
+// ClipsTable::ClipItem
 const int    GUI::TREE_ITEM_H         = 24 ;
 const String GUI::FILE_ITEM_LABEL     = "Source: " ;
 const String GUI::BEGIN_ITEM_LABEL    = "Beginning: " ;
