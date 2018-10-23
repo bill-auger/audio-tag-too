@@ -23,9 +23,11 @@
 //[Headers]     -- You can add your own extra header files here --
 
 #include "../../JuceLibraryCode/JuceHeader.h"
-
 #include "../Constants/GuiConstants.h"
 #include "../Constants/StorageConstants.h"
+
+
+class Clip ;
 
 //[/Headers]
 
@@ -34,9 +36,8 @@
 //==============================================================================
 /**
                                                                     //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
+  ClipsTable is the TreeViewItem container for the AudioTagToo application.
+  It presents two side-by-side trees to allow drag and drop of clips into compilations.
                                                                     //[/Comments]
 */
 class ClipsTable  : public Component,
@@ -77,8 +78,6 @@ private:
   void          createItemsTree (ValueTree root_store) ;
 
   // event handlers
-  bool isInterestedInDragSource  (const DragAndDropTarget::SourceDetails& dragSourceDetails) ;
-  void itemDropped               (const DragAndDropTarget::SourceDetails& dragSourceDetails , int idx) ;
   void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node)                    override ;
   void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
   void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override ;
@@ -88,6 +87,29 @@ private:
   void valueTreePropertyChanged(ValueTree& , const Identifier&) override { }
   void valueTreeParentChanged  (ValueTree&)                     override { }
 
+/*
+  class ClipsTreeView : public TreeView
+  {
+  public:
+
+    ClipsTreeView(const String &component_name = String()) : is_drag_item_hovering(false) {}
+
+//     void paint(Graphics& g) override ;
+
+
+  private:
+
+    bool is_drag_item_hovering ;
+
+
+    // DragAndDropTarget  implementation
+    bool isInterestedInDragSource(const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+    void itemDragEnter           (const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+    void itemDragMove            (const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+    void itemDragExit            (const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+    void itemDropped             (const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+  } ;
+*/
 
   class ClipItem : public TreeViewItem
   {
@@ -96,18 +118,26 @@ private:
     ClipItem(String item_id , String label_text , ValueTree store = ValueTree::invalid) ;
 
 
+//   private:
+
     // TreeViewItem implementation
     String     getUniqueName       () const override ;
     bool       mightContainSubItems()       override ;
     int        getItemHeight       () const override ;
     Component* createItemComponent ()       override ;
 
+    // TreeViewItem drag and drop implementation
+    var  getDragSourceDescription()                                                                    override ;
+    bool isInterestedInDragSource(const DragAndDropTarget::SourceDetails& dragSourceDetails          ) override ;
+    void itemDropped             (const DragAndDropTarget::SourceDetails& dragSourceDetails , int idx) override ;
+
 
   private:
 
-    String    item_id ;
-    String    label_text ;
-    ValueTree store ;
+    String                item_id ;
+    String                label_text ;
+    ValueTree             store ;
+bool is_drag_item_hovering ;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)
