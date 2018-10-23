@@ -88,6 +88,31 @@ private:
   void valueTreePropertyChanged(ValueTree& , const Identifier&) override { }
   void valueTreeParentChanged  (ValueTree&)                     override { }
 
+
+  class ClipItem : public TreeViewItem
+  {
+  public:
+
+    ClipItem(String item_id , String label_text , ValueTree store = ValueTree::invalid) ;
+
+
+    // TreeViewItem implementation
+    String     getUniqueName       () const override ;
+    bool       mightContainSubItems()       override ;
+    int        getItemHeight       () const override ;
+    Component* createItemComponent ()       override ;
+
+
+  private:
+
+    String    item_id ;
+    String    label_text ;
+    ValueTree store ;
+
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)
+  } ;
+
     //[/UserVariables]
 
     //==============================================================================
@@ -102,29 +127,4 @@ private:
 };
 
 //[EndFile] You can add extra defines here...
-
-class ClipItem : public TreeViewItem
-{
-public:
-
-  ClipItem(String item_id , String label_text , ValueTree store = ValueTree::invalid) ;
-
-
-  // TreeViewItem implementation
-  String     getUniqueName       () const override ;
-  bool       mightContainSubItems()       override ;
-  int        getItemHeight       () const override ;
-  Component* createItemComponent ()       override ;
-
-
-private:
-
-  String    item_id ;
-  String    label_text ;
-  ValueTree store ;
-
-
-  JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)
-} ;
-
 //[/EndFile]
