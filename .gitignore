@@ -6,8 +6,11 @@
 !README.md
 
 !Assets/
+!Assets/accessories-text-editor.png
 !Assets/audio-x-generic.png
 !Assets/COPYING_ASSETS
+!Assets/media-playback-start.png
+!Assets/process-stop.png
 !Assets/README.md
 
 !Builds/
@@ -65,6 +68,8 @@
 !Source/Views/
 !Source/Views/Alert.cpp
 !Source/Views/Alert.h
+!Source/Views/Clip.cpp
+!Source/Views/Clip.h
 !Source/Views/ClipsTable.cpp
 !Source/Views/ClipsTable.h
 !Source/Views/MainContent.cpp

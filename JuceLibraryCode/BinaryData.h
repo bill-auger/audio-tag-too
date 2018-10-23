@@ -8,11 +8,20 @@
 
 namespace BinaryData
 {
+    extern const char*   accessoriestexteditor_png;
+    const int            accessoriestexteditor_pngSize = 1029;
+
     extern const char*   audioxgeneric_png;
     const int            audioxgeneric_pngSize = 2060;
 
+    extern const char*   mediaplaybackstart_png;
+    const int            mediaplaybackstart_pngSize = 1170;
+
+    extern const char*   processstop_png;
+    const int            processstop_pngSize = 1399;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 1;
+    const int namedResourceListSize = 4;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];
