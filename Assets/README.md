@@ -10,7 +10,7 @@ that are necessary to accomplish all of the following using only widely-availabl
 * compose the original and modified sources
 * generate equivalent modified versions of the associated target artifacts
 
-For example:
+For example:  
 * "target artifact" such as a composed (mixed-down) .png, .svg, .wav, etc (these are typically all that is covered by a Crerative Commons licencse)
 * "binary data" such as the individual elements that compose the "target artifact" (images, sound tracks, etc.)
 * "editor project files" such as .xcf, .psd, .aup, .ardour, etc.
@@ -18,6 +18,9 @@ For example:
 * "widely-available free software" such as GIMP, Inkscape, Audacity, Ardour, etc.
 
 
-Exceptions:
+Exceptions:  
+the following images are from the [tango desktop project](http://tango-project.org/) public domain icon set
+* accessories-text-editor.png
 * audio-x-generic.png
-    this is from the [tango desktop project](http://tango-project.org/) public domain icon set
+* media-playback-start.png
+* process-stop.png
