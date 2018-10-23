@@ -5,8 +5,14 @@
               includeBinaryInAppConfig="1">
   <MAINGROUP id="iiOCZm" name="AudioTagToo">
     <GROUP id="{06C763FB-F36A-9659-50AA-012427409460}" name="Assets">
+      <FILE id="KuL1yM" name="accessories-text-editor.png" compile="0" resource="1"
+            file="Assets/accessories-text-editor.png"/>
       <FILE id="Ebmfjk" name="audio-x-generic.png" compile="0" resource="1"
             file="Assets/audio-x-generic.png"/>
+      <FILE id="A51DFD" name="media-playback-start.png" compile="0" resource="1"
+            file="Assets/media-playback-start.png"/>
+      <FILE id="TFQXuh" name="process-stop.png" compile="0" resource="1"
+            file="Assets/process-stop.png"/>
     </GROUP>
     <GROUP id="{83125242-B25A-290C-4B4B-C3FF04190730}" name="Source">
       <GROUP id="{B7072F38-DF7A-61A1-713D-C261BA28F538}" name="Constants">
@@ -33,6 +39,7 @@
       </GROUP>
       <GROUP id="{415C92D0-6DB5-561E-5112-51D267588674}" name="Views">
         <FILE id="yQDChz" name="Alert.cpp" compile="1" resource="0" file="Source/Views/Alert.cpp"/>
+        <FILE id="FJGotO" name="Clip.cpp" compile="1" resource="0" file="Source/Views/Clip.cpp"/>
         <FILE id="eSgmpm" name="ClipsTable.cpp" compile="1" resource="0" file="Source/Views/ClipsTable.cpp"/>
         <FILE id="Y76Tzw" name="MainContent.cpp" compile="1" resource="0" file="Source/Views/MainContent.cpp"/>
         <FILE id="Cxr1BM" name="Statusbar.cpp" compile="1" resource="0" file="Source/Views/Statusbar.cpp"/>
