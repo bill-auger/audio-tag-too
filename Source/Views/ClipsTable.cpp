@@ -49,11 +49,11 @@ ClipsTable::ClipsTable ()
     clipsGroup->setTextLabelPosition (Justification::centred);
     clipsGroup->setColour (GroupComponent::outlineColourId, Colours::white);
 
-    clipsTreeview.reset (new TreeView (String()));
+    clipsTreeview.reset (new ClipsTreeView (String()));
     addAndMakeVisible (clipsTreeview.get());
     clipsTreeview->setRootItemVisible (false);
 
-    compilationsTreeview.reset (new TreeView (String()));
+    compilationsTreeview.reset (new ClipsTreeView (String()));
     addAndMakeVisible (compilationsTreeview.get());
     compilationsTreeview->setRootItemVisible (false);
 
@@ -313,11 +313,11 @@ END_JUCER_METADATA
 
 
 //[EndFile] You can add extra defines here...
-/*
-// void ClipsTable::ClipsTreeView::paint(Graphics& g)
-// {
-//   if (this->is_drag_item_hovering) { g.setColour(Colours::red) ; g.drawRect(getLocalBounds() , 3) ; }
-// }
+
+void ClipsTable::ClipsTreeView::paint(Graphics& g)
+{
+  if (this->is_drag_item_hovering) { g.setColour(Colours::red) ; g.drawRect(getLocalBounds() , 3) ; }
+}
 
 bool ClipsTable::ClipsTreeView::isInterestedInDragSource(const DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
@@ -350,7 +350,7 @@ DBG("ClipsTreeView::itemDropped() dragSourceDetails=" + STRING(dragSourceDetails
 
   this->is_drag_item_hovering = false ; repaint() ;
 }
-*/
+
 ClipsTable::ClipItem::ClipItem(String  _item_id  , String     _label_text  , ValueTree _store) :
                                item_id(_item_id) , label_text(_label_text) , store(    _store) { }
 

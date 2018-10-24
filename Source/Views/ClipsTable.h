@@ -41,6 +41,7 @@ class Clip ;
                                                                     //[/Comments]
 */
 class ClipsTable  : public Component,
+public DragAndDropContainer,
                     public ValueTree::Listener
 {
 public:
@@ -87,14 +88,14 @@ private:
   void valueTreePropertyChanged(ValueTree& , const Identifier&) override { }
   void valueTreeParentChanged  (ValueTree&)                     override { }
 
-/*
+
   class ClipsTreeView : public TreeView
   {
   public:
 
     ClipsTreeView(const String &component_name = String()) : is_drag_item_hovering(false) {}
 
-//     void paint(Graphics& g) override ;
+    void paint(Graphics& g) override ;
 
 
   private:
@@ -102,14 +103,14 @@ private:
     bool is_drag_item_hovering ;
 
 
-    // DragAndDropTarget  implementation
+    // DragAndDropTarget implementation
     bool isInterestedInDragSource(const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
     void itemDragEnter           (const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
     void itemDragMove            (const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
     void itemDragExit            (const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
     void itemDropped             (const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
   } ;
-*/
+
 
   class ClipItem : public TreeViewItem
   {
@@ -118,7 +119,7 @@ private:
     ClipItem(String item_id , String label_text , ValueTree store = ValueTree::invalid) ;
 
 
-//   private:
+  private:
 
     // TreeViewItem implementation
     String     getUniqueName       () const override ;
@@ -132,7 +133,7 @@ private:
     void itemDropped             (const DragAndDropTarget::SourceDetails& dragSourceDetails , int idx) override ;
 
 
-  private:
+//   private:
 
     String                item_id ;
     String                label_text ;
