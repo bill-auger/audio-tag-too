@@ -63,21 +63,23 @@
                       " headTime="   + String(this->headTime                                )          + \
                       " tailTime="   + String(this->tailTime                                )          ) ;
 
-  #define DEBUG_TRACE_WAVEFORM_TIME_TO_X                            \
-    Trace::TraceGuiVb("offset_n_secs="   + String(offset_n_secs ) + \
-                      " visible_n_secs=" + String(visible_n_secs) + \
-                      " scale_x="        + String(scale_x       ) + \
-                      " view_l="         + String(view_l        ) + \
-                      " view_r="         + String(view_r        ) + \
-                      " view_w="         + String(view_w        ) ) ;
+  #define DEBUG_TRACE_WAVEFORM_TIME_TO_X                                                           \
+    if (DEBUG_TRACE_GUI_VB) { Trace::TraceGui     ("Waveform::timeToX()") ;                        \
+                              Trace::TraceNoPrefix("offset_n_secs  = " + String(offset_n_secs )) ; \
+                              Trace::TraceNoPrefix("visible_n_secs = " + String(visible_n_secs)) ; \
+                              Trace::TraceNoPrefix("scale_x        = " + String(scale_x       )) ; \
+                              Trace::TraceNoPrefix("view_l         = " + String(view_l        )) ; \
+                              Trace::TraceNoPrefix("view_r         = " + String(view_r        )) ; \
+                              Trace::TraceNoPrefix("view_w         = " + String(view_w        )) ; \
+                              Trace::TraceNoPrefix("x_time         = " + String(x_time        )) ; }
 
-  #define DEBUG_TRACE_WAVEFORM_X_TO_TIME                            \
-    Trace::TraceGuiVb("view_r="          + String(view_r        ) + \
-                      " view_w="         + String(view_w        ) + \
-                      " scale_x="        + String(scale_x       ) + \
-                      " begin_time="     + String(begin_time    ) + \
-                      " end_time="       + String(end_time      ) + \
-                      " visible_n_secs=" + String(visible_n_secs) ) ;
+  #define DEBUG_TRACE_WAVEFORM_X_TO_TIME                                                   \
+    if (DEBUG_TRACE_GUI_VB) { Trace::TraceGui("Waveform::xToTime()") ;                     \
+                              Trace::TraceNoPrefix("x          = " + String(x         )) ; \
+                              Trace::TraceNoPrefix("scale_x    = " + String(scale_x   )) ; \
+                              Trace::TraceNoPrefix("begin_time = " + String(begin_time)) ; \
+                              Trace::TraceNoPrefix("end_time   = " + String(end_time  )) ; \
+                              Trace::TraceNoPrefix("time       = " + String(time_x    )) ; }
 
 #else // DEBUG_TRACE
 

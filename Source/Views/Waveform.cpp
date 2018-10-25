@@ -354,22 +354,27 @@ float Waveform::timeToX(const double time) const
   double view_l         = (double)GUI::PAD2 ;
   double view_r         = (double)getWidth() - (double)GUI::PAD2 ;
   double view_w         = (double)getWidth() - (double)GUI::PAD4 ;
+  double x_time         = (scale_x <= 0.0) ? view_l :
+                          (scale_x >= 1.0) ? view_r : view_l + (view_w * scale_x) ;
 
-  return (scale_x <= 0.0) ? view_l :
-         (scale_x >= 1.0) ? view_r : view_w * scale_x ;
+DEBUG_TRACE_WAVEFORM_TIME_TO_X
+
+  return x_time ;
 }
 
 double Waveform::xToTime(const float x) const
 {
-  double view_r      = (double)getWidth() - (double)GUI::PAD2 ;
   double view_w      = (double)getWidth() - (double)GUI::PAD4 ;
-  double scale_x     = x / view_w ;
+  double scale_x     = (double)(x - GUI::PAD2) / view_w ;
   double begin_time  = this->viewRange.getStart() ;
   double end_time    = this->viewRange.getLength() ;
   double view_n_secs = scale_x * end_time ;
+  double time_x      = (scale_x <= 0.0) ? 0.0      :
+                       (scale_x >= 1.0) ? end_time : begin_time + view_n_secs ;
 
-  return (scale_x <= 0.0) ? 0.0      :
-         (scale_x >= 1.0) ? end_time : begin_time + view_n_secs ;
+DEBUG_TRACE_WAVEFORM_X_TO_TIME
+
+  return time_x ;
 }
 
 void Waveform::updateCursor()
@@ -392,7 +397,7 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="Waveform" componentName=""
                  parentClasses="public Component, private ChangeListener, public ChangeBroadcaster, private ScrollBar::Listener, public Timer"
                  constructorParams="AudioFormatManager&amp; format_manager , AudioTransportSource&amp; source"
-                 variableInitialisers="transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache) , zoomScaleFactor(1.0)"
+                 variableInitialisers="transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache) , zoomFactor(1.0)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="1" initialHeight="1">
   <BACKGROUND backgroundColour="0">
