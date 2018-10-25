@@ -42,6 +42,17 @@
                                          String(this->viewRange.getStart() + this->viewRange.getLength())         + \
                          " transport=" + String(this->transport.getCurrentPosition()                    )         ) ;
 
+  #define DEBUG_TRACE_WAVEFORM_SET_ZOOM_FACTOR                                     \
+    Trace::TraceGui("setting zoom scaling factor: " + String(zoom_scaling_factor)) ;
+
+  #define DEBUG_TRACE_WAVEFORM_MOUSE_WHEEL_MOVE                                                            \
+    if (DEBUG_TRACE_GUI_VB||true) { Trace::TraceGui("Waveform::mouseWheelMove()") ;                        \
+                                    Trace::TraceNoPrefix("mouse_x         = " + String(mouse_x        )) ; \
+                                    Trace::TraceNoPrefix("mouse_time      = " + String(mouse_time     )) ; \
+                                    Trace::TraceNoPrefix("mouse_x_percent = " + String(mouse_x_percent)) ; \
+                                    Trace::TraceNoPrefix("new_begin_time  = " + String(new_begin_time )) ; \
+                                    Trace::TraceNoPrefix("new_end_time    = " + String(new_end_time   )) ; }
+
   #define DEBUG_TRACE_WAVEFORM_SET_VIEWRANGE                                                             \
     Trace::TraceGuiVb("setting ViewRange of " + this->getName()                                        + \
                       " view_range=" + String(view_range.getStart()                         ) + " + "  + \
@@ -72,6 +83,8 @@
 
   #define DEBUG_TRACE_WAVEFORM_PAINT                         ;
   #define DEBUG_TRACE_WAVEFORM_SET_HEAD_OR_TAIL(marker_name) ;
+  #define DEBUG_TRACE_WAVEFORM_SET_ZOOM_FACTOR               ;
+  #define DEBUG_TRACE_WAVEFORM_MOUSE_WHEEL_MOVE              ;
   #define DEBUG_TRACE_WAVEFORM_SET_VIEWRANGE                 ;
   #define DEBUG_TRACE_WAVEFORM_TIME_TO_X                     ;
   #define DEBUG_TRACE_WAVEFORM_X_TO_TIME                     ;

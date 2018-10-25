@@ -51,7 +51,8 @@ const Identifier APP::AUDIO_KEY         = "is-audio-enabled" ;
 const Identifier APP::INIT_DIR_KEY      = "initial-dir" ;
 const Identifier APP::COURSE_FPS_KEY    = "course-fps" ;
 const Identifier APP::FINE_FPS_KEY      = "fine-fps" ;
-const Identifier APP::ZOOM_KEY          = "zoom-scale" ;
+const Identifier APP::ZOOM_KEY          = "zoom-speed" ;
+
 
 // user messages
 #define APP_CMD_PAD String("").paddedLeft(' ' , APP_CMD.length())
@@ -81,7 +82,7 @@ const StringArray APP::CLI_USAGE_MSG = StringArray::fromLines(
   "\n\n\n\tCONFIGURATION:"                                                         +
   "\n\n\t\t"               + CLI_DIR_TOKEN_ENTRY  + "\n\t\t\t" + DIR_USAGE_MSG     +
   "\n\n\t\t"               + CLI_FPS_TOKEN_ENTRY  + "\n\t\t\t" + FPS_USAGE_MSG     +
-  "\n\n\t\t"               + CLI_ZOOM_TOKEN_ENTRY + "\n\t\t\t" + ZOOM_USAGE_MSG   ) ;
+  "\n\n\t\t"               + CLI_ZOOM_TOKEN_ENTRY + "\n\t\t\t" + ZOOM_USAGE_MSG    ) ;
 
 
 // filesystem

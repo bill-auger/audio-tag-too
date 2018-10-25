@@ -251,6 +251,7 @@ void MainContent::initialize(NamedValueSet& features)
   String initial_dir      = STRING(features[APP::INIT_DIR_KEY  ]) ;
   int    course_fps       = int   (features[APP::COURSE_FPS_KEY]) ;
   int    fine_fps         = int   (features[APP::FINE_FPS_KEY  ]) ;
+  double zoom_factor      = double(features[APP::ZOOM_KEY      ]) ;
 
 #if ! DISABLE_AUDIO
   if (is_audio_enabled) this->workerThread.startThread(3) ;
@@ -265,7 +266,8 @@ void MainContent::initialize(NamedValueSet& features)
 
   this->directoryList .setDirectory(File(initial_dir) , true , true) ;
   this->upperWaveform->startTimerHz(course_fps) ;
-  this->lowerWaveform->startTimerHz(fine_fps) ;
+  this->lowerWaveform->startTimerHz(fine_fps  ) ;
+  this->lowerWaveform->setZoomScaleFactor(zoom_factor) ;
 }
 
 

@@ -162,13 +162,17 @@ void JuceBoilerplate::Teardown()
 
 DEBUG_TRACE_SHUTDOWN_PHASE_1
 
+  Gui->shutdownAudio() ;
+
+DEBUG_TRACE_SHUTDOWN_PHASE_2
+
 #ifdef CONTROLLER_OWNS_STORAGE
   if (IsInitialized) SetConfig(STORE::WINDOW_STATE_KEY , Window->getWindowStateAsString()) ;
 #else // CONTROLLER_OWNS_STORAGE
   if (IsInitialized) Gui->storage->root.setProperty(STORE::WINDOW_STATE_KEY , Window->getWindowStateAsString() , nullptr) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
-DEBUG_TRACE_SHUTDOWN_PHASE_2
+DEBUG_TRACE_SHUTDOWN_PHASE_3
 
   // shutdown storage
 #ifdef CONTROLLER_OWNS_STORAGE
@@ -238,21 +242,21 @@ DEBUG_TRACE_PROCESS_CLI_PARAMS
                                                     APP::HomeDir ().getFullPathName() ;
 
   // FPS
-  bool is_valid_fine_fps = (((token_idx = cli_params.indexOf(APP::CLI_FPS_TOKEN))  > -1) &&
-                            ((int_value = cli_params[token_idx + 1].getIntValue()) >  0)  ) ;
-  int course_fps         = GUI::COURSE_FPS ;
-  int fine_fps           = (is_valid_fine_fps) ? int_value : GUI::FINE_FPS ;
+  bool is_valid_fps = (((token_idx = cli_params.indexOf(APP::CLI_FPS_TOKEN))  > -1) &&
+                       ((int_value = cli_params[token_idx + 1].getIntValue()) >  0)  ) ;
+  int course_fps    = GUI::COURSE_FPS ;
+  int fine_fps      = (is_valid_fps) ? int_value : GUI::FINE_FPS ;
 
   // zoom scale
-  bool is_valid_zoom_scale = (((token_idx    = cli_params.indexOf(APP::CLI_ZOOM_TOKEN))    > -1) &&
-                              ((double_value = cli_params[token_idx + 1].getDoubleValue()) >  0)  ) ;
-  int zoom_scale           = (is_valid_zoom_scale) ? double_value : 1.0 ;
+  bool   is_valid_zoom = (((token_idx    = cli_params.indexOf(APP::CLI_ZOOM_TOKEN))    >  -1) &&
+                          ((double_value = cli_params[token_idx + 1].getDoubleValue()) > 0.0)  ) ;
+  double zoom_factor   = (is_valid_zoom) ? double_value : 1.0 ;
 
   Features.set(APP::AUDIO_KEY      , var(is_audio_enabled)) ;
   Features.set(APP::INIT_DIR_KEY   , var(initial_dir     )) ;
   Features.set(APP::COURSE_FPS_KEY , var(course_fps      )) ;
   Features.set(APP::FINE_FPS_KEY   , var(fine_fps        )) ;
-  Features.set(APP::ZOOM_KEY       , var(zoom_scale      )) ;
+  Features.set(APP::ZOOM_KEY       , var(zoom_factor     )) ;
 }
 
 bool JuceBoilerplate::ValidateEnvironment()

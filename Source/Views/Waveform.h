@@ -56,6 +56,8 @@ public:
   double getTailTime  (void) const ;
   void   setHeadMarker(void) ;
   void   setTailMarker(void) ;
+  void   setZoomFactor(double zoom_scaling_factor) ;
+  double getZoomScale (void) const ;
 
     //[/UserMethods]
 
@@ -90,8 +92,9 @@ private:
   AudioTransportSource& transport ;
   AudioThumbnailCache   thumbnailCache ;
   AudioThumbnail        thumbnail ;
-  double                zoomFactor ;
   Range<double>         viewRange ;
+  double                zoomFactor ;
+  double                currentZoom ;
   DrawableRectangle     cursorMarker ;
   DrawableRectangle     headMarker ; double headTime ;
   DrawableRectangle     tailMarker ; double tailTime ;

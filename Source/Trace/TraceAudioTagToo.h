@@ -68,9 +68,11 @@
     if (!is_valid_appdata_dir) { is_err = true ; dbg += " invlaid APPDATA_DIR" ;}       \
     if (!is_err) Trace::TraceState("environment is sane") ; else Trace::TraceError(dbg) ;
 
-  #define DEBUG_TRACE_SHUTDOWN_PHASE_1 Trace::TraceState("storing application state") ;
+  #define DEBUG_TRACE_SHUTDOWN_PHASE_1 Trace::TraceState("shutting down audio ") ;
 
-  #define DEBUG_TRACE_SHUTDOWN_PHASE_2 Trace::TraceState("shutting down storage") ;
+  #define DEBUG_TRACE_SHUTDOWN_PHASE_2 Trace::TraceState("storing application state") ;
+
+  #define DEBUG_TRACE_SHUTDOWN_PHASE_3 Trace::TraceState("shutting down storage") ;
 
 #else // DEBUG_TRACE
 
