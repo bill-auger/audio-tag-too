@@ -54,7 +54,7 @@
 
 //==============================================================================
 Waveform::Waveform (AudioFormatManager& format_manager , AudioTransportSource& source)
-    : transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache) , zoomScaleFactor(1.0)
+    : transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache) , zoomFactor(1.0)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -190,11 +190,11 @@ void Waveform::setUrl(const Url& url)
   {
     this->thumbnail.setSource(input_source) ;
 
-    double audio_n_secs = this->thumbnail.getTotalLength() ;
-    Range<double> new_range(0.0 , audio_n_secs) ;
+    double total_n_secs = this->thumbnail.getTotalLength() ;
+    Range<double> new_range(0.0 , total_n_secs) ;
 
     setMarker(this->headMarker , (this->headTime = 0.0         )) ;
-    setMarker(this->tailMarker , (this->tailTime = audio_n_secs)) ;
+    setMarker(this->tailMarker , (this->tailTime = total_n_secs)) ;
     this->scrollbar->setRangeLimits(new_range) ;
     setViewRange(new_range) ;
   }
@@ -262,9 +262,9 @@ void Waveform::mouseUp(const MouseEvent& evt)
 
 void Waveform::mouseWheelMove(const MouseEvent& , const MouseWheelDetails& wheel)
 {
-  double audio_n_secs = this->thumbnail.getTotalLength() ;
+  double total_n_secs = this->thumbnail.getTotalLength() ;
 
-  if (audio_n_secs <= 0.0 || getName() == GUI::FULL_WAVEFORM_ID) return ;
+  if (total_n_secs <= 0.0 || getName() == GUI::FULL_WAVEFORM_ID) return ;
 
   // set pan
   if (wheel.deltaX != 0.0f)
@@ -272,7 +272,7 @@ void Waveform::mouseWheelMove(const MouseEvent& , const MouseWheelDetails& wheel
     double visible_begin_time   = this->viewRange.getStart() ;
     double visible_n_secs       = this->viewRange.getLength() ;
     double requested_begin_time = visible_begin_time - wheel.deltaX * visible_n_secs / 10.0 ;
-    double cropped_n_secs       = audio_n_secs - visible_n_secs ;
+    double cropped_n_secs       = total_n_secs - visible_n_secs ;
     double max_begin_time       = jmax(0.0 , cropped_n_secs) ;
     double new_begin_time       = jlimit(0.0 , max_begin_time , requested_begin_time) ;
     double new_n_secs           = new_begin_time + visible_n_secs ;
@@ -347,22 +347,27 @@ float Waveform::timeToX(const double time) const
   double view_l         = (double)GUI::PAD2 ;
   double view_r         = (double)getWidth() - (double)GUI::PAD2 ;
   double view_w         = (double)getWidth() - (double)GUI::PAD4 ;
+  double x_time         = (scale_x <= 0.0) ? view_l :
+                          (scale_x >= 1.0) ? view_r : view_l + (view_w * scale_x) ;
 
-  return (scale_x <= 0.0) ? view_l :
-         (scale_x >= 1.0) ? view_r : view_w * scale_x ;
+DEBUG_TRACE_WAVEFORM_TIME_TO_X
+
+  return x_time ;
 }
 
 double Waveform::xToTime(const float x) const
 {
-  double view_r      = (double)getWidth() - (double)GUI::PAD2 ;
   double view_w      = (double)getWidth() - (double)GUI::PAD4 ;
-  double scale_x     = x / view_w ;
+  double scale_x     = (double)(x - GUI::PAD2) / view_w ;
   double begin_time  = this->viewRange.getStart() ;
   double end_time    = this->viewRange.getLength() ;
   double view_n_secs = scale_x * end_time ;
+  double time_x      = (scale_x <= 0.0) ? 0.0      :
+                       (scale_x >= 1.0) ? end_time : begin_time + view_n_secs ;
 
-  return (scale_x <= 0.0) ? 0.0      :
-         (scale_x >= 1.0) ? end_time : begin_time + view_n_secs ;
+DEBUG_TRACE_WAVEFORM_X_TO_TIME
+
+  return time_x ;
 }
 
 void Waveform::updateCursor()
@@ -385,7 +390,7 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="Waveform" componentName=""
                  parentClasses="public Component, private ChangeListener, public ChangeBroadcaster, private ScrollBar::Listener, public Timer"
                  constructorParams="AudioFormatManager&amp; format_manager , AudioTransportSource&amp; source"
-                 variableInitialisers="transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache) , zoomScaleFactor(1.0)"
+                 variableInitialisers="transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache) , zoomFactor(1.0)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="1" initialHeight="1">
   <BACKGROUND backgroundColour="0">

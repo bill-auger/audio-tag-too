@@ -46,12 +46,12 @@ const String     APP::CLI_VERSION_TOKEN = "--version" ;
 const String     APP::CLI_AUDIO_TOKEN   = "--no-audio" ;
 const String     APP::CLI_DIR_TOKEN     = "--dir" ;
 const String     APP::CLI_FPS_TOKEN     = "--fps" ;
-const String     APP::CLI_ZOOM_TOKEN    = "--zoom-scale" ;
+const String     APP::CLI_ZOOM_TOKEN    = "--zoom-factor" ;
 const Identifier APP::AUDIO_KEY         = "is-audio-enabled" ;
 const Identifier APP::INIT_DIR_KEY      = "initial-dir" ;
 const Identifier APP::COURSE_FPS_KEY    = "course-fps" ;
 const Identifier APP::FINE_FPS_KEY      = "fine-fps" ;
-const Identifier APP::ZOOM_KEY          = "zoom-speed" ;
+const Identifier APP::ZOOM_KEY          = "zoom-factor" ;
 
 
 // user messages
