@@ -46,10 +46,12 @@ const String     APP::CLI_VERSION_TOKEN = "--version" ;
 const String     APP::CLI_AUDIO_TOKEN   = "--no-audio" ;
 const String     APP::CLI_DIR_TOKEN     = "--dir" ;
 const String     APP::CLI_FPS_TOKEN     = "--fps" ;
+const String     APP::CLI_ZOOM_TOKEN    = "--zoom-factor" ;
 const Identifier APP::AUDIO_KEY         = "is-audio-enabled" ;
 const Identifier APP::INIT_DIR_KEY      = "initial-dir" ;
 const Identifier APP::COURSE_FPS_KEY    = "course-fps" ;
 const Identifier APP::FINE_FPS_KEY      = "fine-fps" ;
+const Identifier APP::ZOOM_KEY          = "zoom-factor" ;
 
 
 // user messages
@@ -59,8 +61,11 @@ const Identifier APP::FINE_FPS_KEY      = "fine-fps" ;
 #define AUDIO_USAGE_MSG   "disables audio output (safe mode)"
 #define DIR_USAGE_MSG     "starts " + APP_NAME + " with the file browser rooted at DIRECTORY"
 #define FPS_USAGE_MSG     "starts " + APP_NAME + " with integer(N) frames per second graphics update"
+#define ZOOM_USAGE_MSG    "starts " + APP_NAME + " with zoom granularity scaled per decimal(N)" + \
+                          "a negative number inverts the mouse wheel direction (e.g. -1.0)"
 #define CLI_DIR_TOKEN_ENTRY  CLI_DIR_TOKEN  + " <DIRECTORY>"
 #define CLI_FPS_TOKEN_ENTRY  CLI_FPS_TOKEN  + " <N>"
+#define CLI_ZOOM_TOKEN_ENTRY CLI_ZOOM_TOKEN + " <N>"
 const StringArray APP::CLI_USAGE_MSG = StringArray::fromLines(
   String("JuceBoilerplate Usage:\n")                                               +
   "\n\t" + APP_CMD + " [ " + CLI_HELP_TOKEN       + " | "                          +
@@ -68,6 +73,7 @@ const StringArray APP::CLI_USAGE_MSG = StringArray::fromLines(
   "\n\t" + APP_CMD + " [ " + CLI_AUDIO_TOKEN      + " ]"                           +
                      " [ " + CLI_DIR_TOKEN_ENTRY  + " ]"                           +
                      " [ " + CLI_FPS_TOKEN_ENTRY  + " ]"                           +
+                     " [ " + CLI_ZOOM_TOKEN_ENTRY + " ]"                           +
   "\n\n\n\tINFORMATION:"                                                           +
   "\n\n\t\t"               + CLI_HELP_TOKEN       + "\n\t\t\t" + HELP_USAGE_MSG    +
   "\n\n\t\t"               + CLI_VERSION_TOKEN    + "\n\t\t\t" + VERSION_USAGE_MSG +
@@ -75,7 +81,8 @@ const StringArray APP::CLI_USAGE_MSG = StringArray::fromLines(
   "\n\n\t\t"               + CLI_AUDIO_TOKEN      + "\n\t\t\t" + AUDIO_USAGE_MSG   +
   "\n\n\n\tCONFIGURATION:"                                                         +
   "\n\n\t\t"               + CLI_DIR_TOKEN_ENTRY  + "\n\t\t\t" + DIR_USAGE_MSG     +
-  "\n\n\t\t"               + CLI_FPS_TOKEN_ENTRY  + "\n\t\t\t" + FPS_USAGE_MSG     ) ;
+  "\n\n\t\t"               + CLI_FPS_TOKEN_ENTRY  + "\n\t\t\t" + FPS_USAGE_MSG     +
+  "\n\n\t\t"               + CLI_ZOOM_TOKEN_ENTRY + "\n\t\t\t" + ZOOM_USAGE_MSG    ) ;
 
 
 // filesystem

@@ -54,7 +54,7 @@
 
 //==============================================================================
 Waveform::Waveform (AudioFormatManager& format_manager , AudioTransportSource& source)
-    : transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache)
+    : transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache) , zoomScaleFactor(1.0)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -230,6 +230,15 @@ void Waveform::setTailMarker()
 DEBUG_TRACE_WAVEFORM_SET_HEAD_OR_TAIL("tailMarker")
 }
 
+void Waveform::setZoomFactor(double zoom_factor)
+{
+DEBUG_TRACE_WAVEFORM_SET_ZOOM_FACTOR
+
+  this->zoomFactor = zoom_factor ;
+}
+
+double Waveform::getCurrentZoom() const { return this->currentZoom ; }
+
 
 /* event handlers */
 
@@ -270,12 +279,18 @@ void Waveform::mouseWheelMove(const MouseEvent& , const MouseWheelDetails& wheel
   // set zoom level
   if (wheel.deltaY != 0.0f)
   {
-    this->currentZoom     = jlimit(0.0 , 1.0 , (double)(this->currentZoom - wheel.deltaY)) ;
-    double new_scale      = jmax(0.0 , total_n_secs * this->currentZoom) ;
-    double x_median_time  = xToTime((getWidth() - (double)GUI::PAD4) / 2.0f) ;
-    double x_offfset_secs = new_scale * 0.5 ;
+    double zoom_delta      = (double)wheel.deltaY * this->zoomFactor ;
+    this->currentZoom      = jlimit(0.0 , 1.0 , this->currentZoom - zoom_delta) ;
+    double new_n_secs      = jmax(0.0 , total_n_secs * this->currentZoom) ;
+    double mouse_x         = getMouseXYRelative().x ;
+    double mouse_time      = xToTime(mouse_x) ;
+    double mouse_x_percent = (mouse_x - GUI::PAD2) / (getWidth() - GUI::PAD4) ;
+    double new_begin_time  = mouse_time - (     mouse_x_percent  * new_n_secs) ;
+    double new_end_time    = mouse_time + ((1 - mouse_x_percent) * new_n_secs) ;
 
-    setViewRange({ x_median_time - x_offfset_secs , x_median_time + x_offfset_secs }) ;
+DEBUG_TRACE_WAVEFORM_MOUSE_WHEEL_MOVE
+
+    setViewRange({ new_begin_time , new_end_time }) ;
   }
 }
 
@@ -368,7 +383,7 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="Waveform" componentName=""
                  parentClasses="public Component, private ChangeListener, public ChangeBroadcaster, private ScrollBar::Listener, public Timer"
                  constructorParams="AudioFormatManager&amp; format_manager , AudioTransportSource&amp; source"
-                 variableInitialisers="transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache)"
+                 variableInitialisers="transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache) , zoomScaleFactor(1.0)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="1" initialHeight="1">
   <BACKGROUND backgroundColour="0">

@@ -50,12 +50,14 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 
   // getters/setters
-  void   setUrl       (const Url& url) ;
-  void   resetPosition(void) ;
-  double getHeadTime  (void) const ;
-  double getTailTime  (void) const ;
-  void   setHeadMarker(void) ;
-  void   setTailMarker(void) ;
+  void   setUrl        (const Url& url) ;
+  void   resetPosition (void) ;
+  double getHeadTime   (void) const ;
+  double getTailTime   (void) const ;
+  void   setHeadMarker (void) ;
+  void   setTailMarker (void) ;
+  void   setZoomFactor (double zoom_factor) ;
+  double getCurrentZoom(void) const ;
 
     //[/UserMethods]
 
@@ -90,8 +92,9 @@ private:
   AudioTransportSource& transport ;
   AudioThumbnailCache   thumbnailCache ;
   AudioThumbnail        thumbnail ;
-  double                currentZoom ;
   Range<double>         viewRange ;
+  double                zoomFactor ;
+  double                currentZoom ;
   DrawableRectangle     cursorMarker ;
   DrawableRectangle     headMarker ; double headTime ;
   DrawableRectangle     tailMarker ; double tailTime ;

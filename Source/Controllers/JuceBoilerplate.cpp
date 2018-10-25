@@ -246,10 +246,16 @@ DEBUG_TRACE_PROCESS_CLI_PARAMS
   int course_fps    = GUI::COURSE_FPS ;
   int fine_fps      = (is_valid_fps) ? int_value : GUI::FINE_FPS ;
 
+  // zoom scale
+  bool   is_valid_zoom = (((token_idx    = cli_params.indexOf(APP::CLI_ZOOM_TOKEN))    >  -1) &&
+                          ((double_value = cli_params[token_idx + 1].getDoubleValue()) > 0.0)  ) ;
+  double zoom_factor   = (is_valid_zoom) ? double_value : 1.0 ;
+
   Features.set(APP::AUDIO_KEY      , var(is_audio_enabled)) ;
   Features.set(APP::INIT_DIR_KEY   , var(initial_dir     )) ;
   Features.set(APP::COURSE_FPS_KEY , var(course_fps      )) ;
   Features.set(APP::FINE_FPS_KEY   , var(fine_fps        )) ;
+  Features.set(APP::ZOOM_KEY       , var(zoom_factor     )) ;
 }
 
 bool JuceBoilerplate::ValidateEnvironment()

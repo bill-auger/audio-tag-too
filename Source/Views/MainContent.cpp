@@ -251,12 +251,14 @@ void MainContent::initialize(NamedValueSet& features)
   String initial_dir      = STRING(features[APP::INIT_DIR_KEY  ]) ;
   int    course_fps       = int   (features[APP::COURSE_FPS_KEY]) ;
   int    fine_fps         = int   (features[APP::FINE_FPS_KEY  ]) ;
+  double zoom_factor      = double(features[APP::ZOOM_KEY      ]) ;
 
 #if ! DISABLE_AUDIO
   if (is_audio_enabled) this->workerThread.startThread(3) ;
 #endif // DISABLE_AUDIO
 
   this->directoryList .setDirectory(File(initial_dir) , true , true) ;
+  this->lowerWaveform->setZoomFactor(zoom_factor) ;
 
 #ifdef CONTROLLER_OWNS_STORAGE
   this->deviceManager.addChangeListener(JuceBoilerplate::Store.get()) ;

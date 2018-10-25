@@ -81,12 +81,14 @@ public:
   static const String CLI_AUDIO_TOKEN ;
   static const String CLI_DIR_TOKEN ;
   static const String CLI_FPS_TOKEN ;
+  static const String CLI_ZOOM_TOKEN ;
 
   // feature set keys
   static const Identifier AUDIO_KEY ;
   static const Identifier INIT_DIR_KEY ;
   static const Identifier COURSE_FPS_KEY ;
   static const Identifier FINE_FPS_KEY ;
+  static const Identifier ZOOM_KEY ;
 
   // user messages
   static const StringArray CLI_USAGE_MSG ;
