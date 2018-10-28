@@ -286,6 +286,8 @@ DEBUG_TRACE_VALIDATE_ENVIRONMENT
 
 void AudioTagToo::UpdateStatusGUI()
 {
+  Gui->setStatus() ; return ; // TODO: refactor
+
   Gui->setStatusL(String()) ;
   Gui->setStatusC(String()) ;
   Gui->setStatusR(String()) ;

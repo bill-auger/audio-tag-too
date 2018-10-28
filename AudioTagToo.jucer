@@ -2,6 +2,7 @@
 
 <JUCERPROJECT id="CQ5KH7" name="AudioTagToo" projectType="guiapp" jucerVersion="5.3.2"
               version="0.0.2" bundleIdentifier="free.bill-auger.AudioTagToo"
+              version="0.0.4" bundleIdentifier="free.bill-auger.AudioTagToo"
               includeBinaryInAppConfig="1">
   <MAINGROUP id="iiOCZm" name="AudioTagToo">
     <GROUP id="{06C763FB-F36A-9659-50AA-012427409460}" name="Assets">

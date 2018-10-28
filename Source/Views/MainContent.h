@@ -67,6 +67,7 @@ public:
   void setStatusL(String statusText) ;
   void setStatusC(String statusText) ;
   void setStatusR(String statusText) ;
+  void setStatus (void) ;
 
     //[/UserMethods]
 

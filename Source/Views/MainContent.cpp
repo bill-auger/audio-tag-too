@@ -322,6 +322,21 @@ void MainContent::setStatusC(String statusText) { this->statusbar->setStatusC(st
 
 void MainContent::setStatusR(String statusText) { this->statusbar->setStatusR(statusText) ; }
 
+void MainContent::setStatus()
+{
+  double head_time      = this->clipWaveform->getHeadTime() ;
+  double tail_time      = this->clipWaveform->getTailTime() ;
+  double cursor_time    = this->transportSource.getCurrentPosition() ;
+  double clip_time      = tail_time - head_time ;
+  bool   is_playing     = this->transportSource.isPlaying() ;
+  double status_c_time  = (is_playing) ? cursor_time       : clip_time ;
+  Colour status_c_color = (is_playing) ? GUI::CURSOR_COLOR : GUI::CURSOR_COLOR.darker(0.5) ;
+
+  this->statusbar->setStatusL(AudioTagToo::DurationString(head_time    ) , GUI::HEAD_COLOR) ;
+  this->statusbar->setStatusC(AudioTagToo::DurationString(status_c_time) , status_c_color ) ;
+  this->statusbar->setStatusR(AudioTagToo::DurationString(tail_time    ) , GUI::TAIL_COLOR) ;
+}
+
 void MainContent::loadUrl(File audio_file)
 {
   const Url          url    = Url(audio_file) ;

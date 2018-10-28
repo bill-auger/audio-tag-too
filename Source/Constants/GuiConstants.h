@@ -31,11 +31,12 @@ class GUI
 public:
 
   // common
-  static const uint8 PAD ;
-  static const uint8 PAD2 ;
-  static const uint8 PAD4 ;
-  static const uint8 STROKE_W ;
-  static const float FONT_SIZE ;
+  static const uint8  PAD ;
+  static const uint8  PAD2 ;
+  static const uint8  PAD4 ;
+  static const uint8  STROKE_W ;
+  static const float  FONT_SIZE ;
+  static const Colour TEXT_FG_COLOR ;
 
   // MainWindow
   static const uint8  BORDERS_W ;
