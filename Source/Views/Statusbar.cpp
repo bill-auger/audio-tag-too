@@ -1,25 +1,26 @@
-/*\
-|*|  AudioTagToo - Clip and stitch audio samples
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
-|*|
-|*|  This file is part of the AudioTagToo program.
-|*|
-|*|  AudioTagToo is free software: you can redistribute it and/or modify
-|*|  it under the terms of the GNU General Public License as published by
-|*|  the Free Software Foundation, either version 3 of the License, or
-|*|  (at your option) any later version.
-|*|
-|*|  AudioTagToo is distributed in the hope that it will be useful,
-|*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
-|*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-|*|  GNU General Public License for more details.
-|*|
-|*|  You should have received a copy of the GNU General Public License
-|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
-\*/
+/*
+  ==============================================================================
 
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.3.2
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
+*/
 
 //[Headers] You can add your own extra header files here...
+
+#include "../Constants/GuiConstants.h"
+
 //[/Headers]
 
 #include "Statusbar.h"
@@ -34,12 +35,12 @@ Statusbar::Statusbar ()
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    statusLLabel.reset (new Label ("statusLLabel",
+    statusLLabel.reset (new Label (String(),
                                    String()));
     addAndMakeVisible (statusLLabel.get());
     statusLLabel->setExplicitFocusOrder (1);
     statusLLabel->setFont (Font (Font::getDefaultMonospacedFontName(), 15.00f, Font::plain));
-    statusLLabel->setJustificationType (Justification::centredLeft);
+    statusLLabel->setJustificationType (Justification::centred);
     statusLLabel->setEditable (false, false, false);
     statusLLabel->setColour (Label::backgroundColourId, Colour (0x00000000));
     statusLLabel->setColour (Label::textColourId, Colours::grey);
@@ -47,9 +48,9 @@ Statusbar::Statusbar ()
     statusLLabel->setColour (TextEditor::textColourId, Colours::black);
     statusLLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    statusLLabel->setBounds (8, 4, 152, 16);
+    statusLLabel->setBounds (16, 12, 142, 16);
 
-    statusCLabel.reset (new Label ("statusCLabel",
+    statusCLabel.reset (new Label (String(),
                                    String()));
     addAndMakeVisible (statusCLabel.get());
     statusCLabel->setExplicitFocusOrder (2);
@@ -62,12 +63,12 @@ Statusbar::Statusbar ()
     statusCLabel->setColour (TextEditor::textColourId, Colours::black);
     statusCLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    statusRLabel.reset (new Label ("statusRLabel",
+    statusRLabel.reset (new Label (String(),
                                    String()));
     addAndMakeVisible (statusRLabel.get());
     statusRLabel->setExplicitFocusOrder (3);
     statusRLabel->setFont (Font (Font::getDefaultMonospacedFontName(), 15.00f, Font::plain));
-    statusRLabel->setJustificationType (Justification::centredRight);
+    statusRLabel->setJustificationType (Justification::centred);
     statusRLabel->setEditable (false, false, false);
     statusRLabel->setColour (Label::backgroundColourId, Colour (0x00000000));
     statusRLabel->setColour (Label::textColourId, Colours::grey);
@@ -77,15 +78,17 @@ Statusbar::Statusbar ()
 
 
     //[UserPreSize]
-
-  setStatusL(String::empty) ; setStatusC(String::empty) ; setStatusR(String::empty) ;
-
     //[/UserPreSize]
 
     setSize (1, 1);
 
 
     //[Constructor] You can add your own custom stuff here..
+
+  this->statusLLabel->setColour(Label::textColourId , GUI::HEAD_COLOR  ) ; setStatusL(String::empty) ;
+  this->statusCLabel->setColour(Label::textColourId , GUI::CURSOR_COLOR) ; setStatusC(String::empty) ;
+  this->statusRLabel->setColour(Label::textColourId , GUI::TAIL_COLOR  ) ; setStatusR(String::empty) ;
+
     //[/Constructor]
 }
 
@@ -166,8 +169,8 @@ void Statusbar::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    statusCLabel->setBounds (172, 4, getWidth() - 342, 16);
-    statusRLabel->setBounds (getWidth() - 8 - 152, 4, 152, 16);
+    statusCLabel->setBounds ((getWidth() / 2) - ((getWidth() - 370) / 2), 12, getWidth() - 370, 16);
+    statusRLabel->setBounds (getWidth() - 16 - 142, 12, 142, 16);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -176,14 +179,23 @@ void Statusbar::resized()
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-void Statusbar::setStatusL(String statusText)
-{ this->statusLLabel->setText(statusText , juce::dontSendNotification) ; }
+void Statusbar::setStatusL(String status_text , Colour text_color)
+{
+  this->statusLLabel ->setText(status_text , juce::dontSendNotification) ;
+  this->statusLLabel->setColour(Label::textColourId , text_color) ;
+}
 
-void Statusbar::setStatusC(String statusText)
-{ this->statusCLabel->setText(statusText , juce::dontSendNotification) ; }
+void Statusbar::setStatusC(String status_text , Colour text_color)
+{
+  this->statusCLabel->setText(status_text , juce::dontSendNotification) ;
+  this->statusCLabel->setColour(Label::textColourId , text_color) ;
+}
 
-void Statusbar::setStatusR(String statusText)
-{ this->statusRLabel->setText(statusText , juce::dontSendNotification) ; }
+void Statusbar::setStatusR(String status_text , Colour text_color)
+{
+  this->statusRLabel ->setText(status_text , juce::dontSendNotification) ;
+  this->statusRLabel->setColour(Label::textColourId , text_color) ;
+}
 
 //[/MiscUserCode]
 
@@ -211,24 +223,24 @@ BEGIN_JUCER_METADATA
     <ROUNDRECT pos="8 8 160 24" cornerSize="10.00000000000000000000" fill="solid: ff000000"
                hasStroke="1" stroke="1, mitered, butt" strokeColour="solid: ffffffff"/>
   </BACKGROUND>
-  <LABEL name="statusLLabel" id="2b89e84fd708c8e0" memberName="statusLLabel"
-         virtualName="" explicitFocusOrder="1" pos="8 4 152 16" bkgCol="0"
-         textCol="ff808080" outlineCol="0" edTextCol="ff000000" edBkgCol="0"
-         labelText="" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default monospaced font" fontsize="15.00000000000000000000"
-         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
-  <LABEL name="statusCLabel" id="4acd1cc773c3be28" memberName="statusCLabel"
-         virtualName="" explicitFocusOrder="2" pos="172 4 342M 16" bkgCol="0"
-         textCol="ff808080" outlineCol="0" edTextCol="ff000000" edBkgCol="0"
-         labelText="" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default monospaced font" fontsize="15.00000000000000000000"
+  <LABEL name="" id="2b89e84fd708c8e0" memberName="statusLLabel" virtualName=""
+         explicitFocusOrder="1" pos="16 12 142 16" bkgCol="0" textCol="ff808080"
+         outlineCol="0" edTextCol="ff000000" edBkgCol="0" labelText=""
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default monospaced font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
-  <LABEL name="statusRLabel" id="d9ab2c99c74ba401" memberName="statusRLabel"
-         virtualName="" explicitFocusOrder="3" pos="8Rr 4 152 16" bkgCol="0"
-         textCol="ff808080" outlineCol="0" edTextCol="ff000000" edBkgCol="0"
-         labelText="" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default monospaced font" fontsize="15.00000000000000000000"
-         kerning="0.00000000000000000000" bold="0" italic="0" justification="34"/>
+  <LABEL name="" id="4acd1cc773c3be28" memberName="statusCLabel" virtualName=""
+         explicitFocusOrder="2" pos="-0.5Cc 12 370M 16" bkgCol="0" textCol="ff808080"
+         outlineCol="0" edTextCol="ff000000" edBkgCol="0" labelText=""
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default monospaced font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
+  <LABEL name="" id="d9ab2c99c74ba401" memberName="statusRLabel" virtualName=""
+         explicitFocusOrder="3" pos="16Rr 12 142 16" bkgCol="0" textCol="ff808080"
+         outlineCol="0" edTextCol="ff000000" edBkgCol="0" labelText=""
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default monospaced font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -66,6 +66,7 @@ public:
   void setStatusL(String statusText) ;
   void setStatusC(String statusText) ;
   void setStatusR(String statusText) ;
+  void setStatus (void) ;
 
     //[/UserMethods]
 
@@ -102,6 +103,9 @@ private:
   void setHeadMarker        (void) ;
   void setTailMarker        (void) ;
   void createClip           (void) ;
+
+  // helpers
+  String durationString(double duration) ;
 
   // event handlers
   void paintOverChildren     (Graphics& g)                                override ;
