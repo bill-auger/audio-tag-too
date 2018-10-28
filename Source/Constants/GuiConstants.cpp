@@ -24,11 +24,12 @@
 
 
 // common
-const uint8 GUI::PAD       = 4 ;
-const uint8 GUI::PAD2      = PAD * 2 ;
-const uint8 GUI::PAD4      = PAD * 4 ;
-const uint8 GUI::STROKE_W  = 1 ;
-const float GUI::FONT_SIZE = 16.0 ;
+const uint8  GUI::PAD           = 4 ;
+const uint8  GUI::PAD2          = PAD * 2 ;
+const uint8  GUI::PAD4          = PAD * 4 ;
+const uint8  GUI::STROKE_W      = 1 ;
+const float  GUI::FONT_SIZE     = 16.0 ;
+const Colour GUI::TEXT_FG_COLOR = Colour(0xFFFFFFFF) ;
 
 // MainContent
 const uint8  GUI::BORDERS_W                    = 2 ;
@@ -45,7 +46,7 @@ const uint16 GUI::BIN_N_SAMPLES       = 512 ;
 const uint8  GUI::SCROLLBARS_H        = 12 ;
 const Colour GUI::WAVE_BG_COLOR       = Colour(0xFF000000) ;
 const Colour GUI::WAVE_FG_COLOR       = Colour(0xFF80FF80) ;
-const Colour GUI::WAVE_SELECTED_COLOR = Colour(0xFF202040) ;
+const Colour GUI::WAVE_SELECTED_COLOR = Colour(0xFF606030) ;
 const Colour GUI::CURSOR_COLOR        = Colour(0xFFFFFF80) ;
 const Colour GUI::HEAD_COLOR          = Colour(0xFF8080FF) ;
 const Colour GUI::TAIL_COLOR          = Colour(0xFFFF8080) ;
@@ -64,12 +65,12 @@ const int GUI::DEVICE_SELECTOR_IDX = 2 ;
 const Colour GUI::TABPANEL_BG_COLOR         = Colour(0xFF303030) ;
 const Colour GUI::TABPANEL_FG_COLOR         = Colour(0xFF808080) ;
 const Colour GUI::FILEPATH_BG_COLOR         = Colour(0xFF606060) ;
-const Colour GUI::FILEPATH_FG_COLOR         = Colour(0xFFFFFFFF) ;
+const Colour GUI::FILEPATH_FG_COLOR         = GUI::TEXT_FG_COLOR ;
 const Colour GUI::FILEPATH_ARROW_COLOR      = Colour(0xFF80FF80) ;
 const Colour GUI::FILENAME_BG_COLOR         = Colour(0xFF000000) ;
-const Colour GUI::FILENAME_FG_COLOR         = Colour(0xFFFFFFFF) ;
+const Colour GUI::FILENAME_FG_COLOR         = GUI::TEXT_FG_COLOR ;
 const Colour GUI::BROWSER_BG_COLOR          = Colour(0xFF000000) ;
-const Colour GUI::BROWSER_FG_COLOR          = Colour(0xFFFFFFFF) ;
+const Colour GUI::BROWSER_FG_COLOR          = GUI::TEXT_FG_COLOR ;
 const Colour GUI::BROWSER_SELECTED_BG_COLOR = Colour(0xFF404040) ;
 const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 
