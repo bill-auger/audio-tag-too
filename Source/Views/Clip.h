@@ -56,12 +56,14 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
-//   void buttonClicked(Button* a_button) override ;
+  void buttonClicked(Button* a_button) override ;
 
 
   String    itemId ;
   String    labelText ;
+  ValueTree masterStore ;
   ValueTree clipStore ;
+
 
     //[/UserVariables]
 

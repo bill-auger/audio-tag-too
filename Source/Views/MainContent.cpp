@@ -379,6 +379,11 @@ void MainContent::updateTransportButton()
   transportButton->setToggleState(is_rolling , juce::dontSendNotification) ;
 }
 
+void MainContent::setPosition(double time)
+{
+  this->transportSource.setPosition(jmax(0.0 , time)) ;
+}
+
 void MainContent::setHeadMarker()
 {
   for (Waveform* waveform : this->waveforms) { waveform->setHeadMarker() ; }

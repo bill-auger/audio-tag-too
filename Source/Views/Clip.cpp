@@ -22,7 +22,9 @@
 
 //[Headers] You can add your own extra header files here...
 
+#include "../Constants/GuiConstants.h"
 #include "../Constants/StorageConstants.h"
+#include "../Controllers/AudioTagToo.h"
 
 //[/Headers]
 
@@ -34,7 +36,8 @@
 
 //==============================================================================
 Clip::Clip (String item_id , String label_text , ValueTree clip_store) :
-            itemId(item_id) , labelText(label_text) , clipStore(clip_store)
+            itemId(item_id) , labelText(label_text) ,
+            masterStore(clip_store.getParent()) , clipStore(clip_store)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -42,7 +45,7 @@ Clip::Clip (String item_id , String label_text , ValueTree clip_store) :
     label.reset (new Label ("new label",
                             TRANS("label text")));
     addAndMakeVisible (label.get());
-    label->setFont (Font (24.00f, Font::plain).withTypefaceStyle ("Regular"));
+    label->setFont (Font ((float)(GUI::TREE_ITEM_H - 2), Font::plain).withTypefaceStyle ("Regular"));
     label->setJustificationType (Justification::centredLeft);
     label->setEditable (false, false, false);
     label->setColour (Label::textColourId, Colours::white);
@@ -82,9 +85,26 @@ Clip::Clip (String item_id , String label_text , ValueTree clip_store) :
 //   Label* item_label = new Label(item_id , label_text) ;
   if (this->clipStore.hasProperty(STORE::LABEL_TEXT_KEY))
   {
+  this->label->setText(label_text , juce::dontSendNotification) ;
+  this->label->setFont(Font((float)(GUI::TREE_ITEM_H - 2) , Font::plain).withTypefaceStyle("Regular")) ;
+
+  if (this->clipStore.isValid())
+  {
+    Value stored_value = this->clipStore.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
+
     this->itemLabel->setEditable(true) ;
     Value stored_value = this->clipStore.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
     this->itemLabel->getTextValue().referTo(stored_value) ;
+    this->loadButton  ->addListener(this) ;
+    this->editButton  ->addListener(this) ;
+    this->deleteButton->addListener(this) ;
+  }
+  else
+  {
+    // ensure metadata leaf items are immutable
+    removeChildComponent(this->loadButton  .get()) ;
+    removeChildComponent(this->editButton  .get()) ;
+    removeChildComponent(this->deleteButton.get()) ;
   }
 
     //[/Constructor]
@@ -133,14 +153,14 @@ void Clip::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-/*
+
 void Clip::buttonClicked(Button* a_button)
 {
-  if      (a_button == this->loadButton  .get()) ;
-  else if (a_button == this->editButton  .get()) ;
-  else if (a_button == this->deleteButton.get()) ;
+  if      (a_button == this->loadButton  .get()) AudioTagToo::LoadClip(this->clipStore) ;
+  else if (a_button == this->editButton  .get()) this->label->showEditor() ;
+  else if (a_button == this->deleteButton.get()) this->masterStore.removeChild(this->clipStore , nullptr) ;
 }
-*/
+
 //[/MiscUserCode]
 
 
@@ -155,8 +175,9 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="Clip" componentName="" parentClasses="public Component, private Button::Listener"
                  constructorParams="String item_id , String label_text , ValueTree clip_store"
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330" fixedSize="0" initialWidth="1" initialHeight="1">
+                 variableInitialisers="clipStore(clip_store)" snapPixels="8" snapActive="1"
+                 snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="1"
+                 initialHeight="1">
   <BACKGROUND backgroundColour="ff323e44"/>
   <LABEL name="new label" id="53e00129390ce15c" memberName="label" virtualName=""
          explicitFocusOrder="0" pos="0 0 72M 24" textCol="ffffffff" edTextCol="ff000000"

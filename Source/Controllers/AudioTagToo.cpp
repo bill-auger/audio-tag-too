@@ -113,6 +113,18 @@ String AudioTagToo::DurationString(double duration)
   return clip_time ;
 }
 
+void AudioTagToo::LoadClip(ValueTree& clip_store)
+{
+  String master_filename = STRING(clip_store[STORE::FILENAME_KEY  ]) ;
+  double begin_time      = double(clip_store[STORE::BEGIN_TIME_KEY]) ;
+  double end_time        = double(clip_store[STORE::END_TIME_KEY  ]) ;
+
+  Gui->loadUrl(File(master_filename)) ;
+  Gui->setPosition(begin_time) ; Gui->setHeadMarker() ;
+  Gui->setPosition(end_time  ) ; Gui->setTailMarker() ;
+  Gui->updateTransportButton() ; Gui->repaint() ;
+}
+
 
 /* AudioTagToo private class methods */
 
