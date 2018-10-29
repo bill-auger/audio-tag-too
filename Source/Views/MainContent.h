@@ -45,9 +45,7 @@ class MainContent  : public AudioAppComponent,
                      private FileBrowserListener,
                      private ChangeListener
 {
-#ifndef CONTROLLER_OWNS_STORAGE
   friend class AudioTagToo ;
-#endif // CONTROLLER_OWNS_STORAGE
 
 
 public:
@@ -101,6 +99,7 @@ private:
   void loadUrl              (File audio_url) ;
   void toggleTransport      (void) ;
   void updateTransportButton(void) ;
+  void setPosition          (double time) ;
   void setHeadMarker        (void) ;
   void setTailMarker        (void) ;
   void createClip           (void) ;

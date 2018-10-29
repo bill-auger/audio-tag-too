@@ -58,7 +58,11 @@ private:
 
   String    itemId ;
   String    labelText ;
+  ValueTree masterStore ;
   ValueTree clipStore ;
+
+
+  void buttonClicked(Button* a_button) override ;
 
     //[/UserVariables]
 

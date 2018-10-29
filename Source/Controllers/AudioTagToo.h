@@ -57,6 +57,7 @@ public:
 
   // helpers
   static String DurationString(double duration) ;
+  static void   LoadClip      (ValueTree& clip_store) ;
 
 
 private:

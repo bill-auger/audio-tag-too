@@ -276,6 +276,7 @@ DEBUG_TRACE_STORAGE_CHILD_REMOVED
 
 void ClipsTable::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_idx , int curr_idx)
 {
+  // TODO:
 DBG("ClipsTable::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
 }
 
