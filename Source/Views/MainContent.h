@@ -60,9 +60,10 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 
 #ifdef CONTROLLER_OWNS_STORAGE
-  void initialize(ValueTree& storage , NamedValueSet& features) ;
+  void initialize(ValueTree&           storage        , NamedValueSet& features ,
+                  AudioThumbnailCache& thumbnailCache                           ) ;
 #else // CONTROLLER_OWNS_STORAGE
-  void initialize(NamedValueSet& features) ;
+  void initialize(NamedValueSet& features , AudioThumbnailCache& thumbnailCache) ;
 #endif // CONTROLLER_OWNS_STORAGE
   void setStatusL(String statusText) ;
   void setStatusC(String statusText) ;

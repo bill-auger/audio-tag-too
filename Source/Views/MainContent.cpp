@@ -65,10 +65,10 @@ MainContent::MainContent ()
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    upperWaveform.reset (new Waveform (formatManager , transportSource));
+    upperWaveform.reset (new Waveform (transportSource));
     addAndMakeVisible (upperWaveform.get());
 
-    lowerWaveform.reset (new Waveform (formatManager , transportSource));
+    lowerWaveform.reset (new Waveform (transportSource));
     addAndMakeVisible (lowerWaveform.get());
 
     groupComponent.reset (new GroupComponent ("new group",
@@ -240,11 +240,12 @@ void MainContent::resized()
 /* setup/teardown */
 
 #ifdef CONTROLLER_OWNS_STORAGE
-void MainContent::initialize(ValueTree& storage , NamedValueSet& features)
+void MainContent::initialize(ValueTree&           storage         , NamedValueSet& features ,
+                             AudioThumbnailCache& thumbnail_cache                           )
 {
   this->storage           = storage ;
 #else // CONTROLLER_OWNS_STORAGE
-void MainContent::initialize(NamedValueSet& features)
+void MainContent::initialize(NamedValueSet& features , AudioThumbnailCache& thumbnail_cache)
 {
 #endif // CONTROLLER_OWNS_STORAGE
   bool   is_audio_enabled = bool  (features[APP::AUDIO_KEY     ]) ;
@@ -262,10 +263,10 @@ void MainContent::initialize(NamedValueSet& features)
 
 #ifdef CONTROLLER_OWNS_STORAGE
   this->deviceManager.addChangeListener(JuceBoilerplate::Store.get()) ;
-#else // CONTROLLER_OWNS_STORAGE
-  this->deviceManager.addChangeListener(this) ;
-#endif // CONTROLLER_OWNS_STORAGE
   this->storage      .addListener      (this) ;
+#else // CONTROLLER_OWNS_STORAGE
+  this->storage->root.addListener      (this) ;
+#endif // CONTROLLER_OWNS_STORAGE
 
   this->upperWaveform->startTimerHz(course_fps) ;
   this->lowerWaveform->startTimerHz(fine_fps  ) ;

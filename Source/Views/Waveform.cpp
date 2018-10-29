@@ -53,8 +53,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-Waveform::Waveform (AudioFormatManager& format_manager , AudioTransportSource& source)
-    : transport(source) , thumbnailCache(GUI::CACHE_N_THUMBS) , thumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnailCache) , zoomScaleFactor(1.0)
+Waveform::Waveform (AudioTransportSource& audio_source)
+    : transport(audio_source) , zoomFactor(1.0)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -83,10 +83,8 @@ Waveform::Waveform (AudioFormatManager& format_manager , AudioTransportSource& s
   this->scrollbar  ->setRangeLimits(viewRange) ;
   this->scrollbar  ->setAutoHide(false) ;
   this->headTime = this->tailTime = 0.0 ;
-  this->isFollowingTransport      = false ;
 
-  this->thumbnail .addChangeListener(this) ;
-  this->scrollbar->addListener      (this) ;
+  this->scrollbar->addListener(this) ;
 
     //[/Constructor]
 }
@@ -95,7 +93,7 @@ Waveform::~Waveform()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
 
-  this->thumbnail .removeChangeListener(this) ;
+  this->thumbnail->removeChangeListener(this) ;
   this->scrollbar->removeListener      (this) ;
 
     //[/Destructor_pre]
@@ -143,12 +141,12 @@ void Waveform::paint (Graphics& g)
 
   // waveform
   g.setColour(GUI::WAVE_FG_COLOR) ;
-  if (this->thumbnail.getTotalLength() > 0.0)
+  if (this->thumbnail->getTotalLength() > 0.0)
   {
     double begin_secs = this->viewRange.getStart() ;
     double end_secs   = this->viewRange.getEnd  () ;
 
-    this->thumbnail.drawChannels(g , thumb_rect , begin_secs , end_secs , 1.0f) ;
+    this->thumbnail->drawChannels(g , thumb_rect , begin_secs , end_secs , 1.0f) ;
   }
   else
   {
@@ -177,6 +175,15 @@ void Waveform::resized()
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
+/* setup/teardown */
+
+void Waveform::initialize(AudioFormatManager& format_manager , AudioThumbnailCache& thumbnail_cache)
+{
+  this->thumbnail.reset(new AudioThumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnail_cache)) ;
+  this->thumbnail->addChangeListener(this) ;
+}
+
+
 /* public getters/setters */
 
 void Waveform::setUrl(const Url& url)
@@ -188,10 +195,10 @@ void Waveform::setUrl(const Url& url)
 
   if (input_source != nullptr)
   {
-    this->thumbnail.setSource(input_source) ;
+    this->thumbnail->setSource(input_source) ;
 
-    double total_n_secs = this->thumbnail.getTotalLength() ;
-    Range<double> new_range(0.0 , total_n_secs) ;
+    double        total_n_secs = this->thumbnail->getTotalLength() ;
+    Range<double> new_range    = Range<double>(0.0 , total_n_secs) ;
 
     setMarker(this->headMarker , (this->headTime = 0.0         )) ;
     setMarker(this->tailMarker , (this->tailTime = total_n_secs)) ;
@@ -244,7 +251,7 @@ double Waveform::getCurrentZoom() const { return this->currentZoom ; }
 
 void Waveform::changeListenerCallback(ChangeBroadcaster* object_that_changed)
 {
-  if (object_that_changed == &(this->thumbnail)) repaint() ;
+  if (object_that_changed == this->thumbnail.get()) sendChangeMessage() ;
 }
 
 void Waveform::mouseDown(const MouseEvent& evt) { setPosition(xToTime((float)evt.x)) ; }
@@ -258,7 +265,7 @@ void Waveform::mouseUp(const MouseEvent& evt)
 
 void Waveform::mouseWheelMove(const MouseEvent& , const MouseWheelDetails& wheel)
 {
-  double total_n_secs = this->thumbnail.getTotalLength() ;
+  double total_n_secs = this->thumbnail->getTotalLength() ;
 
   if (total_n_secs <= 0.0 || getName() == GUI::UPPER_WAVEFORM_ID) return ;
 

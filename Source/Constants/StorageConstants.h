@@ -71,5 +71,6 @@ public:
   static const String STORAGE_DIRNAME ;
   static const String STORAGE_FILENAME ;
   static const String DEVICE_FILENAME ;
+  static const String PEAKS_FILENAME ;
   static const int    CONFIG_VERSION ;
 } ;

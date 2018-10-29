@@ -35,13 +35,13 @@
 
 /* setup/teardown */
 
-JuceBoilerplateStore::JuceBoilerplateStore()
+JuceBoilerplateStore::JuceBoilerplateStore() : thumbnailCache(GUI::CACHE_N_THUMBS)
 {
   File storage_dir      = APP::AppdataDir().getChildFile(STORE::STORAGE_DIRNAME ) ;
   this->storageFile     = storage_dir      .getChildFile(STORE::STORAGE_FILENAME) ;
   this->deviceFile      = storage_dir      .getChildFile(STORE::DEVICE_FILENAME ) ;
   this->peaksCacheFile  = storage_dir      .getChildFile(STORE::PEAKS_FILENAME  ) ;
-  this->storageTempFile = storage_dir      .getChildFile(APP:APP_CMD + ".temp") ;
+  this->storageTempFile = storage_dir      .getChildFile(APP::APP_CMD + ".temp" ) ;
 
   // create shared config ValueTree from persistent storage or defaults
   loadConfig() ; verifyConfig() ;
@@ -54,7 +54,7 @@ JuceBoilerplateStore::JuceBoilerplateStore()
 JuceBoilerplateStore::~JuceBoilerplateStore() { listen(false) ; storeConfig() ; }
 
 
-/* getters/setters */
+/* public getters/setters */
 
 bool JuceBoilerplateStore::setProperty(ValueTree node  , const Identifier& key ,
                                    const var value                         )
@@ -120,6 +120,11 @@ void JuceBoilerplateStore::loadConfig()
   bool is_config_valid = (this->deviceStateXml.get() != nullptr                      &&
                           this->deviceStateXml.get()->hasTagName(STORE::DEVICE_XML_ID)) ;
   if (!is_config_valid) this->deviceStateXml.reset() ;
+
+  // load audio file peaks cache from persistent storage
+  FileInputStream* peaks = new FileInputStream(this->peaksCacheFile) ;
+  if (peaks->openedOk()) this->thumbnailCache.readFromStream(*peaks) ;
+  delete peaks ;
 }
 
 bool JuceBoilerplateStore::storeConfig(XmlElement* device_state_xml)
@@ -130,6 +135,7 @@ DEBUG_TRACE_STORE_CONFIG
   if (this->storageTempFile.create().failed() || !this->storageTempFile.deleteFile())
   {
     JuceBoilerplate::Error(GUI::FILESYSTEM_WRITE_ERROR_MSG) ;
+
     return false ;
   }
 
@@ -187,6 +193,23 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
 
       return false ;
     }
+  }
+
+  // marshall audio file peaks cache out to persistent binary storage
+  FileOutputStream* peaks_stream = new FileOutputStream(this->storageTempFile) ;
+  if (!peaks_stream->failedToOpen())
+  {
+    this->thumbnailCache.writeToStream(*peaks_stream) ;
+    peaks_stream->flush() ;
+    this->storageTempFile.moveFileTo(this->peaksCacheFile) ;
+    delete peaks_stream ;
+  }
+  else
+  {
+    JuceBoilerplate::Error(GUI::STORAGE_WRITE_ERROR_MSG + "audio file peaks cache") ;
+    delete peaks_stream ;
+
+    return false ;
   }
 
   return true ;
@@ -372,7 +395,7 @@ DEBUG_TRACE_CONFIG_TREE_CHANGED
 }
 
 
-/* getters/setters */
+/* private getters/setters */
 
 bool JuceBoilerplateStore::isKnownProperty(ValueTree node , const Identifier& key)
 {

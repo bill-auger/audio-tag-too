@@ -22,6 +22,7 @@
 #include "Constants/AppConstants.h"
 #include "Constants/GuiConstants.h"
 #include "Controllers/JuceBoilerplate.h"
+#include "Trace/TraceMain.h"
 #include "Views/Alert.h"
 #include "Views/MainContent.h"
 

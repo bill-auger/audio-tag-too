@@ -43,11 +43,14 @@ class Waveform  : public Component,
 {
 public:
     //==============================================================================
-    Waveform (AudioFormatManager& format_manager , AudioTransportSource& source);
+    Waveform (AudioTransportSource& audio_source);
     ~Waveform();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+
+  // setup/teardown
+  void initialize(AudioFormatManager& format_manager , AudioThumbnailCache& thumbnail_cache) ;
 
   // getters/setters
   void   setUrl        (const Url& url) ;
@@ -89,15 +92,14 @@ private:
   void   setMarker   (DrawableRectangle& marker , const double time) ;
 
   // vars
-  AudioTransportSource& transport ;
-  AudioThumbnailCache   thumbnailCache ;
-  AudioThumbnail        thumbnail ;
-  Range<double>         viewRange ;
-  double                zoomFactor ;
-  double                currentZoom ;
-  DrawableRectangle     cursorMarker ;
-  DrawableRectangle     headMarker ; double headTime ;
-  DrawableRectangle     tailMarker ; double tailTime ;
+  AudioTransportSource&           transport ;
+  std::unique_ptr<AudioThumbnail> thumbnail ;
+  Range<double>                   viewRange ;
+  double                          zoomFactor ;
+  double                          currentZoom ;
+  DrawableRectangle               cursorMarker ;
+  DrawableRectangle               headMarker ; double headTime ;
+  DrawableRectangle               tailMarker ; double tailTime ;
 
     //[/UserVariables]
 
