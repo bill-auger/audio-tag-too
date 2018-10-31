@@ -56,8 +56,8 @@ public:
   static ValueTree   CreateClip      (String audio_filename , double begin_time , double end_time) ;
 
   // helpers
-  static String DurationString(double duration) ;
   static void   LoadClip      (ValueTree& clip_store) ;
+  static String DurationString(double duration) ;
 
 
 private:

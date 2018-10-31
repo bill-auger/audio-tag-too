@@ -102,18 +102,6 @@ ValueTree AudioTagToo::CreateClip(String audio_filename , double begin_time , do
   return Store->createClip(audio_filename , begin_time , end_time) ;
 }
 
-String AudioTagToo::DurationString(double duration)
-{
-  int    duration_int =        int(duration) ;
-  String milliseconds = String(int(duration     * 1000.0) % 1000) ;
-  String seconds      = String(   (duration_int         ) %   60) ;
-  String minutes      = String(   (duration_int /     60) %   60) ;
-  String hours        = String(   (duration_int /   3600)       ) ;
-  String clip_time    = String(hours + ":" + minutes + ":" + seconds + ":" + milliseconds) ;
-
-  return clip_time ;
-}
-
 void AudioTagToo::LoadClip(ValueTree& clip_store)
 {
   String master_filename = STRING(clip_store[STORE::FILENAME_KEY  ]) ;
@@ -124,6 +112,18 @@ void AudioTagToo::LoadClip(ValueTree& clip_store)
   Gui->setPosition(begin_time) ; Gui->setHeadMarker() ;
   Gui->setPosition(end_time  ) ; Gui->setTailMarker() ;
   Gui->updateTransportButton() ; Gui->repaint() ;
+}
+
+String AudioTagToo::DurationString(double duration)
+{
+  int    duration_int =        int(duration) ;
+  String milliseconds = String(int(duration     * 1000.0) % 1000) ;
+  String seconds      = String(   (duration_int         ) %   60) ;
+  String minutes      = String(   (duration_int /     60) %   60) ;
+  String hours        = String(   (duration_int /   3600)       ) ;
+  String clip_time    = String(hours + ":" + minutes + ":" + seconds + ":" + milliseconds) ;
+
+  return clip_time ;
 }
 
 
