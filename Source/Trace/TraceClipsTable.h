@@ -56,9 +56,10 @@
   #define DEBUG_TRACE_NEW_MASTER_ITEM                                     \
     Trace::TraceGui("preparing new master item: [ " + master_text + " ]") ;
 
-  #define DEBUG_TRACE_NEW_CLIP_ITEM                                                                  \
-    Trace::TraceGui("preparing new clip item: [ " + clip_text  + "," + file_text + "," + \
-                                                    begin_text + "," + end_text  + " ]") ;
+  #define DEBUG_TRACE_NEW_CLIP_ITEM                                                         \
+    Trace::TraceGui("preparing new clip item: [ " + clip_text     + "," + file_text + "," + \
+                                                    begin_text    + "," + end_text  + "," + \
+                                                    duration_text + " ]")                 ;
 
   #define DEBUG_TRACE_CREATE_MASTER_ITEM                                        \
     String master_id = STRING(master_node.getType()) ;                          \
