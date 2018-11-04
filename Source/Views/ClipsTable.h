@@ -79,8 +79,6 @@ private:
   void          createItemsTree (ValueTree root_store) ;
 
   // event handlers
-  bool isInterestedInDragSource  (const DragAndDropTarget::SourceDetails& dragSourceDetails) ;
-  void itemDropped               (const DragAndDropTarget::SourceDetails& dragSourceDetails , int idx) ;
   void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node)                    override ;
   void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
   void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override ;
@@ -95,7 +93,7 @@ private:
   {
   public:
 
-    ClipItem(String item_id , String label_text , ValueTree store = ValueTree()) ;
+    ClipItem(String item_id , String label_text , ValueTree clipStore = ValueTree()) ;
 
 
     // TreeViewItem implementation
@@ -109,8 +107,8 @@ private:
 
     String    itemId ;
     String    labelText ;
-    ValueTree store ;
-    Clip*     clip ;
+    ValueTree clipStore ;
+//     Clip*     clip ;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)

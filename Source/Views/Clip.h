@@ -46,7 +46,6 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-  void buttonClicked(Button* a_button) override ;
     //[/UserMethods]
 
     void paint (Graphics& g) override;

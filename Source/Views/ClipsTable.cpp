@@ -61,8 +61,8 @@ ClipsTable::ClipsTable ()
 
     //[UserPreSize]
 
-  this->clipItems       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ) , String())) ;
-  this->compilationItems.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID) , String())) ;
+  this->clipItems       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ) , String() , ValueTree::invalid)) ;
+  this->compilationItems.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID) , String() , ValueTree::invalid)) ;
 
     //[/UserPreSize]
 
@@ -322,15 +322,16 @@ END_JUCER_METADATA
 //[EndFile] You can add extra defines here...
 
 ClipsTable::ClipItem::ClipItem(String _item_id  , String    _label_text  , ValueTree _store) :
-                               itemId(_item_id) , labelText(_label_text) , store(    _store)
+                               itemId(_item_id) , labelText(_label_text) , clipStore(_store)
 {
 //   this->clip = new Clip(this->itemId , this->labelText , this->store) ;
 }
 
 
-String     ClipsTable::ClipItem::getUniqueName       () const { return this->itemId          ; }
-bool       ClipsTable::ClipItem::mightContainSubItems()       { return this->store.isValid() ; }
-int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H      ; }
-Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->itemId , this->labelText , this->store) ;            }
+String     ClipsTable::ClipItem::getUniqueName       () const { return this->itemId              ; }
+bool       ClipsTable::ClipItem::mightContainSubItems()       { return this->clipStore.isValid() ; }
+int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H          ; }
+// Component* ClipsTable::ClipItem::createItemComponent ()       { return this->clip                 ; }
+Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->itemId , this->labelText , this->clipStore) ; }
 
 //[/EndFile]
