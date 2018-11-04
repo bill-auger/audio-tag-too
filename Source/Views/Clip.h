@@ -36,12 +36,12 @@
   to load the clip into the GUI, edit it's friendly name label, and destroy the clip entry.
                                                                     //[/Comments]
 */
-class Clip  : public Component
-//               private Button::Listener
+class Clip  : public Component,
+              private Button::Listener
 {
 public:
     //==============================================================================
-    Clip (String item_id , String label_text , ValueTree clip_store);
+    Clip (String item_id , String label_text , ValueTree clip_store = ValueTree::invalid);
     ~Clip();
 
     //==============================================================================
@@ -63,7 +63,6 @@ private:
   String    labelText ;
   ValueTree masterStore ;
   ValueTree clipStore ;
-
 
     //[/UserVariables]
 
