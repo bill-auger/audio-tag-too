@@ -61,8 +61,8 @@ ClipsTable::ClipsTable ()
 
     //[UserPreSize]
 
-  this->clipItems       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ) , String::empty)) ;
-  this->compilationItems.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID) , String::empty)) ;
+  this->clipItems       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ) , String::empty , ValueTree::invalid)) ;
+  this->compilationItems.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID) , String::empty , ValueTree::invalid)) ;
 
     //[/UserPreSize]
 
@@ -321,16 +321,17 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 
-ClipsTable::ClipItem::ClipItem(String  _item_id  , String     _label_text  , ValueTree _store) :
-                               item_id(_item_id) , label_text(_label_text) , store(    _store)
+ClipsTable::ClipItem::ClipItem(String  _item_id  , String     _label_text  , ValueTree  _store) :
+                               item_id(_item_id) , label_text(_label_text) , clip_store(_store)
 {
-//   this->clip = new Clip(this->item_id , this->label_text , this->store) ;
+//   this->clip = new Clip(this->item_id , this->label_text , this->clip_store) ;
 }
 
 
-String     ClipsTable::ClipItem::getUniqueName       () const { return this->item_id         ; }
-bool       ClipsTable::ClipItem::mightContainSubItems()       { return this->store.isValid() ; }
-int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H      ; }
-Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->item_id , this->label_text , this->store) ;            }
+String     ClipsTable::ClipItem::getUniqueName       () const { return this->item_id              ; }
+bool       ClipsTable::ClipItem::mightContainSubItems()       { return this->clip_store.isValid() ; }
+int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H           ; }
+// Component* ClipsTable::ClipItem::createItemComponent ()       { return this->clip                 ; }
+Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->item_id , this->label_text , this->clip_store) ; }
 
 //[/EndFile]
