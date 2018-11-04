@@ -1,3 +1,5 @@
+#define itemLabel label
+
 /*\
 |*|  AudioTagToo - Clip and stitch audio samples
 |*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
@@ -31,7 +33,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-Clip::Clip (String item_id , String label_text , ValueTree store)
+Clip::Clip (String item_id , String label_text , ValueTree clip_store) :
+            itemId(item_id) , labelText(label_text) , clipStore(clip_store)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -76,13 +79,12 @@ Clip::Clip (String item_id , String label_text , ValueTree store)
 
     //[Constructor] You can add your own custom stuff here..
 
-  Label* item_label = new Label(item_id , label_text) ;
-
-  if (store.hasProperty(STORE::LABEL_TEXT_KEY))
+//   Label* item_label = new Label(item_id , label_text) ;
+  if (this->clipStore.hasProperty(STORE::LABEL_TEXT_KEY))
   {
-    item_label->setEditable(true) ;
-    Value stored_value = store.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
-    item_label->getTextValue().referTo(stored_value) ;
+    this->itemLabel->setEditable(true) ;
+    Value stored_value = this->clipStore.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
+    this->itemLabel->getTextValue().referTo(stored_value) ;
   }
 
     //[/Constructor]
@@ -152,7 +154,7 @@ void Clip::buttonClicked(Button* a_button)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="Clip" componentName="" parentClasses="public Component, private Button::Listener"
-                 constructorParams="String item_id , String label_text , ValueTree store"
+                 constructorParams="String item_id , String label_text , ValueTree clip_store"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="1" initialHeight="1">
   <BACKGROUND backgroundColour="ff323e44"/>

@@ -20,7 +20,9 @@
 
 //[Headers] You can add your own extra header files here...
 
+#include "../Controllers/AudioTagToo.h"
 #include "../Trace/TraceClipsTable.h"
+#include "Clip.h"
 
 //[/Headers]
 
@@ -321,13 +323,13 @@ END_JUCER_METADATA
 ClipsTable::ClipItem::ClipItem(String _item_id  , String    _label_text  , ValueTree _store) :
                                itemId(_item_id) , labelText(_label_text) , store(    _store)
 {
-  this->clip = new Clip(this->itemId , this->labelText , this->store) ;
+//   this->clip = new Clip(this->itemId , this->labelText , this->store) ;
 }
 
 
 String     ClipsTable::ClipItem::getUniqueName       () const { return this->itemId          ; }
 bool       ClipsTable::ClipItem::mightContainSubItems()       { return this->store.isValid() ; }
 int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H      ; }
-Component* ClipsTable::ClipItem::createItemComponent ()       { return this->clip ;            }
+Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->item_id , this->label_text , this->store) ;            }
 
 //[/EndFile]
