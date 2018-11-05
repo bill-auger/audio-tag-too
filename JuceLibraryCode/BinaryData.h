@@ -14,6 +14,9 @@ namespace BinaryData
     extern const char*   audioxgeneric_png;
     const int            audioxgeneric_pngSize = 2060;
 
+    extern const char*   listadd_png;
+    const int            listadd_pngSize = 528;
+
     extern const char*   mediaplaybackstart_png;
     const int            mediaplaybackstart_pngSize = 1170;
 
@@ -21,7 +24,7 @@ namespace BinaryData
     const int            processstop_pngSize = 1399;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 4;
+    const int namedResourceListSize = 5;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

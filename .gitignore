@@ -9,6 +9,7 @@
 !Assets/accessories-text-editor.png
 !Assets/audio-x-generic.png
 !Assets/COPYING_ASSETS
+!Assets/list-add.png
 !Assets/media-playback-start.png
 !Assets/process-stop.png
 !Assets/README.md
@@ -72,6 +73,8 @@
 !Source/Views/Clip.h
 !Source/Views/ClipsTable.cpp
 !Source/Views/ClipsTable.h
+!Source/Views/ConfigMetadata.cpp
+!Source/Views/ConfigMetadata.h
 !Source/Views/MainContent.cpp
 !Source/Views/MainContent.h
 !Source/Views/Statusbar.cpp

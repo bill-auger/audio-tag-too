@@ -38,7 +38,7 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "AudioTagToo";
-    const char* const  versionString  = "0.0.4";
-    const int          versionNumber  = 0x4;
+    const char* const  versionString  = "0.0.2";
+    const int          versionNumber  = 0x2;
 }
 #endif

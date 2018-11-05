@@ -61,8 +61,8 @@ ClipsTable::ClipsTable ()
 
     //[UserPreSize]
 
-  this->clipItems       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ) , String::empty , ValueTree::invalid)) ;
-  this->compilationItems.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID) , String::empty , ValueTree::invalid)) ;
+  this->clipItems       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ) , String::empty)) ;
+  this->compilationItems.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID) , String::empty)) ;
 
     //[/UserPreSize]
 
@@ -173,11 +173,12 @@ TreeViewItem* ClipsTable::newClipItem(ValueTree clip_node)
   String        begin_text      = GUI::BEGIN_ITEM_LABEL    + String(begin_time , 6) ;
   String        end_text        = GUI::END_ITEM_LABEL      + String(end_time   , 6) ;
   String        duration_text   = GUI::DURATION_ITEM_LABEL + AudioTagToo::DurationString(duration) ;
-  TreeViewItem* clip_item       = new ClipItem(clip_id     , clip_text , clip_node) ;
-  TreeViewItem* filename_item   = new ClipItem(file_id     , file_text            ) ;
-  TreeViewItem* begin_time_item = new ClipItem(begin_id    , begin_text           ) ;
-  TreeViewItem* end_time_item   = new ClipItem(end_id      , end_text             ) ;
-  TreeViewItem* duration_item   = new ClipItem(duration_id , duration_text        ) ;
+  TreeViewItem* clip_item       = new ClipItem(clip_id     , clip_text    , clip_node) ;
+  TreeViewItem* filename_item   = new ClipItem(file_id     , file_text    ) ;
+  TreeViewItem* begin_time_item = new ClipItem(begin_id    , begin_text   ) ;
+  TreeViewItem* end_time_item   = new ClipItem(end_id      , end_text     ) ;
+  TreeViewItem* duration_item   = new ClipItem(duration_id , duration_text) ;
+
   clip_item->addSubItem(filename_item   , 0) ;
   clip_item->addSubItem(begin_time_item , 1) ;
   clip_item->addSubItem(end_time_item   , 2) ;
@@ -321,17 +322,29 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 
-ClipsTable::ClipItem::ClipItem(String  _item_id  , String     _label_text  , ValueTree  _store) :
-                               item_id(_item_id) , label_text(_label_text) , clip_store(_store)
+ClipsTable::ClipItem::ClipItem(String item_id  , String    label_text  , ValueTree clip_store) :
+                               itemId(item_id) , labelText(label_text) , clipStore(clip_store)
 {
 //   this->clip = new Clip(this->item_id , this->label_text , this->clip_store) ;
+
+//   ValueTree root_node = this->clip_store.getParent().getParent() ;
+//   this->isRootItem    = this->clip_store.getNumProperties() == 0 ;
+  bool is_root_item = STORE::RootNodes().contains(this->itemId) :
+//   this->isClipNode    = root_node.getType() == STORE::CLIPS_ID       ||
+//                         root_node.getType() == STORE::COMPILATIONS_ID ;
+  this->isLeafNode  = !this->isRootItem && !clip_store.isValid() ;
+//   this->isEditable    = root_node.getType() == STORE::CLIPS_ID       ||
+//                         root_node.getType() == STORE::COMPILATIONS_ID ;
+//   this->isLeafNode = getParentItem().getParentItem() == this->clipItems       ||
+//                      getParentItem().getParentItem() == this->compilationItems ;
+
 }
 
 
-String     ClipsTable::ClipItem::getUniqueName       () const { return this->item_id              ; }
-bool       ClipsTable::ClipItem::mightContainSubItems()       { return this->clip_store.isValid() ; }
-int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H           ; }
+String     ClipsTable::ClipItem::getUniqueName       () const { return this->itemId    ; }
+bool       ClipsTable::ClipItem::mightContainSubItems()       { return !this->isLeafNode ; }
+int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H ; }
 // Component* ClipsTable::ClipItem::createItemComponent ()       { return this->clip                 ; }
-Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->item_id , this->label_text , this->clip_store) ; }
+Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->labelText , this->clipStore) ; }
 
 //[/EndFile]

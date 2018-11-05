@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="CQ5KH7" name="AudioTagToo" projectType="guiapp" jucerVersion="5.3.2"
-              version="0.0.2" bundleIdentifier="free.bill-auger.AudioTagToo"
               version="0.0.4" bundleIdentifier="free.bill-auger.AudioTagToo"
               includeBinaryInAppConfig="1">
   <MAINGROUP id="iiOCZm" name="AudioTagToo">
@@ -10,6 +9,7 @@
             file="Assets/accessories-text-editor.png"/>
       <FILE id="Ebmfjk" name="audio-x-generic.png" compile="0" resource="1"
             file="Assets/audio-x-generic.png"/>
+      <FILE id="fnUs2r" name="list-add.png" compile="0" resource="1" file="Assets/list-add.png"/>
       <FILE id="A51DFD" name="media-playback-start.png" compile="0" resource="1"
             file="Assets/media-playback-start.png"/>
       <FILE id="TFQXuh" name="process-stop.png" compile="0" resource="1"

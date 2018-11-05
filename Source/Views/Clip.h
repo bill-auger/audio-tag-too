@@ -41,7 +41,7 @@ class Clip  : public Component,
 {
 public:
     //==============================================================================
-    Clip (String item_id , String label_text , ValueTree clip_store);
+    Clip (String item_id , String label_text , ValueTree store);
     ~Clip();
 
     //==============================================================================
@@ -56,7 +56,6 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
-  ValueTree masterStore ;
   ValueTree clipStore ;
 
 
@@ -65,7 +64,7 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<Label> label;
+    std::unique_ptr<Label> itemLabel;
     std::unique_ptr<ImageButton> loadButton;
     std::unique_ptr<ImageButton> editButton;
     std::unique_ptr<ImageButton> deleteButton;

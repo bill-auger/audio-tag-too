@@ -22,5 +22,6 @@ Exceptions:
 the following images are from the [tango desktop project](http://tango-project.org/) public domain icon set
 * accessories-text-editor.png
 * audio-x-generic.png
+* list-add.png
 * media-playback-start.png
 * process-stop.png
