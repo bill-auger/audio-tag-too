@@ -277,17 +277,6 @@ void ClipsTable::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_id
 DBG("ClipsTable::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
 }
 
-bool ClipsTable::isInterestedInDragSource(const DragAndDropTarget::SourceDetails& dragSourceDetails) ;
-{
-DBG("ClipsTable::isInterestedInDragSource() dragSourceDetails=" + dragSourceDetails->description) ;
-}
-
-void ClipsTable::itemDropped(const DragAndDropTarget::SourceDetails& dragSourceDetails , int idx) ;
-{
-DBG("ClipsTable::itemDropped() dragSourceDetails=" + dragSourceDetails->description) ;
-
-}
-
 //[/MiscUserCode]
 
 
@@ -329,14 +318,14 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 
-ClipsTable::ClipItem::ClipItem(String  _item_id  , String     _label_text  , ValueTree _store) :
-                               item_id(_item_id) , label_text(_label_text) , store(    _store)
+ClipsTable::ClipItem::ClipItem(String _item_id  , String    _label_text  , ValueTree _store) :
+                               itemId(_item_id) , labelText(_label_text) , store(    _store)
 {
-  this->clip = new Clip(this->item_id , this->label_text , this->store) ;
+  this->clip = new Clip(this->itemId , this->labelText , this->store) ;
 }
 
 
-String     ClipsTable::ClipItem::getUniqueName       () const { return this->item_id         ; }
+String     ClipsTable::ClipItem::getUniqueName       () const { return this->itemId          ; }
 bool       ClipsTable::ClipItem::mightContainSubItems()       { return this->store.isValid() ; }
 int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H      ; }
 Component* ClipsTable::ClipItem::createItemComponent ()       { return this->clip ;            }

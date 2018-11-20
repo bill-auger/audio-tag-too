@@ -26,6 +26,8 @@
 
 #include "../Constants/GuiConstants.h"
 #include "../Constants/StorageConstants.h"
+#include "../Controllers/AudioTagToo.h"
+#include "Clip.h"
 
 //[/Headers]
 
@@ -105,9 +107,10 @@ private:
 
   private:
 
-    String    item_id ;
-    String    label_text ;
+    String    itemId ;
+    String    labelText ;
     ValueTree store ;
+    Clip*     clip ;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)

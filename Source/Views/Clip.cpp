@@ -19,6 +19,9 @@
 
 
 //[Headers] You can add your own extra header files here...
+
+#include "../Constants/StorageConstants.h"
+
 //[/Headers]
 
 #include "Clip.h"
@@ -73,12 +76,12 @@ Clip::Clip (String item_id , String label_text , ValueTree store)
 
     //[Constructor] You can add your own custom stuff here..
 
-  Label* item_label = new Label(this->item_id , this->label_text) ;
+  Label* item_label = new Label(item_id , label_text) ;
 
-  if (this->store.hasProperty(STORE::LABEL_TEXT_KEY))
+  if (store.hasProperty(STORE::LABEL_TEXT_KEY))
   {
     item_label->setEditable(true) ;
-    Value stored_value = this->store.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
+    Value stored_value = store.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
     item_label->getTextValue().referTo(stored_value) ;
   }
 
@@ -128,6 +131,14 @@ void Clip::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+void Clip::buttonClicked(Button* a_button)
+{
+  if      (a_button == this->loadButton  .get()) ;
+  else if (a_button == this->editButton  .get()) ;
+  else if (a_button == this->deleteButton.get()) ;
+}
+
 //[/MiscUserCode]
 
 
