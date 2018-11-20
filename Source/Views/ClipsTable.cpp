@@ -330,6 +330,6 @@ ClipsTable::ClipItem::ClipItem(String _item_id  , String    _label_text  , Value
 String     ClipsTable::ClipItem::getUniqueName       () const { return this->itemId          ; }
 bool       ClipsTable::ClipItem::mightContainSubItems()       { return this->store.isValid() ; }
 int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H      ; }
-Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->item_id , this->label_text , this->store) ;            }
+Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->itemId , this->labelText , this->store) ;            }
 
 //[/EndFile]

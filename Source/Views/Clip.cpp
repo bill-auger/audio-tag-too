@@ -133,14 +133,14 @@ void Clip::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-
+/*
 void Clip::buttonClicked(Button* a_button)
 {
   if      (a_button == this->loadButton  .get()) ;
   else if (a_button == this->editButton  .get()) ;
   else if (a_button == this->deleteButton.get()) ;
 }
-
+*/
 //[/MiscUserCode]
 
 
