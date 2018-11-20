@@ -5,8 +5,9 @@
 |*|  This file is part of the AudioTagToo program.
 |*|
 |*|  AudioTagToo is free software: you can redistribute it and/or modify
-|*|  it under the terms of the GNU General Public License version 3
-|*|  as published by the Free Software Foundation.
+|*|  it under the terms of the GNU General Public License as published by
+|*|  the Free Software Foundation, either version 3 of the License, or
+|*|  (at your option) any later version.
 |*|
 |*|  AudioTagToo is distributed in the hope that it will be useful,
 |*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +34,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-Clip::Clip (String item_id , String label_text , ValueTree store)
+Clip::Clip (String label_text , ValueTree store)
     : store(store)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -70,6 +71,13 @@ Clip::Clip (String item_id , String label_text , ValueTree store)
                              ImageCache::getFromMemory (BinaryData::processstop_png, BinaryData::processstop_pngSize), 1.000f, Colour (0x00000000),
                              Image(), 1.000f, Colour (0x00000000),
                              Image(), 1.000f, Colour (0x00000000));
+    addMetadataButton.reset (new ImageButton (String()));
+    addAndMakeVisible (addMetadataButton.get());
+
+    addMetadataButton->setImages (false, true, false,
+                                  ImageCache::getFromMemory (BinaryData::processstop_png, BinaryData::processstop_pngSize), 1.000f, Colour (0x00000000),
+                                  Image(), 1.000f, Colour (0x00000000),
+                                  Image(), 1.000f, Colour (0x00000000));
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -120,6 +128,7 @@ Clip::~Clip()
     loadButton = nullptr;
     editButton = nullptr;
     deleteButton = nullptr;
+    addMetadataButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -143,10 +152,11 @@ void Clip::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    itemLabel->setBounds (0, 0, getWidth() - 72, 24);
-    loadButton->setBounds (((getWidth() - 24) + 0 - 24) + 0 - 24, 0, 24, 24);
-    editButton->setBounds ((getWidth() - 24) + 0 - 24, 0, 24, 24);
-    deleteButton->setBounds (getWidth() - 24, 0, 24, 24);
+    itemLabel->setBounds (0, 0, getWidth() - -145, 24);
+    loadButton->setBounds (((getWidth() - -217 - 24) + 0 - 24) + 0 - 24, 0, 24, 24);
+    editButton->setBounds ((getWidth() - -217 - 24) + 0 - 24, 0, 24, 24);
+    deleteButton->setBounds (getWidth() - -217 - 24, 0, 24, 24);
+    addMetadataButton->setBounds (getWidth() - -217 - 24, 0, 24, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -176,13 +186,12 @@ void Clip::buttonClicked(Button* a_button)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="Clip" componentName="" parentClasses="public Component, private Button::Listener"
-                 constructorParams="String item_id , String label_text , ValueTree store"
-                 variableInitialisers="store(store)" snapPixels="8" snapActive="1"
-                 snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="1"
-                 initialHeight="1">
+                 constructorParams="String label_text , ValueTree store" variableInitialisers="store(store)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="1" initialHeight="1">
   <BACKGROUND backgroundColour="ff323e44"/>
   <LABEL name="new label" id="53e00129390ce15c" memberName="itemLabel"
-         virtualName="" explicitFocusOrder="0" pos="0 0 -145M 24" textCol="ffffffff"
+         virtualName="" explicitFocusOrder="0" pos="0 0 -1264M 24" textCol="ffffffff"
          edTextCol="ff000000" edBkgCol="0" labelText="label text" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="24.00000000000000000000" kerning="0.00000000000000000000"
@@ -202,11 +211,18 @@ BEGIN_JUCER_METADATA
                opacityOver="1.00000000000000000000" colourOver="0" resourceDown=""
                opacityDown="1.00000000000000000000" colourDown="0"/>
   <IMAGEBUTTON name="" id="5519a8f967bbfc3e" memberName="deleteButton" virtualName=""
-               explicitFocusOrder="0" pos="-217Rr 0 24 24" buttonText="" connectedEdges="0"
+               explicitFocusOrder="0" pos="-1336Rr 0 24 24" buttonText="" connectedEdges="0"
                needsCallback="0" radioGroupId="0" keepProportions="0" resourceNormal="BinaryData::processstop_png"
                opacityNormal="1.00000000000000000000" colourNormal="0" resourceOver=""
                opacityOver="1.00000000000000000000" colourOver="0" resourceDown=""
                opacityDown="1.00000000000000000000" colourDown="0"/>
+  <IMAGEBUTTON name="" id="1d6dab7d33774e55" memberName="addMetadataButton"
+               virtualName="" explicitFocusOrder="0" pos="-1336Rr 0 24 24" buttonText=""
+               connectedEdges="0" needsCallback="0" radioGroupId="0" keepProportions="0"
+               resourceNormal="BinaryData::processstop_png" opacityNormal="1.00000000000000000000"
+               colourNormal="0" resourceOver="" opacityOver="1.00000000000000000000"
+               colourOver="0" resourceDown="" opacityDown="1.00000000000000000000"
+               colourDown="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

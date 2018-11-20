@@ -106,7 +106,7 @@ private:
     String    itemId ;
     String    labelText ;
     ValueTree clipStore ;
-    bool      isLeafNode ;
+    bool      isLeafItem ;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)

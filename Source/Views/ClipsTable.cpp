@@ -329,21 +329,21 @@ ClipsTable::ClipItem::ClipItem(String item_id  , String    label_text  , ValueTr
 
 //   ValueTree root_node = this->clip_store.getParent().getParent() ;
 //   this->isRootItem    = this->clip_store.getNumProperties() == 0 ;
-  bool is_root_item = STORE::RootNodes().contains(this->itemId) :
+  bool is_root_item =  STORE::RootNodes().contains(this->itemId) ;
 //   this->isClipNode    = root_node.getType() == STORE::CLIPS_ID       ||
 //                         root_node.getType() == STORE::COMPILATIONS_ID ;
-  this->isLeafNode  = !this->isRootItem && !clip_store.isValid() ;
+  this->isLeafItem = !is_root_item && !clip_store.isValid() ;
 //   this->isEditable    = root_node.getType() == STORE::CLIPS_ID       ||
 //                         root_node.getType() == STORE::COMPILATIONS_ID ;
-//   this->isLeafNode = getParentItem().getParentItem() == this->clipItems       ||
+//   this->iisLeafItem = getParentItem().getParentItem() == this->clipItems       ||
 //                      getParentItem().getParentItem() == this->compilationItems ;
 
 }
 
 
-String     ClipsTable::ClipItem::getUniqueName       () const { return this->itemId    ; }
-bool       ClipsTable::ClipItem::mightContainSubItems()       { return !this->isLeafNode ; }
-int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H ; }
+String     ClipsTable::ClipItem::getUniqueName       () const { return this->itemId ;      }
+bool       ClipsTable::ClipItem::mightContainSubItems()       { return !this->isLeafItem ; }
+int        ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H ;  }
 // Component* ClipsTable::ClipItem::createItemComponent ()       { return this->clip                 ; }
 Component* ClipsTable::ClipItem::createItemComponent ()       { return new Clip(this->labelText , this->clipStore) ; }
 
