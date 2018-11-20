@@ -221,7 +221,7 @@ String Trace::TraceSetValue(ValueTree node , const Identifier& key , var value)
                       "'] changing from (" + prev_type + ")'"  + prev_val +
                       "' to ("             + next_type + ")'"  + next_val + "'" ;
 
-  return (next_type != prev_type || next_val != prev_val) ? change_msg : String::empty ;
+  return (next_type != prev_type || next_val != prev_val) ? change_msg : String() ;
 }
 
 #endif // DEBUG_TRACE

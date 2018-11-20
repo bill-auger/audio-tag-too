@@ -30,7 +30,7 @@ ValueTree Seeds::DefaultStore()
   ValueTree default_store = ValueTree(STORE::STORAGE_ID) ;
 
   default_store.setProperty(STORE::CONFIG_VERSION_KEY , STORE::CONFIG_VERSION , nullptr) ;
-  default_store.setProperty(STORE::WINDOW_STATE_KEY   , String::empty         , nullptr) ;
+  default_store.setProperty(STORE::WINDOW_STATE_KEY   , String()              , nullptr) ;
 
   return default_store ;
 }

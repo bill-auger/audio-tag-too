@@ -94,7 +94,7 @@ ValueTree AudioTagTooStore::getChildNodeById(ValueTree root_store , Identifier n
     if ((child_node = root_store.getChild(master_n).getChildWithName(node_id)).isValid())
       return child_node ;
 
-  return ValueTree::invalid ;
+  return ValueTree() ;
 }
 
 ValueTree AudioTagTooStore::createClip(String audio_filename , double begin_time , double end_time)
@@ -142,7 +142,7 @@ DEBUG_TRACE_DUMP_STORE(master_node , "master_node")
   }
   else if (is_id_collision) AudioTagToo::Warning(GUI::ID_COLLISION_ERROR_MSG) ;
 
-  return (is_valid) ? clip_node : ValueTree::invalid ;
+  return (is_valid) ? clip_node : ValueTree() ;
 }
 
 
@@ -156,12 +156,12 @@ void AudioTagTooStore::loadConfig()
 #ifdef STORAGE_IS_BINARY
   FileInputStream* storage = new FileInputStream(this->storageFile) ;
   this->root               = (storage->openedOk()) ? ValueTree::readFromStream(*storage) :
-                                                     ValueTree::invalid                  ;
+                                                     ValueTree()                         ;
   delete storage ;
 #else // STORAGE_IS_BINARY
   XmlElement* storage_xml  = XmlDocument::parse(this->storageFile) ;
   this->root               = (storage_xml != nullptr) ? ValueTree::fromXml(*storage_xml) :
-                                                        ValueTree::invalid               ;
+                                                        ValueTree()                      ;
   delete storage_xml ;
 #endif // STORAGE_IS_BINARY
 
@@ -235,7 +235,7 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
   if (device_state_xml != nullptr)
   {
     this->deviceStateXml.reset(device_state_xml) ;
-    if (this->deviceStateXml->writeToFile(this->storageTempFile , String::empty))
+    if (this->deviceStateXml->writeToFile(this->storageTempFile , String()))
       this->storageTempFile.moveFileTo(this->deviceFile) ;
     else
     {
@@ -275,7 +275,7 @@ void AudioTagTooStore::verifyConfig()
   bool is_root_valid       = this->root.hasType(STORE::STORAGE_ID) ;
   bool has_canonical_nodes = !hasDuplicatedNodes(this->root) ;
   if      (!was_storage_found || !is_root_valid) this->root = Seeds::DefaultStore() ;
-  else if (!has_canonical_nodes                ) removeConflictedNodes(this->root , String::empty) ;
+  else if (!has_canonical_nodes                ) removeConflictedNodes(this->root , String()) ;
 
   // verify schema version
   int  stored_version    = int(this->root[STORE::CONFIG_VERSION_KEY]) ;

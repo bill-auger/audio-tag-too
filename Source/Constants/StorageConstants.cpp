@@ -33,11 +33,11 @@ const Identifier STORE::FilterId(String a_string , String retain_chars)
                  .toLowerCase()
                  .replaceCharacters(APP::FILTER_CHARS , APP::REPLACE_CHARS) ;
 }
-#define ROOT_PERSISTENT_NODE_IDS String::empty
-#define ROOT_TRANSIENT_NODE_IDS  String::empty
+#define ROOT_PERSISTENT_NODE_IDS String()
+#define ROOT_TRANSIENT_NODE_IDS  String()
 #define ROOT_PERSISTENT_IDS      STRING(CONFIG_VERSION_KEY) + newLine + \
                                  STRING(WINDOW_STATE_KEY  )
-#define ROOT_TRANSIENT_IDS       String::empty
+#define ROOT_TRANSIENT_IDS       String()
 const StringArray STORE::RootPersistentNodes() { return StringArray::fromLines(ROOT_PERSISTENT_NODE_IDS           ) ; }
 const StringArray STORE::RootNodes()           { return StringArray::fromLines(ROOT_PERSISTENT_NODE_IDS + newLine +
                                                                                ROOT_TRANSIENT_NODE_IDS            ) ; }

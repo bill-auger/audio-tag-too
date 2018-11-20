@@ -74,8 +74,7 @@ String AudioTagToo::GetVersionString()
 void AudioTagToo::SetConfig(const Identifier& a_key , const var a_value)
 {
 #ifdef CONTROLLER_OWNS_STORAGE
-  ValueTree storage_node = (STORE::RootKeys().contains(a_key)) ? Store->root        :
-                                                                 ValueTree::invalid ;
+  ValueTree storage_node = (STORE::RootKeys().contains(a_key)) ? Store->root : ValueTree() ;
 
   Store->setConfig(storage_node , a_key , a_value) ;
 #endif // CONTROLLER_OWNS_STORAGE
@@ -216,7 +215,7 @@ bool AudioTagToo::HandleCliParams(StringArray cli_params)
   // detect terminating CLI params
   String token = (cli_params.contains(APP::CLI_HELP_TOKEN   )) ? APP::CLI_HELP_TOKEN    :
                  (cli_params.contains(APP::CLI_VERSION_TOKEN)) ? APP::CLI_VERSION_TOKEN :
-                                                                 String::empty          ;
+                                                                 String()               ;
 
 DEBUG_TRACE_HANDLE_CLI_PARAMS
 
@@ -287,9 +286,9 @@ DEBUG_TRACE_VALIDATE_ENVIRONMENT
 
 void AudioTagToo::UpdateStatusGUI()
 {
-  Gui->setStatusL(String::empty) ;
-  Gui->setStatusC(String::empty) ;
-  Gui->setStatusR(String::empty) ;
+  Gui->setStatusL(String()) ;
+  Gui->setStatusC(String()) ;
+  Gui->setStatusR(String()) ;
 }
 
 void AudioTagToo::PumpThreads()

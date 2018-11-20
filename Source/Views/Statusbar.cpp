@@ -78,7 +78,7 @@ Statusbar::Statusbar ()
 
     //[UserPreSize]
 
-  setStatusL(String::empty) ; setStatusC(String::empty) ; setStatusR(String::empty) ;
+  setStatusL(String()) ; setStatusC(String()) ; setStatusR(String()) ;
 
     //[/UserPreSize]
 

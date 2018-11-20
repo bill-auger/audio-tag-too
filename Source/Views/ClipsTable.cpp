@@ -59,8 +59,8 @@ ClipsTable::ClipsTable ()
 
     //[UserPreSize]
 
-  this->clipItems       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ) , String::empty)) ;
-  this->compilationItems.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID) , String::empty)) ;
+  this->clipItems       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ) , String())) ;
+  this->compilationItems.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID) , String())) ;
 
     //[/UserPreSize]
 

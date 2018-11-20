@@ -105,10 +105,10 @@
     bool      is_compilations_node_ = isCompilationsNode(parent_node) ;                   \
     ValueTree root_store_           = (is_clips_node_       ) ? this->clipsStore        : \
                                       (is_compilations_node_) ? this->compilationsStore : \
-                                                                ValueTree::invalid ;      \
+                                                                ValueTree()             ; \
     ValueTree master_node_          = (is_master_node_) ? a_node             :            \
                                       (is_clip_node_  ) ? a_node.getParent() :            \
-                                                          ValueTree::invalid ;            \
+                                                          ValueTree()        ;            \
     String    master_idx_           = String(root_store_.indexOf(master_node_)) ;         \
     String    node_role             = (is_master_node_) ? "master " :                     \
                                       (is_clip_node_  ) ? "clip"    : "(unknown)" ;       \

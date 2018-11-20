@@ -93,7 +93,7 @@ private:
   {
   public:
 
-    ClipItem(String item_id , String label_text , ValueTree store = ValueTree::invalid) ;
+    ClipItem(String item_id , String label_text , ValueTree store = ValueTree()) ;
 
 
     // TreeViewItem implementation
