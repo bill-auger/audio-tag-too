@@ -44,9 +44,9 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 
-  void setStatusL(String status_text , Colour text_color = GUI::TEXT_FG_COLOR) ;
-  void setStatusC(String status_text , Colour text_color = GUI::TEXT_FG_COLOR) ;
-  void setStatusR(String status_text , Colour text_color = GUI::TEXT_FG_COLOR) ;
+  void setStatusL(String status_text , Colour text_color = GUI::TEXT_NORMAL_COLOR) ;
+  void setStatusC(String status_text , Colour text_color = GUI::TEXT_NORMAL_COLOR) ;
+  void setStatusR(String status_text , Colour text_color = GUI::TEXT_NORMAL_COLOR) ;
 
     //[/UserMethods]
 

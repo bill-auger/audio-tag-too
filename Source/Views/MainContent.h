@@ -1,22 +1,21 @@
-/*\
-|*|  AudioTagToo - Clip and stitch audio samples
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
-|*|
-|*|  This file is part of the AudioTagToo program.
-|*|
-|*|  AudioTagToo is free software: you can redistribute it and/or modify
-|*|  it under the terms of the GNU General Public License version 3
-|*|  as published by the Free Software Foundation.
-|*|
-|*|  AudioTagToo is distributed in the hope that it will be useful,
-|*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
-|*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-|*|  GNU General Public License for more details.
-|*|
-|*|  You should have received a copy of the GNU General Public License
-|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
-\*/
+/*
+  ==============================================================================
 
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.3.2
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
+*/
 
 #pragma once
 
@@ -45,9 +44,6 @@ class MainContent  : public AudioAppComponent,
                      private FileBrowserListener,
                      private ChangeListener
 {
-  friend class AudioTagToo ;
-
-
 public:
     //==============================================================================
     MainContent ();
@@ -56,12 +52,21 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 
+  // getters/setters
+  void loadUrl              (File audio_url) ;
+  void setPosition          (double time) ;
+  void setHeadMarker        (void) ;
+  void setTailMarker        (void) ;
+  void updateTransportButton(void) ;
+
+
 #ifdef CONTROLLER_OWNS_STORAGE
   void initialize(ValueTree&     clips    , ValueTree&           compilations  ,
                   NamedValueSet& features , AudioThumbnailCache& thumbnailCache) ;
 #else // CONTROLLER_OWNS_STORAGE
   void initialize(NamedValueSet& features , AudioThumbnailCache& thumbnailCache) ;
 #endif // CONTROLLER_OWNS_STORAGE
+
   void setStatusL(String statusText) ;
   void setStatusC(String statusText) ;
   void setStatusR(String statusText) ;
@@ -96,13 +101,8 @@ private:
 #endif // CONTROLLER_OWNS_STORAGE
 
   // getters/setters
-  void loadUrl              (File audio_url) ;
-  void toggleTransport      (void) ;
-  void updateTransportButton(void) ;
-  void setPosition          (double time) ;
-  void setHeadMarker        (void) ;
-  void setTailMarker        (void) ;
-  void createClip           (void) ;
+  void toggleTransport(void) ;
+  void createClip     (void) ;
 
   // event handlers
   void paintOverChildren     (Graphics& g)                                override ;
@@ -121,8 +121,6 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-
-
     std::unique_ptr<Waveform> fullWaveform;
     std::unique_ptr<Waveform> clipWaveform;
     std::unique_ptr<GroupComponent> controlsGroup;

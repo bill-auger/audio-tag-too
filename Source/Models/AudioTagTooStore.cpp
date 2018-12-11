@@ -152,6 +152,8 @@ DEBUG_TRACE_DUMP_STORE(master_node , "master_node")
 
 void AudioTagTooStore::loadConfig()
 {
+// DEBUG_TRACE_LOAD_CONFIG
+
   // load application configuration from persistent storage
 #ifdef STORAGE_IS_BINARY
   FileInputStream* storage = new FileInputStream(this->storageFile) ;

@@ -20,7 +20,9 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
+
 #include "../../JuceLibraryCode/JuceHeader.h"
+
 //[/Headers]
 
 
@@ -34,7 +36,7 @@
                                                                     //[/Comments]
 */
 class ConfigMetadata  : public Component,
-                        public Button::Listener,
+                        private Button::Listener,
                         public ComboBox::Listener
 {
 public:
@@ -54,15 +56,34 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+
+  void buttonClicked     (Button* a_button) ;
+  bool handleAcceptButton(void) ;
+
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<Label> keyLabel;
-    std::unique_ptr<ComboBox> keySelect;
     std::unique_ptr<Label> valueLabel;
+    std::unique_ptr<ComboBox> keySelect;
     std::unique_ptr<TextEditor> valueText;
+    std::unique_ptr<ComboBox> keySelect2;
+    std::unique_ptr<TextEditor> valueText2;
+    std::unique_ptr<ComboBox> keySelect3;
+    std::unique_ptr<TextEditor> valueText3;
+    std::unique_ptr<ComboBox> keySelect4;
+    std::unique_ptr<TextEditor> valueText4;
+    std::unique_ptr<ComboBox> keySelect5;
+    std::unique_ptr<TextEditor> valueText5;
+    std::unique_ptr<ComboBox> keySelect6;
+    std::unique_ptr<TextEditor> valueText6;
+    std::unique_ptr<ComboBox> keySelect7;
+    std::unique_ptr<TextEditor> valueText7;
+    std::unique_ptr<ComboBox> keySelect8;
+    std::unique_ptr<TextEditor> valueText8;
     std::unique_ptr<TextButton> acceptButton;
     std::unique_ptr<TextButton> cancelButton;
+    std::unique_ptr<Label> clipLabel;
 
 
     //==============================================================================

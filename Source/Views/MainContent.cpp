@@ -1,22 +1,21 @@
-/*\
-|*|  AudioTagToo - Clip and stitch audio samples
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
-|*|
-|*|  This file is part of the AudioTagToo program.
-|*|
-|*|  AudioTagToo is free software: you can redistribute it and/or modify
-|*|  it under the terms of the GNU General Public License version 3
-|*|  as published by the Free Software Foundation.
-|*|
-|*|  AudioTagToo is distributed in the hope that it will be useful,
-|*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
-|*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-|*|  GNU General Public License for more details.
-|*|
-|*|  You should have received a copy of the GNU General Public License
-|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
-\*/
+/*
+  ==============================================================================
 
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.3.2
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
+*/
 
 //[Headers] You can add your own extra header files here...
 
@@ -260,7 +259,6 @@ void MainContent::resized()
     tailButton->setBounds (((getWidth() / 2) - ((getWidth() - 32) / 2)) + (getWidth() - 32) / 2 + 100, ((16 + 120 - -8) + 120 - -8) + 0, 100, 24);
     tabPanel->setBounds ((getWidth() / 2) - ((getWidth() - 32) / 2), ((16 + 120 - -8) + 120 - -8) + 24 - -8, getWidth() - 32, getHeight() - 366);
     statusbar->setBounds ((getWidth() / 2) - ((getWidth() - 16) / 2), getHeight() - 8 - 40, getWidth() - 16, 40);
-
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -505,10 +503,10 @@ BEGIN_JUCER_METADATA
   </BACKGROUND>
   <GENERICCOMPONENT name="" id="6d2236e7e917afa4" memberName="fullWaveform" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc 16 32M 120" class="Waveform"
-                    params="formatManager , transportSource"/>
+                    params="transportSource"/>
   <GENERICCOMPONENT name="" id="f967fc403ed73574" memberName="clipWaveform" virtualName=""
                     explicitFocusOrder="0" pos="0.5Cc -8R 32M 120" posRelativeY="6d2236e7e917afa4"
-                    class="Waveform" params="formatManager , transportSource"/>
+                    class="Waveform" params="transportSource"/>
   <GROUPCOMPONENT name="" id="f42caa46057f2a0" memberName="controlsGroup" virtualName=""
                   explicitFocusOrder="0" pos="0.5Cc -8R 32M 24" posRelativeY="f967fc403ed73574"
                   outlinecol="0" title=""/>

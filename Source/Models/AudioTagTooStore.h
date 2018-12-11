@@ -88,8 +88,8 @@ private:
 
   // unhandled ValueTree::Listener events
   void valueTreeChildAdded       (ValueTree& /*parent_node*/ , ValueTree& /*new_node*/                       ) override { }
-  void valueTreeChildRemoved     (ValueTree& /*parent_node*/ , ValueTree& /*deleted_node*/ , int /*prev_idx*/) override { }
   void valueTreeChildOrderChanged(ValueTree& /*parent_node*/ , int        /*prev_idx*/     , int /*curr_idx*/) override { }
+  void valueTreeChildRemoved     (ValueTree& /*parent_node*/ , ValueTree& /*deleted_node*/ , int /*prev_idx*/) override { }
   void valueTreeParentChanged    (ValueTree& /*reparented_node*/                                             ) override { }
   void valueTreeRedirected       (ValueTree& /*target_node*/                                                 ) override { }
 

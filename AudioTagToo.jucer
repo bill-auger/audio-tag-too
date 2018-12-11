@@ -42,6 +42,8 @@
         <FILE id="yQDChz" name="Alert.cpp" compile="1" resource="0" file="Source/Views/Alert.cpp"/>
         <FILE id="FJGotO" name="Clip.cpp" compile="1" resource="0" file="Source/Views/Clip.cpp"/>
         <FILE id="eSgmpm" name="ClipsTable.cpp" compile="1" resource="0" file="Source/Views/ClipsTable.cpp"/>
+        <FILE id="Jq226T" name="ConfigMetadata.cpp" compile="1" resource="0"
+              file="Source/Views/ConfigMetadata.cpp"/>
         <FILE id="Y76Tzw" name="MainContent.cpp" compile="1" resource="0" file="Source/Views/MainContent.cpp"/>
         <FILE id="Cxr1BM" name="Statusbar.cpp" compile="1" resource="0" file="Source/Views/Statusbar.cpp"/>
         <FILE id="M3PK9P" name="Waveform.cpp" compile="1" resource="0" file="Source/Views/Waveform.cpp"/>

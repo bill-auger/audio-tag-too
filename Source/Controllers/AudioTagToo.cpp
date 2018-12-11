@@ -49,10 +49,6 @@ NamedValueSet    AudioTagToo::Features ;                 // ProcessCliParams()
 
 /* AudioTagToo public class methods */
 
-void AudioTagToo::Warning(String message_text) { Alert::Push(GUI::ALERT_TYPE_WARNING , message_text) ; }
-
-void AudioTagToo::Error(String message_text) { Alert::Push(GUI::ALERT_TYPE_ERROR , message_text) ; }
-
 StringArray AudioTagToo::VersionMsg()
 {
   StringArray version_msg = StringArray(GetVersionString()) ;
@@ -102,7 +98,11 @@ ValueTree AudioTagToo::CreateClip(String audio_filename , double begin_time , do
   return Store->createClip(audio_filename , begin_time , end_time) ;
 }
 
-void AudioTagToo::LoadClip(ValueTree& clip_store)
+void AudioTagToo::Warning(String message_text) { Alert::Push(GUI::ALERT_TYPE_WARNING , message_text) ; }
+
+void AudioTagToo::Error(String message_text) { Alert::Push(GUI::ALERT_TYPE_ERROR , message_text) ; }
+
+void AudioTagToo::LoadClip(ValueTree clip_store)
 {
   String master_filename = STRING(clip_store[STORE::FILENAME_KEY  ]) ;
   double begin_time      = double(clip_store[STORE::BEGIN_TIME_KEY]) ;

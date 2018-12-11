@@ -30,13 +30,26 @@ class GUI
 {
 public:
 
+  // helpers
+  static void ConfigureTextEditor(TextEditor* a_text_editor , TextEditor::Listener* a_text_listener ,
+                                  int         max_n_chars   , const String          allowed_chars   ) ;
+
+
   // common
   static const uint8  PAD ;
   static const uint8  PAD2 ;
   static const uint8  PAD4 ;
   static const uint8  STROKE_W ;
   static const float  FONT_SIZE ;
-  static const Colour TEXT_FG_COLOR ;
+  static const Colour TEXT_NORMAL_COLOR ;
+  static const Colour TEXT_DISABLED_COLOR ;
+  static const Colour TEXT_INVALID_COLOR ;
+  static const Colour TEXT_HILITE_COLOR ;
+  static const Colour TEXT_HILITEBG_COLOR ;
+  static const Colour TEXT_CARET_COLOR ;
+  static const Colour TEXT_FOCUS_COLOR ;
+  static const Colour TEXT_SHADOW_COLOR ;
+  static const Colour TEXT_BG_COLOR ;
 
   // MainWindow
   static const uint8  BORDERS_W ;
@@ -82,12 +95,17 @@ public:
   static const Colour BROWSER_SELECTED_BG_COLOR ;
   static const Colour BROWSER_SELECTED_FG_COLOR ;
 
-  // ClipItem
+  // ClipsTable::ClipItem
   static const int    TREE_ITEM_H ;
   static const String FILE_ITEM_LABEL ;
   static const String BEGIN_ITEM_LABEL ;
   static const String END_ITEM_LABEL ;
   static const String DURATION_ITEM_LABEL ;
+  static const uint8  MAX_KEY_TEXTEDITOR_N_CHARS ;
+  static const uint16 MAX_VALUE_TEXTEDITOR_N_CHARS ;
+  static const String NEW_KEY_TEXT ;
+  static const String NEW_VALUE_TEXT ;
+  enum                ITEM_CLASS { MASTER_ITEM , CLIP_ITEM , LEAF_ITEM } ;
 
   // Alert
   enum         AlertType { ALERT_TYPE_WARNING , ALERT_TYPE_ERROR } ;

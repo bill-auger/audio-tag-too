@@ -80,6 +80,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/Alert_b633633c.o \
   $(JUCE_OBJDIR)/Clip_1609977a.o \
   $(JUCE_OBJDIR)/ClipsTable_98e5c555.o \
+  $(JUCE_OBJDIR)/ConfigMetadata_2f4dddfb.o \
   $(JUCE_OBJDIR)/MainContent_91787020.o \
   $(JUCE_OBJDIR)/Statusbar_b88450c1.o \
   $(JUCE_OBJDIR)/Waveform_b456ee67.o \
@@ -165,6 +166,11 @@ $(JUCE_OBJDIR)/Clip_1609977a.o: ../../Source/Views/Clip.cpp
 $(JUCE_OBJDIR)/ClipsTable_98e5c555.o: ../../Source/Views/ClipsTable.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
 	@echo "Compiling ClipsTable.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
+
+$(JUCE_OBJDIR)/ConfigMetadata_2f4dddfb.o: ../../Source/Views/ConfigMetadata.cpp
+	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
+	@echo "Compiling ConfigMetadata.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/MainContent_91787020.o: ../../Source/Views/MainContent.cpp

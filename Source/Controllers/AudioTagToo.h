@@ -44,10 +44,6 @@ class AudioTagToo
 
 public:
 
-  // GUI dispatchers
-  static void Warning(String message_text) ;
-  static void Error  (String message_text) ;
-
   // getters/setters
   static StringArray VersionMsg      (void) ;
   static String      GetVersionString(void) ;
@@ -55,8 +51,10 @@ public:
   static void        ResetAudio      (void) ;
   static ValueTree   CreateClip      (String audio_filename , double begin_time , double end_time) ;
 
-  // helpers
-  static void   LoadClip      (ValueTree& clip_store) ;
+  // view helpers
+  static void   Warning       (String message_text) ;
+  static void   Error         (String message_text) ;
+  static void   LoadClip      (ValueTree clip_store) ;
   static String DurationString(double duration) ;
 
 

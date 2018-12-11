@@ -93,7 +93,7 @@
     int n_masters = clips_store.getNumChildren() ; int n_clips = 0 ;                   \
     for (int master_n = 0 ; master_n < n_clips ; ++master_n)                           \
       n_clips += clips_store.getChild(master_n).getNumChildren() ;                     \
-    Trace::TraceGui("initializing storage for '" + clips_store.getType() + "' - ("   + \
+    Trace::TraceGui("creating tree items for '" + clips_store.getType()  + "' - ("   + \
                     String(n_masters) + ") masters (" + String(n_clips)  + ") clips" ) ;
 
   #define DEBUG_TRACE_STORAGE_CHILD(a_node)                                               \
@@ -129,6 +129,16 @@
     Trace::TraceGui     ("storage node for "   + node_role        + "'"    + node_id_ + "'") ; \
     Trace::TraceNoPrefix("deleted from index " + String(prev_idx) + " of " + ancestry_msg  )   ;
 
+  #define DEBUG_TRACE_CLIPITEM                                                                \
+    String item_role  = (is_root_item    ) ? "root_item"   :                                  \
+                        (is_master_item  ) ? "master_item" :                                  \
+                        (is_clip_item    ) ? "clip_item"   :                                  \
+                        (this->isLeafItem) ? "leaf_item"   : "invalid_item" ;                 \
+    String item_class = (this->itemClass == GUI::MASTER_ITEM) ? "MASTER_ITEM" :               \
+                        (this->itemClass == GUI::CLIP_ITEM  ) ? "CLIP_ITEM"   : "CLIP_ITEM" ; \
+    Trace::TraceGui("adding " + item_role + "(" + item_class + ") ClipItem to ClipsTable (" + \
+                    keyText + "|" + valueText + ")"                                         ) ;
+
 #else // DEBUG_TRACE
 
   #define DEBUG_TRACE_NEW_MASTER_ITEM       ;
@@ -138,5 +148,6 @@
   #define DEBUG_TRACE_INIT_STORAGE(unused)  ;
   #define DEBUG_TRACE_STORAGE_CHILD_ADDED   ;
   #define DEBUG_TRACE_STORAGE_CHILD_REMOVED ;
+  #define DEBUG_TRACE_CLIPITEM              ;
 
 #endif // DEBUG_TRACE

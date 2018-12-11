@@ -91,6 +91,7 @@ public:
   static const Identifier BEGIN_TIME_KEY ;
   static const Identifier END_TIME_KEY ;
   static const Identifier ITEM_ID_KEY ;
+  static const Identifier NEW_KEY_KEY ;
 
   // root defaults
   static const String STORAGE_DIRNAME ;

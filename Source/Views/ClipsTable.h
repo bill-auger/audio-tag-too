@@ -69,29 +69,33 @@ private:
   std::unique_ptr<TreeViewItem> compilationItems ;
 
   // model helpers
-  TreeViewItem* getViewItemFor  (ValueTree root_store) ;
-  TreeViewItem* newMasterItem   (ValueTree master_node) ;
-  TreeViewItem* newClipItem     (ValueTree clip_node) ;
-  void          createMasterItem(ValueTree root_store , ValueTree master_node) ;
-  void          createClipItem  (ValueTree root_store , ValueTree clip_node) ;
-  void          createItemsTree (ValueTree root_store) ;
+  TreeViewItem* getViewItemFor  (ValueTree& root_store) ;
+  TreeViewItem* newMasterItem   (ValueTree& master_node) ;
+  TreeViewItem* newClipItem     (ValueTree& clip_node) ;
+  TreeViewItem* newLeafItem     (ValueTree& clip_node , const Identifier& key) ;
+  void          createMasterItem(ValueTree& root_store , ValueTree master_node) ;
+  void          createClipItem  (ValueTree& root_store , ValueTree clip_node) ;
+  void          createLeafItem  (ValueTree clip_node , const Identifier& key) ;
+  void          createItemsTree (ValueTree& root_store) ;
 
   // event handlers
   void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node)                    override ;
-  void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
   void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override ;
+  void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
+  void valueTreePropertyChanged  (ValueTree& changed_node , const Identifier& key)                 override ;
 
   // unhandled ValueTree::Listener events
-  void valueTreeRedirected     (ValueTree&)                     override { }
-  void valueTreePropertyChanged(ValueTree& , const Identifier&) override { }
-  void valueTreeParentChanged  (ValueTree&)                     override { }
+  void valueTreeParentChanged(ValueTree& /*reparented_node*/) override { }
+  void valueTreeRedirected   (ValueTree& /*target_node*/) override { }
 
 
   class ClipItem : public TreeViewItem
   {
   public:
 
-    ClipItem(String item_id , String label_text , ValueTree clip_store = ValueTree::invalid) ;
+    ClipItem(String item_id , String    key_text   = String::empty     ,
+                              String    value_text = String::empty     ,
+                              ValueTree clip_store = ValueTree::invalid) ;
 
 
     // TreeViewItem implementation
@@ -103,10 +107,12 @@ private:
 
   private:
 
-    String    itemId ;
-    String    labelText ;
-    ValueTree clipStore ;
-    bool      isLeafItem ;
+    String          itemId ;
+    String          keyText ;
+    String          valueText ;
+    ValueTree       clipStore ;
+    bool            isLeafItem ;
+    GUI::ITEM_CLASS itemClass ;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)

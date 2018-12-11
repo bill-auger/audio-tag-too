@@ -23,13 +23,41 @@
 #include "GuiConstants.h"
 
 
+/* helpers */
+void GUI::ConfigureTextEditor(TextEditor*           a_text_editor   ,
+                              TextEditor::Listener* a_text_listener ,
+                              int                   max_n_chars     ,
+                              const String          allowed_chars   )
+{
+  a_text_editor->setSelectAllWhenFocused(true) ;
+  a_text_editor->setInputRestrictions(max_n_chars , allowed_chars) ;
+  a_text_editor->setColour(CaretComponent::caretColourId       , TEXT_CARET_COLOR   ) ;
+  a_text_editor->setColour(TextEditor::backgroundColourId      , TEXT_BG_COLOR      ) ;
+  a_text_editor->setColour(TextEditor::textColourId            , TEXT_NORMAL_COLOR  ) ;
+  a_text_editor->setColour(TextEditor::highlightColourId       , TEXT_HILITEBG_COLOR) ;
+  a_text_editor->setColour(TextEditor::highlightedTextColourId , TEXT_HILITE_COLOR  ) ;
+  a_text_editor->setColour(TextEditor::outlineColourId         , TEXT_BG_COLOR      ) ;
+  a_text_editor->setColour(TextEditor::focusedOutlineColourId  , TEXT_FOCUS_COLOR   ) ;
+  a_text_editor->setColour(TextEditor::shadowColourId          , TEXT_SHADOW_COLOR  ) ;
+  a_text_editor->addListener(a_text_listener) ;
+}
+
+
 // common
-const uint8  GUI::PAD           = 4 ;
-const uint8  GUI::PAD2          = PAD * 2 ;
-const uint8  GUI::PAD4          = PAD * 4 ;
-const uint8  GUI::STROKE_W      = 1 ;
-const float  GUI::FONT_SIZE     = 16.0 ;
-const Colour GUI::TEXT_FG_COLOR = Colour(0xFFFFFFFF) ;
+const uint8  GUI::PAD                 = 4 ;
+const uint8  GUI::PAD2                = PAD * 2 ;
+const uint8  GUI::PAD4                = PAD * 4 ;
+const uint8  GUI::STROKE_W            = 1 ;
+const float  GUI::FONT_SIZE           = 16.0 ;
+const Colour GUI::TEXT_NORMAL_COLOR   = Colour(0xFFC0C0C0) ;
+const Colour GUI::TEXT_DISABLED_COLOR = Colour(0xFF606060) ;
+const Colour GUI::TEXT_INVALID_COLOR  = Colour(0xFFFF0000) ;
+const Colour GUI::TEXT_HILITE_COLOR   = Colour(0xFFFFFFFF) ;
+const Colour GUI::TEXT_HILITEBG_COLOR = Colour(0xFF000040) ;
+const Colour GUI::TEXT_CARET_COLOR    = Colour(0xFFFFFFFF) ;
+const Colour GUI::TEXT_FOCUS_COLOR    = Colour(0xFF000000) ;
+const Colour GUI::TEXT_SHADOW_COLOR   = Colour(0xFF000000) ;
+const Colour GUI::TEXT_BG_COLOR       = Colour(0xFF000000) ;
 
 // MainContent
 const uint8  GUI::BORDERS_W                    = 2 ;
@@ -65,21 +93,25 @@ const int GUI::DEVICE_SELECTOR_IDX = 2 ;
 const Colour GUI::TABPANEL_BG_COLOR         = Colour(0xFF303030) ;
 const Colour GUI::TABPANEL_FG_COLOR         = Colour(0xFF808080) ;
 const Colour GUI::FILEPATH_BG_COLOR         = Colour(0xFF606060) ;
-const Colour GUI::FILEPATH_FG_COLOR         = GUI::TEXT_FG_COLOR ;
+const Colour GUI::FILEPATH_FG_COLOR         = GUI::TEXT_NORMAL_COLOR ;
 const Colour GUI::FILEPATH_ARROW_COLOR      = Colour(0xFF80FF80) ;
 const Colour GUI::FILENAME_BG_COLOR         = Colour(0xFF000000) ;
-const Colour GUI::FILENAME_FG_COLOR         = GUI::TEXT_FG_COLOR ;
+const Colour GUI::FILENAME_FG_COLOR         = GUI::TEXT_NORMAL_COLOR ;
 const Colour GUI::BROWSER_BG_COLOR          = Colour(0xFF000000) ;
-const Colour GUI::BROWSER_FG_COLOR          = GUI::TEXT_FG_COLOR ;
+const Colour GUI::BROWSER_FG_COLOR          = GUI::TEXT_NORMAL_COLOR ;
 const Colour GUI::BROWSER_SELECTED_BG_COLOR = Colour(0xFF404040) ;
 const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 
 // ClipsTable::ClipItem
-const int    GUI::TREE_ITEM_H         = 24 ;
-const String GUI::FILE_ITEM_LABEL     = "Source: " ;
-const String GUI::BEGIN_ITEM_LABEL    = "Beginning: " ;
-const String GUI::END_ITEM_LABEL      = "Ending: " ;
-const String GUI::DURATION_ITEM_LABEL = "Duration: " ;
+const int    GUI::TREE_ITEM_H                  = 24 ;
+const String GUI::FILE_ITEM_LABEL              = "Source: " ;
+const String GUI::BEGIN_ITEM_LABEL             = "Beginning: " ;
+const String GUI::END_ITEM_LABEL               = "Ending: " ;
+const String GUI::DURATION_ITEM_LABEL          = "Duration: " ;
+const uint8  GUI::MAX_KEY_TEXTEDITOR_N_CHARS   = 64 ;
+const uint16 GUI::MAX_VALUE_TEXTEDITOR_N_CHARS = 4096 ;
+const String GUI::NEW_KEY_TEXT                 = "(Type property name)" ;
+const String GUI::NEW_VALUE_TEXT               = "(Type property value)" ;
 
 // Alert
 const String GUI::MODAL_WARNING_TITLE = APP::APP_NAME + " Warning" ;
