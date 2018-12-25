@@ -24,7 +24,6 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 
-#include "../Constants/GuiConstants.h"
 #include "../Constants/StorageConstants.h"
 
 //[/Headers]
@@ -87,36 +86,6 @@ private:
   // unhandled ValueTree::Listener events
   void valueTreeParentChanged(ValueTree& /*reparented_node*/) override { }
   void valueTreeRedirected   (ValueTree& /*target_node*/) override { }
-
-
-  class ClipItem : public TreeViewItem
-  {
-  public:
-
-    ClipItem(String item_id , String    key_text   = String::empty     ,
-                              String    value_text = String::empty     ,
-                              ValueTree clip_store = ValueTree::invalid) ;
-
-
-    // TreeViewItem implementation
-    String     getUniqueName       () const override ;
-    bool       mightContainSubItems()       override ;
-    int        getItemHeight       () const override ;
-    Component* createItemComponent ()       override ;
-
-
-  private:
-
-    String          itemId ;
-    String          keyText ;
-    String          valueText ;
-    ValueTree       clipStore ;
-    bool            isLeafItem ;
-    GUI::ITEM_CLASS itemClass ;
-
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClipItem)
-  } ;
 
     //[/UserVariables]
 

@@ -52,14 +52,15 @@
                                         " - " +                   String(begin_time) ) ; \
     if (is_duplicate_clip) warnings.add("duplicate clip exists: " + clip_id) ;           \
     if (is_id_collision  ) warnings.add("ID collision creating " + master_msg) ;         \
-    if (!warnings.isEmpty())                                                             \
-      for (String warning : warnings) Trace::TraceWarning(warning    + " - ignoring") ;  \
-    else { if (is_new_master)         Trace::TraceStore  ("created " + master_msg) ;     \
-           Trace::TraceStore ("creating clip: '" + clip_id + "'") ;                      \
-           Trace::TraceNoPrefix("derived from " + master_msg) ;                          \
-           Trace::TraceNoPrefixVb("audio_filename=" + audio_filename     +               \
-                                  " begin_time="    + String(begin_time) +               \
-                                  " end_time="      + String(end_time  ) ) ;             }
+    if (!warnings.isEmpty()) for (String warning : warnings)                             \
+           Trace::TraceWarning   (warning            + " - ignoring") ;                  \
+    else { if (is_new_master)                                                            \
+           Trace::TraceStore     ("created "         + master_msg) ;                     \
+           Trace::TraceStore     ("creating clip: '" + clip_id + "'") ;                  \
+           Trace::TraceNoPrefix  ("derived from "    + master_msg) ;                     \
+           Trace::TraceNoPrefixVb("audio_filename="  + audio_filename     +              \
+                                  " begin_time="     + String(begin_time) +              \
+                                  " end_time="       + String(end_time  ) ) ;            }
 
   #define DEBUG_TRACE_VERIFY_STORED_CONFIG                                                     \
     String not_found_msg = "stored config not found - restoring defaults" ;                    \

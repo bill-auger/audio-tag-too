@@ -20,7 +20,7 @@
 
 //[Headers] You can add your own extra header files here...
 
-#include "ClipsTableItem.h"
+#include "ClipsTableView.h"
 #include "../Controllers/AudioTagToo.h"
 #include "../Trace/TraceClipsTable.h"
 
@@ -61,8 +61,8 @@ ClipsTable::ClipsTable ()
 
     //[UserPreSize]
 
-  this->clipItems       .reset(new ClipItem(STRING(STORE::CLIPS_ID       ))) ;
-  this->compilationItems.reset(new ClipItem(STRING(STORE::COMPILATIONS_ID))) ;
+  this->clipItems       .reset(new RootClipsTableItem(STRING(STORE::CLIPS_ID       ))) ;
+  this->compilationItems.reset(new RootClipsTableItem(STRING(STORE::COMPILATIONS_ID))) ;
 
     //[/UserPreSize]
 
@@ -147,10 +147,10 @@ TreeViewItem* ClipsTable::getViewItemFor(ValueTree& root_store)
 
 TreeViewItem* ClipsTable::newMasterItem(ValueTree& master_node)
 {
-  String        master_id       = STRING(master_node.getType()) ;
-  String        master_filename = STRING(master_node[STORE::FILENAME_KEY  ]) ;
-  String        master_text     = STRING(master_node[STORE::LABEL_TEXT_KEY]) ;
-  TreeViewItem* master_item     = new ClipItem(master_id , master_text , String::empty) ;
+  String        item_id     = STRING(master_node.getType()) ;
+  String        filename    = STRING(master_node[STORE::FILENAME_KEY  ]) ; // unused
+  String        label_text  = STRING(master_node[STORE::LABEL_TEXT_KEY]) ;
+  TreeViewItem* master_item = new MasterClipsTableItem(item_id , label_text) ;
 
 DEBUG_TRACE_NEW_MASTER_ITEM
 
@@ -159,24 +159,24 @@ DEBUG_TRACE_NEW_MASTER_ITEM
 
 TreeViewItem* ClipsTable::newClipItem(ValueTree& clip_node)
 {
-  String        clip_id         = STRING(clip_node.getType()) ;
-  String        file_id         = clip_id + "-filename" ;
-  String        begin_id        = clip_id + "-begin_time" ;
-  String        end_id          = clip_id + "-end_time" ;
-  String        duration_id     = clip_id + "-duration" ;
+  String        item_id         = STRING(clip_node.getType()) ;
+  String        file_id         = item_id + "-" + STRING(STORE::FILENAME_KEY  ) ;
+  String        begin_id        = item_id + "-" + STRING(STORE::BEGIN_TIME_KEY) ;
+  String        end_id          = item_id + "-" + STRING(STORE::END_TIME_KEY  ) ;
+  String        duration_id     = item_id + "-" + STRING(STORE::DURATION_KEY  ) ;
   String        filename        = STRING(clip_node[STORE::FILENAME_KEY  ]) ;
   double        begin_time      = double(clip_node[STORE::BEGIN_TIME_KEY]) ;
   double        end_time        = double(clip_node[STORE::END_TIME_KEY  ]) ;
-  String        clip_text       = STRING(clip_node[STORE::LABEL_TEXT_KEY]) ;
+  String        duration_text   = STRING(clip_node[STORE::DURATION_KEY  ]) ;
+  String        label_text      = STRING(clip_node[STORE::LABEL_TEXT_KEY]) ;
   String        file_text       = filename ;
-  String        begin_text      = String(begin_time , 6) ;
-  String        end_text        = String(end_time   , 6) ;
-  String        duration_text   = AudioTagToo::DurationString(end_time - begin_time) ;
-  TreeViewItem* clip_item       = new ClipItem(clip_id     , clip_text                , String::empty , clip_node) ;
-  TreeViewItem* filename_item   = new ClipItem(file_id     , GUI::FILE_ITEM_LABEL     , file_text                ) ;
-  TreeViewItem* begin_time_item = new ClipItem(begin_id    , GUI::BEGIN_ITEM_LABEL    , begin_text               ) ;
-  TreeViewItem* end_time_item   = new ClipItem(end_id      , GUI::END_ITEM_LABEL      , end_text                 ) ;
-  TreeViewItem* duration_item   = new ClipItem(duration_id , GUI::DURATION_ITEM_LABEL , duration_text            ) ;
+  String        begin_text      = AudioTagToo::DurationString(begin_time) ;
+  String        end_text        = AudioTagToo::DurationString(end_time  ) ;
+  TreeViewItem* clip_item       = new ClipClipsTableItem(item_id     , label_text               , clip_node                            ) ;
+  TreeViewItem* filename_item   = new LeafClipsTableItem(file_id     , GUI::FILE_ITEM_LABEL     , file_text     , STORE::FILENAME_KEY  ) ;
+  TreeViewItem* begin_time_item = new LeafClipsTableItem(begin_id    , GUI::BEGIN_ITEM_LABEL    , begin_text    , STORE::BEGIN_TIME_KEY) ;
+  TreeViewItem* end_time_item   = new LeafClipsTableItem(end_id      , GUI::END_ITEM_LABEL      , end_text      , STORE::END_TIME_KEY  ) ;
+  TreeViewItem* duration_item   = new LeafClipsTableItem(duration_id , GUI::DURATION_ITEM_LABEL , duration_text , STORE::DURATION_KEY  ) ;
 
   clip_item->addSubItem(filename_item   , 0) ;
   clip_item->addSubItem(begin_time_item , 1) ;
@@ -190,10 +190,10 @@ DEBUG_TRACE_NEW_CLIP_ITEM
 
 TreeViewItem* ClipsTable::newLeafItem(ValueTree& clip_node , const Identifier& key)
 {
-  String        leaf_id    = STRING(key) ;
-  String        key_text   = leaf_id ;
+  String        item_id    = STRING(key) ;
+  String        key_text   = STRING(key) ;
   String        value_text = STRING(clip_node[key]) ;
-  TreeViewItem* leaf_item  = new ClipItem(leaf_id , key_text , value_text) ;
+  TreeViewItem* leaf_item  = new LeafClipsTableItem(item_id , key_text , value_text , key , clip_node) ;
 
 // DEBUG_TRACE_NEW_LEAF_ITEM
 
@@ -207,8 +207,8 @@ void ClipsTable::createMasterItem(ValueTree& root_store , ValueTree master_node)
   int           master_idx  = root_store.indexOf(master_node) ;
 
   root_item->addSubItem(master_item , master_idx) ;
-  String master_item_id = master_item->getItemIdentifierString() ;
-  master_node.setProperty(STORE::ITEM_ID_KEY , master_item_id , nullptr) ;
+  String item_id = master_item->getItemIdentifierString() ;
+  master_node.setProperty(STORE::ITEM_ID_KEY , item_id , nullptr) ;
 
 DEBUG_TRACE_CREATE_MASTER_ITEM
 
@@ -354,60 +354,4 @@ END_JUCER_METADATA
 
 
 //[EndFile] You can add extra defines here...
-
-ClipsTable::ClipItem::ClipItem(String item_id  , String  key_text  , String    value_text  , ValueTree clip_store) :
-                               itemId(item_id) , keyText(key_text) , valueText(value_text) , clipStore(clip_store)
-{
-//   this->clip = new Clip(this->item_id , this->label_text , this->clip_store) ;
-
-//   ValueTree root_node = this->clip_store.getParent().getParent() ;
-//   this->isRootItem    = this->clip_store.getNumProperties() == 0 ;
-//   this->isClipNode    = root_node.getType() == STORE::CLIPS_ID       ||
-//                         root_node.getType() == STORE::COMPILATIONS_ID ;
-//   this->isEditable    = root_node.getType() == STORE::CLIPS_ID       ||
-//                         root_node.getType() == STORE::COMPILATIONS_ID ;
-//   this->iisLeafItem = getParentItem().getParentItem() == this->clipItems       ||
-//                      getParentItem().getParentItem() == this->compilationItems ;
-
-  bool has_store = this->clipStore.isValid() ;
-  bool has_key   = !keyText.isEmpty() ;
-  bool has_value = !valueText.isEmpty() ;
-
-  bool is_root_item   = !has_store && !has_key && !has_value && STORE::RootNodes().contains(this->itemId) ;
-  bool is_master_item = !has_store &&  has_key && !has_value ;
-  bool is_clip_item   =  has_store &&  has_key && !has_value ;
-  this->isLeafItem    = !has_store &&  has_key &&  has_value ;
-
-  this->itemClass = (is_root_item    ) ? GUI::MASTER_ITEM : // tree roots not displayed
-                    (is_master_item  ) ? GUI::MASTER_ITEM :
-                    (is_clip_item    ) ? GUI::CLIP_ITEM   :
-                    (this->isLeafItem) ? GUI::LEAF_ITEM   : String::empty ;
-
-DEBUG_TRACE_CLIPITEM
-}
-
-Component* ClipsTable::ClipItem::createItemComponent()
-{
-#define ROOT_ITEM_PARAMS    this->itemId , String::empty
-#define MASTER_ITEM_PARAMS  this->itemId , this->keyText
-#define CLIP_ITEM_PARAMS    this->itemId , this->keyText     , this->clipStore
-#define LEAF_ITEM_PARAMS    this->itemId , this->keyText     , this->valueText
-#define INVALID_ITEM_PARAMS this->itemId , String("INVALID") , String("INVALID")
-
-  // instantiate library-managed, transient GUI component
-  switch (this->itemClass)
-  {
-    case GUI::ROOT_ITEM   : return new MasterClipsTableItem(ROOT_ITEM_PARAMS   ) ; break ;
-    case GUI::MASTER_ITEM : return new MasterClipsTableItem(MASTER_ITEM_PARAMS ) ; break ;
-    case GUI::CLIP_ITEM   : return new ClipClipsTableItem  (CLIP_ITEM_PARAMS   ) ; break ;
-    case GUI::LEAF_ITEM   : return new LeafClipsTableItem  (LEAF_ITEM_PARAMS   ) ; break ;
-    default               : return new LeafClipsTableItem  (INVALID_ITEM_PARAMS) ; break ;
-  }
-}
-
-String ClipsTable::ClipItem::getUniqueName       () const { return this->itemId ;      }
-bool   ClipsTable::ClipItem::mightContainSubItems()       { return !this->isLeafItem ; }
-int    ClipsTable::ClipItem::getItemHeight       () const { return GUI::TREE_ITEM_H ;  }
-// Component* ClipsTable::ClipItem::createItemComponent ()       { return this->clip                 ; }
-
 //[/EndFile]

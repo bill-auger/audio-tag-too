@@ -70,10 +70,10 @@ public:
     public: static const int compareElements(const ValueTree& tree_a , const ValueTree& tree_b) ;
   } ;
   static const Identifier  FilterId           (String a_string , String retain_chars = APP::VALID_ID_CHARS) ;
-  static const StringArray RootPersistentNodes() ;
-  static const StringArray RootNodes          () ;
-  static const StringArray RootPersistentKeys () ;
-  static const StringArray RootKeys           () ;
+  static const StringArray RootPersistentNodes(void) ;
+  static const StringArray RootNodes          (void) ;
+  static const StringArray RootPersistentKeys (void) ;
+  static const StringArray RootKeys           (void) ;
 
   // storage nodes
   static const Identifier STORAGE_ID ;
@@ -81,16 +81,17 @@ public:
   static const Identifier CLIPS_ID ;
   static const Identifier COMPILATIONS_ID ;
 
-  // root IDs
+  // root keys
   static const Identifier CONFIG_VERSION_KEY ;
   static const Identifier WINDOW_STATE_KEY ;
 
-  // clips/compilations IDs
+  // clips/compilations keys
+  static const Identifier ITEM_ID_KEY ;
   static const Identifier LABEL_TEXT_KEY ;
   static const Identifier FILENAME_KEY ;
   static const Identifier BEGIN_TIME_KEY ;
   static const Identifier END_TIME_KEY ;
-  static const Identifier ITEM_ID_KEY ;
+  static const Identifier DURATION_KEY ;
   static const Identifier NEW_KEY_KEY ;
 
   // root defaults

@@ -35,15 +35,15 @@ const Identifier STORE::FilterId(String a_string , String retain_chars)
 }
 #define ROOT_PERSISTENT_NODE_IDS STORE::CLIPS_ID + newLine + STORE::COMPILATIONS_ID
 #define ROOT_TRANSIENT_NODE_IDS  String::empty
-#define ROOT_PERSISTENT_IDS      STRING(CONFIG_VERSION_KEY) + newLine + \
+#define ROOT_PERSISTENT_KEYS     STRING(CONFIG_VERSION_KEY) + newLine + \
                                  STRING(WINDOW_STATE_KEY  )
-#define ROOT_TRANSIENT_IDS       String::empty
+#define ROOT_TRANSIENT_KEYS      String::empty
 const StringArray STORE::RootPersistentNodes() { return StringArray::fromLines(ROOT_PERSISTENT_NODE_IDS           ) ; }
 const StringArray STORE::RootNodes()           { return StringArray::fromLines(ROOT_PERSISTENT_NODE_IDS + newLine +
                                                                                ROOT_TRANSIENT_NODE_IDS            ) ; }
-const StringArray STORE::RootPersistentKeys()  { return StringArray::fromLines(ROOT_PERSISTENT_IDS                ) ; }
-const StringArray STORE::RootKeys()            { return StringArray::fromLines(ROOT_PERSISTENT_IDS      + newLine +
-                                                                               ROOT_TRANSIENT_IDS                 ) ; }
+const StringArray STORE::RootPersistentKeys()  { return StringArray::fromLines(ROOT_PERSISTENT_KEYS               ) ; }
+const StringArray STORE::RootKeys()            { return StringArray::fromLines(ROOT_PERSISTENT_KEYS     + newLine +
+                                                                               ROOT_TRANSIENT_KEYS                ) ; }
 
 // storage nodes
 const Identifier STORE::STORAGE_ID      = "audio-tag-too-config" ;
@@ -51,16 +51,17 @@ const Identifier STORE::DEVICE_XML_ID   = "audio-tag-too-device-config" ;
 const Identifier STORE::CLIPS_ID        = "clips" ;
 const Identifier STORE::COMPILATIONS_ID = "compilations" ;
 
-// root IDs
+// root keys
 const Identifier STORE::CONFIG_VERSION_KEY = "config-version" ;
 const Identifier STORE::WINDOW_STATE_KEY   = "window-state" ;
 
-// clips/compilations IDs
+// clips/compilations keys
+const Identifier STORE::ITEM_ID_KEY    = "item-id" ;
 const Identifier STORE::LABEL_TEXT_KEY = "label-text" ;
 const Identifier STORE::FILENAME_KEY   = "master-filename" ;
 const Identifier STORE::BEGIN_TIME_KEY = "begin-time" ;
 const Identifier STORE::END_TIME_KEY   = "end-time" ;
-const Identifier STORE::ITEM_ID_KEY    = "item_id" ;
+const Identifier STORE::DURATION_KEY   = "duration" ;
 const Identifier STORE::NEW_KEY_KEY    = "new-key" ;
 
 // root defaults

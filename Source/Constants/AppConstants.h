@@ -24,7 +24,7 @@
 
 // disable standard features
 #ifdef DEBUG
-  #define QUIT_BEFORE_MAIN_LOOP 1
+  #define QUIT_BEFORE_MAIN_LOOP 0
   #define QUIT_AFTER_MAIN_LOOP  0
   #define DISABLE_AUDIO         0
   #define SUPRESS_ALERTS        0
