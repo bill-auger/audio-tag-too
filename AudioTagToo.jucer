@@ -40,8 +40,8 @@
       </GROUP>
       <GROUP id="{415C92D0-6DB5-561E-5112-51D267588674}" name="Views">
         <FILE id="yQDChz" name="Alert.cpp" compile="1" resource="0" file="Source/Views/Alert.cpp"/>
-        <FILE id="FJGotO" name="ClipsTableItem.cpp" compile="1" resource="0"
-              file="Source/Views/ClipsTableItem.cpp"/>
+        <FILE id="FJGotO" name="ClipsTableView.cpp" compile="1" resource="0"
+              file="Source/Views/ClipsTableView.cpp"/>
         <FILE id="eSgmpm" name="ClipsTable.cpp" compile="1" resource="0" file="Source/Views/ClipsTable.cpp"/>
         <FILE id="Jq226T" name="ConfigMetadata.cpp" compile="1" resource="0"
               file="Source/Views/ConfigMetadata.cpp"/>

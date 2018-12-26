@@ -78,7 +78,7 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/Seeds_7de92226.o \
   $(JUCE_OBJDIR)/Trace_fd3024bc.o \
   $(JUCE_OBJDIR)/Alert_b633633c.o \
-  $(JUCE_OBJDIR)/ClipsTableItem_e0599308.o \
+  $(JUCE_OBJDIR)/ClipsTableView_e171399a.o \
   $(JUCE_OBJDIR)/ClipsTable_98e5c555.o \
   $(JUCE_OBJDIR)/ConfigMetadata_2f4dddfb.o \
   $(JUCE_OBJDIR)/MainContent_91787020.o \
@@ -158,9 +158,9 @@ $(JUCE_OBJDIR)/Alert_b633633c.o: ../../Source/Views/Alert.cpp
 	@echo "Compiling Alert.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
-$(JUCE_OBJDIR)/ClipsTableItem_e0599308.o: ../../Source/Views/ClipsTableItem.cpp
+$(JUCE_OBJDIR)/ClipsTableView_e171399a.o: ../../Source/Views/ClipsTableView.cpp
 	-$(V_AT)mkdir -p $(JUCE_OBJDIR)
-	@echo "Compiling ClipsTableItem.cpp"
+	@echo "Compiling ClipsTableView.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/ClipsTable_98e5c555.o: ../../Source/Views/ClipsTable.cpp
