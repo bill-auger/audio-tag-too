@@ -88,6 +88,14 @@ ClipsTableView::ClipsTableView ()
                           ImageCache::getFromMemory (BinaryData::listadd_png, BinaryData::listadd_pngSize), 1.000f, Colour (0x00000000),
                           Image(), 1.000f, Colour (0x00000000),
                           Image(), 1.000f, Colour (0x00000000));
+    keySelect.reset (new ComboBox (String()));
+    addAndMakeVisible (keySelect.get());
+    keySelect->setEditableText (true);
+    keySelect->setJustificationType (Justification::centredLeft);
+    keySelect->setTextWhenNothingSelected (String());
+    keySelect->setTextWhenNoChoicesAvailable (String());
+    keySelect->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -96,6 +104,9 @@ ClipsTableView::ClipsTableView ()
 
 
     //[Constructor] You can add your own custom stuff here..
+
+  this->keySelect->setTextWhenNothingSelected(GUI::NEW_KEY_TEXT) ;
+
     //[/Constructor]
 }
 
@@ -110,6 +121,7 @@ ClipsTableView::~ClipsTableView()
     editButton = nullptr;
     deleteButton = nullptr;
     addButton = nullptr;
+    keySelect = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -138,8 +150,24 @@ void ClipsTableView::resized()
     editButton->setBounds (((getWidth() - 24) + 0 - 24) + 0 - 24, 0 + 0, 24, 24);
     deleteButton->setBounds ((getWidth() - 24) + 0 - 24, 0 + 0, 24, 24);
     addButton->setBounds (getWidth() - 24, 0 + 0, 24, 24);
+    keySelect->setBounds (0 + 0, 0 + 0, 128 - 0, 24 - 0);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
+}
+
+void ClipsTableView::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+{
+    //[UsercomboBoxChanged_Pre]
+    //[/UsercomboBoxChanged_Pre]
+
+    if (comboBoxThatHasChanged == keySelect.get())
+    {
+        //[UserComboBoxCode_keySelect] -- add your combo box handling code here..
+        //[/UserComboBoxCode_keySelect]
+    }
+
+    //[UsercomboBoxChanged_Post]
+    //[/UsercomboBoxChanged_Post]
 }
 
 
@@ -150,10 +178,8 @@ void ClipsTableView::resized()
 
 MasterClipsTableView::MasterClipsTableView(String label_text)
 {
-DEBUG_TRACE_MASTERCLIPSTABLEITEM
+DEBUG_TRACE_MASTERCLIPSTABLEVIEW
 
-//   GUI::ConfigureTextEditor(labelR  ->getTextEditor()     , text_listener      ,
-//                            GUI::MAX_KEY_TEXTEDITOR_N_CHARS , APP::VALID_ID_CHARS) ;
   this->labelL->setText(label_text , juce::dontSendNotification) ;
   this->labelL->setFont(Font((float)(GUI::TREE_ITEM_H - 2) , Font::plain).withTypefaceStyle("Regular")) ;
 
@@ -168,14 +194,14 @@ DEBUG_TRACE_MASTERCLIPSTABLEITEM
 ClipClipsTableView::ClipClipsTableView(String label_text , ValueTree store_) :
                                                            store(store_)
 {
-DEBUG_TRACE_CLIPCLIPSTABLEITEM
+DEBUG_TRACE_CLIPCLIPSTABLEVIEW
 
   Value label_l_value = this->labelL->getTextValue() ;
   Value label_storage = this->store.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
 
-//   GUI::ConfigureTextEditor(labelR  ->getTextEditor()       , text_listener      ,
-//                            GUI::MAX_KEY_TEXTEDITOR_N_CHARS   , APP::VALID_ID_CHARS) ;
-  this->labelL      ->setText(label_text + ":" , juce::dontSendNotification) ;
+//   GUI::ConfigureTextEditor(labelL  ->getTextEditor()       , text_listener      ,
+//                            GUI::MAX_CLIPNAME_TEXTEDITOR_N_CHARS   , APP::VALID_ID_CHARS) ;
+  this->labelL      ->setText(label_text , juce::dontSendNotification) ;
   this->labelL      ->setFont(Font((float)(GUI::TREE_ITEM_H - 2) , Font::plain).withTypefaceStyle("Regular")) ;
   this->loadButton  ->setTooltip(GUI::LOAD_BTN_HOVERTEXT    ) ;
   this->editButton  ->setTooltip(GUI::EDIT_BTN_HOVERTEXT    ) ;
@@ -198,10 +224,10 @@ LeafClipsTableView::LeafClipsTableView(String key_text , String value_text ,
 {
   Value label_r_value        = this->labelR->getTextValue() ;
   Value label_storage        = this->store.getPropertyAsValue(this->key , nullptr) ;
-  bool  is_standard_metadata = GUI::MetadataLabels().hasProperty(this->key) &&
+  bool  is_standard_metadata = STORE::MetadataKeys().contains(STRING(this->key)) &&
                                !this->store.isValid() ;
 
-DEBUG_TRACE_LEAFCLIPSTABLEITEM
+DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 
 if (key == STORE::NEW_KEY_KEY) showEditor() ;
 
@@ -220,7 +246,7 @@ if (key == STORE::NEW_KEY_KEY) showEditor() ;
     this->deleteButton->setTooltip(GUI::DELETE_BTN_HOVERTEXT) ;
 
     // enable data change callbacks
-    this->labelL->addListener(this) ;
+//     this->labelL->addListener(this) ;
     label_r_value.referTo(label_storage) ;
   }
   else
@@ -258,10 +284,12 @@ void ClipClipsTableView::buttonClicked(Button* a_button)
   Button* delete_btn = this->deleteButton.get() ;
   Button* add_btn    = this->addButton   .get() ;
 
+DEBUG_TRACE_CLIPVIEW_BTN_CLICKED
+
   if      (a_button == load_btn  ) AudioTagToo::LoadClip(this->store) ;
   else if (a_button == edit_btn  ) showEditor() ;
-  else if (a_button == delete_btn) this->store.getParent().removeChild(this->store , nullptr) ;
-  else if (a_button == add_btn   ) this->store.setProperty(STORE::NEW_KEY_KEY , String::empty , nullptr) ;
+  else if (a_button == delete_btn) removeClip() ;
+  else if (a_button == add_btn   ) setMetadata() ;
 }
 
 void LeafClipsTableView::buttonClicked(Button* a_button)
@@ -269,35 +297,12 @@ void LeafClipsTableView::buttonClicked(Button* a_button)
   Button* edit_btn   = this->editButton  .get() ;
   Button* delete_btn = this->deleteButton.get() ;
 
+DEBUG_TRACE_LEAFVIEW_BTN_CLICKED
+
   if      (a_button == edit_btn  ) showEditor() ;
-  else if (a_button == delete_btn) this->store.removeProperty(this->key , nullptr) ;
+  else if (a_button == delete_btn) resetMetadata() ;
 }
 /*
-void ClipsTableItem::textEditorTextChanged(TextEditor& a_texteditor)
-{
-DBG("ClipsTableItem::textEditorTextChanged() a_texteditor='" + a_texteditor.getText() + "'") ;
-
-  String filtered_text     = STRING(STORE::FilterId(a_texteditor.getText())) ;
-  bool   is_standard_metadata = STORE::MetadataLabels().contains(filtered_text) ;
-  Colour bg_color          = (is_standard_metadata) ? GUI::TEXT_ERROR_COLOR : GUI::TEXT_BG_COLOR ;
-
-  // validate and constrain metadata keys
-  a_texteditor.setText(filtered_text , juce::dontSendNotification) ;
-  a_texteditor.setColour(TextEditor::backgroundColourId , bg_color) ;
-}
-
-void ClipsTableItem::editorAboutToBeHidden(Label* a_label) // metadata leaf nodes
-{
-  String stored_text       = a_label.getText(false) ;
-  String current_text      = a_label.getText(true ) ;
-  bool   is_standard_metadata = STORE::MetadataLabels().contains(current_text) ;
-
-DBG("ClipsTableItem::editorAboutToBeHidden() " + stored_text + "' -> '" + current_text + "'") ;
-
-  // prevent duplicate metadata keys
-  if (is_standard_metadata) a_texteditor.setText(stored_text , juce::dontSendNotification) ;
-}
-*/
 void LeafClipsTableView::labelTextChanged(Label* a_label) // metadata leaf nodes
 {
 DBG("LeafClipsTableView::labelTextChanged() a_label='" + a_label->getText() + "'") ;
@@ -307,41 +312,66 @@ DBG("LeafClipsTableView::labelTextChanged() isValidIdentifier(key)=" + String((I
 
   String     key_text       = this->labelL->getText() ;
   String     value_text     = this->labelR->getText() ;
-  Identifier key            = key_text ;
-  bool       is_valid_key   = Identifier::isValidIdentifier(STRING(key)) ;
+  Identifier new_key        = Identifier(key_text) ;
+  bool       is_valid_key   = Identifier::isValidIdentifier(key_text) ;
   bool       is_valid_value = !value_text.isEmpty() ;
 
-  if (is_valid_key && is_valid_value && key != STORE::NEW_KEY_KEY)
+  if (is_valid_key && is_valid_value && new_key != STORE::NEW_KEY_KEY)
   {
+    // trigger destruction of this parent LeafClipsTableItem
 //     if (this->store.hasProperty(key))
     this->store.removeProperty(this->key , nullptr) ;
-//     this->store.removeProperty(this->itemId , nullptr) ;
     this->store.removeProperty(STORE::NEW_KEY_KEY , nullptr) ;
-    this->store.setProperty(this->key , String::empty , nullptr) ;
+
+    // trigger instantiation of replacement LeafClipsTableItem
+    this->store.setProperty(new_key , String::empty , nullptr) ;
   }
 }
-
+*/
 void ClipClipsTableView::showEditor()
 {
-DBG("ClipClipsTableView::showEditor() labelL=" + this->labelL->getComponentID()  +
-                                    " labelR=" + this->labelR->getComponentID()) ;
+DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR
+
+  this->labelL->showEditor() ;
+
+  TextEditor* editor_l = this->labelL->getCurrentTextEditor() ;
+
+  editor_l->setTextToShowWhenEmpty(GUI::NEW_CLIPNAME_TEXT , GUI::TEXT_DISABLED_COLOR) ;
 }
 
 void LeafClipsTableView::showEditor()
 {
-DBG("LeafClipsTableView::showEditor() labelL=" + this->labelL->getComponentID()  +
-                                    " labelR=" + this->labelR->getComponentID()) ;
-/*
-  TextEditor* editor ;
+DEBUG_TRACE_LEAFVIEW_SHOW_EDITOR
 
-  if ((editor = static_cast<TextEditor*>(findChildWithID("fred"  ))) != nullptr ||
-      (editor = static_cast<TextEditor*>(findChildWithID("barney"))) != nullptr  )
-  {
-    editor->showEditor() ;
-    editor->setTextToShowWhenEmpty(GUI::NEW_KEY_TEXT   , GUI::TEXT_DISABLED_COLOR) ;
-    editor->setTextToShowWhenEmpty(GUI::NEW_VALUE_TEXT , GUI::TEXT_DISABLED_COLOR) ;
-  }
-*/
+//   this->labelL->showEditor() ;
+  this->labelR->showEditor() ;
+
+//   TextEditor* editor_l = this->labelL->getCurrentTextEditor() ;
+  TextEditor* editor_r = this->labelR->getCurrentTextEditor() ;
+
+//   editor_l->setTextToShowWhenEmpty(GUI::NEW_KEY_TEXT   , GUI::TEXT_DISABLED_COLOR) ;
+  editor_r->setTextToShowWhenEmpty(GUI::NEW_VALUE_TEXT , GUI::TEXT_DISABLED_COLOR) ;
+}
+
+void ClipClipsTableView::removeClip()
+{
+DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP
+
+  this->store.getParent().removeChild(this->store , nullptr) ;
+}
+
+void ClipClipsTableView::setMetadata()
+{
+DEBUG_TRACE_LEAFVIEW_SET_METADATA
+
+  this->store.setProperty(STORE::NEW_KEY_KEY , String::empty , nullptr) ;
+}
+
+void LeafClipsTableView::resetMetadata()
+{
+DEBUG_TRACE_LEAFVIEW_RESET_METADATA
+
+  this->store.removeProperty(this->key , nullptr) ;
 }
 
 
@@ -350,21 +380,38 @@ DBG("LeafClipsTableView::showEditor() labelL=" + this->labelL->getComponentID() 
 ClipsTableItem::ClipsTableItem(String item_id  , String label_text_l      , String label_text_r) :
                                itemId(item_id) , labelTextL(label_text_l) , labelTextR(label_text_r) { }
 
-String ClipsTableItem::getUniqueName() const { return this->itemId ;     }
-int    ClipsTableItem::getItemHeight() const { return GUI::TREE_ITEM_H ; }
+String ClipsTableItem::getUniqueName() const { return this->itemId ; }
+
+int ClipsTableItem::getItemHeight() const { return GUI::TREE_ITEM_H ; }
+
+ClipsTableView* ClipsTableItem::setId(ClipsTableView* new_view)
+{
+  new_view->setComponentID(this->itemId) ;
+
+  return new_view ;
+}
 
 
 /* ClipsTableItem subclasses */
 
 MasterClipsTableItem::MasterClipsTableItem(String item_id , String label_text) :
-  ClipsTableItem(item_id , label_text) { }
+  ClipsTableItem(item_id , label_text)
+{
+DEBUG_TRACE_MASTERCLIPSTABLEITEM
+}
 
 ClipClipsTableItem::ClipClipsTableItem(String item_id , String label_text , ValueTree store) :
-  ClipsTableItem(item_id , label_text) , store(store) { }
+  ClipsTableItem(item_id , label_text) , store(store)
+{
+DEBUG_TRACE_CLIPCLIPSTABLEITEM
+}
 
 LeafClipsTableItem::LeafClipsTableItem(String     item_id , String     key_text , String value_text ,
                                        Identifier key_    , ValueTree  store_                       ) :
-  ClipsTableItem(item_id , key_text , value_text) , key(key_) , store(store_) { }
+  ClipsTableItem(item_id , key_text , value_text) , key(key_) , store(store_)
+{
+DEBUG_TRACE_LEAFCLIPSTABLEITEM
+}
 
 bool MasterClipsTableItem::mightContainSubItems() { return TRUE ; }
 bool ClipClipsTableItem::mightContainSubItems() { return TRUE ; }
@@ -373,19 +420,19 @@ bool LeafClipsTableItem::mightContainSubItems() { return FALSE ; }
 Component* MasterClipsTableItem::createItemComponent()
 {
   // instantiate library-managed, transient GUI component
-  return new MasterClipsTableView(this->labelTextL) ;
+  return setId(new MasterClipsTableView(this->labelTextL)) ;
 }
 
 Component* ClipClipsTableItem::createItemComponent()
 {
   // instantiate library-managed, transient GUI component
-  return new ClipClipsTableView(this->labelTextL , this->store) ;
+  return setId(new ClipClipsTableView(this->labelTextL , this->store)) ;
 }
 
 Component* LeafClipsTableItem::createItemComponent()
 {
   // instantiate library-managed, transient GUI component
-  return new LeafClipsTableView(this->labelTextL , this->labelTextR , this->key , this->store) ;
+  return setId(new LeafClipsTableView(this->labelTextL , this->labelTextR , this->key , this->store)) ;
 }
 
 //[/MiscUserCode]
@@ -444,6 +491,11 @@ BEGIN_JUCER_METADATA
                opacityNormal="1.00000000000000000000" colourNormal="0" resourceOver=""
                opacityOver="1.00000000000000000000" colourOver="0" resourceDown=""
                opacityDown="1.00000000000000000000" colourDown="0"/>
+  <COMBOBOX name="" id="e14bf58725f7ec5a" memberName="keySelect" virtualName=""
+            explicitFocusOrder="0" pos="0 0 0M 0M" posRelativeX="53e00129390ce15c"
+            posRelativeY="53e00129390ce15c" posRelativeW="53e00129390ce15c"
+            posRelativeH="53e00129390ce15c" editable="1" layout="33" items=""
+            textWhenNonSelected="" textWhenNoItems=""/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

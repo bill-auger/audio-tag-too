@@ -38,7 +38,8 @@
   Subclass constructors are called by their corresponding ClipsTableItem subclass constructors.
                                                                     //[/Comments]
 */
-class ClipsTableView  : public Component
+class ClipsTableView  : public Component,
+                        public ComboBox::Listener
 {
 public:
     //==============================================================================
@@ -51,6 +52,7 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
@@ -71,6 +73,7 @@ protected:
     std::unique_ptr<ImageButton> editButton;
     std::unique_ptr<ImageButton> deleteButton;
     std::unique_ptr<ImageButton> addButton;
+    std::unique_ptr<ComboBox> keySelect;
 
 
     //==============================================================================
@@ -124,7 +127,9 @@ private:
   void buttonClicked(Button* a_button) override ;
 
   // helpers
-  void showEditor(void) override ;
+  void showEditor (void) override ;
+  void removeClip (void) ;
+  void setMetadata(void) ;
 
 
   ValueTree store ;
@@ -138,8 +143,8 @@ private:
   It is always a bottom-level (visible) child item of a ClipClipsTableView.
 */
 class LeafClipsTableView : public  ClipsTableView   ,
-                           private Button::Listener ,
-                           private Label::Listener
+                           private Button::Listener/* ,
+                           private Label::Listener*/
 {
 public:
 
@@ -154,16 +159,12 @@ public:
 private:
 
   // event handlers
-  void buttonClicked        (Button* a_button)         override ;
-// void textEditorTextChanged(TextEditor& a_texteditor) override ; // TextEditor::Listener
-// void editorAboutToBeHidden(Label* a_label)           override ; // Label
-  void labelTextChanged     (Label* a_label)           override ; // Label::Listener
-// void textWasEdited 	( 		) 	 // Label
-// void textWasChanged 	( 		) 	 // Label
-// void editorHidden (Label *, TextEditor &) // Label::Listener
+  void buttonClicked   (Button* a_button) override ;
+//   void labelTextChanged(Label* a_label)   override ;
 
   // helpers
-  void showEditor(void) override ;
+  void showEditor   (void) override ;
+  void resetMetadata(void) ;
 
 
   ValueTree  store ;
@@ -192,6 +193,9 @@ public:
   int                getItemHeight       (void) const override ;
   virtual bool       mightContainSubItems(void) = 0 ;
   virtual Component* createItemComponent (void) = 0 ;
+
+  // helpers
+  ClipsTableView* setId(ClipsTableView* new_view) ;
 
 
 protected:

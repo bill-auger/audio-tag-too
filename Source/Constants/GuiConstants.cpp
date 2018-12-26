@@ -105,30 +105,21 @@ const Colour GUI::BROWSER_SELECTED_BG_COLOR = Colour(0xFF404040) ;
 const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 
 // ClipsTable::ClipItem
-const int       GUI::TREE_ITEM_H                  = 24 ;
-const String    GUI::FILE_ITEM_LABEL              = "Source" ;
-const String    GUI::BEGIN_ITEM_LABEL             = "Beginning" ;
-const String    GUI::END_ITEM_LABEL               = "Ending" ;
-const String    GUI::DURATION_ITEM_LABEL          = "Duration" ;
-const uint8     GUI::MAX_KEY_TEXTEDITOR_N_CHARS   = 64 ;
-const uint16    GUI::MAX_VALUE_TEXTEDITOR_N_CHARS = 4096 ;
-const String    GUI::NEW_KEY_TEXT                 = "(Type property name)" ;
-const String    GUI::NEW_VALUE_TEXT               = "(Type property value)" ;
-const String    GUI::LOAD_BTN_HOVERTEXT           = "Load this clip into the waveform display" ;
-const String    GUI::EDIT_BTN_HOVERTEXT           = "Edit this metadata item" ;
-const String    GUI::DELETE_BTN_HOVERTEXT         = "Delete this metadata item" ;
-const String    GUI::METADATA_BTN_HOVERTEXT       = "Add new metadata item" ;
-const ValueTree GUI::MetadataLabels()
-{
-  ValueTree metadata_labels = ValueTree("metadata-labels") ;
-
-  metadata_labels.setProperty(STORE::FILENAME_KEY   , FILE_ITEM_LABEL     , nullptr) ;
-  metadata_labels.setProperty(STORE::BEGIN_TIME_KEY , BEGIN_ITEM_LABEL    , nullptr) ;
-  metadata_labels.setProperty(STORE::END_TIME_KEY   , END_ITEM_LABEL      , nullptr) ;
-  metadata_labels.setProperty(STORE::DURATION_KEY   , DURATION_ITEM_LABEL , nullptr) ;
-
-  return metadata_labels ;
-}
+const int       GUI::TREE_ITEM_H                     = 24 ;
+const String    GUI::FILE_ITEM_LABEL                 = "Source" ;
+const String    GUI::BEGIN_ITEM_LABEL                = "Beginning" ;
+const String    GUI::END_ITEM_LABEL                  = "Ending" ;
+const String    GUI::DURATION_ITEM_LABEL             = "Duration" ;
+const uint8     GUI::MAX_CLIPNAME_TEXTEDITOR_N_CHARS = 128 ;
+const uint8     GUI::MAX_KEY_TEXTEDITOR_N_CHARS      = 64 ;
+const uint16    GUI::MAX_VALUE_TEXTEDITOR_N_CHARS    = 4096 ;
+const String    GUI::NEW_CLIPNAME_TEXT               = "(Type clip name)" ;
+const String    GUI::NEW_KEY_TEXT                    = "(Type property name)" ;
+const String    GUI::NEW_VALUE_TEXT                  = "(Type property value)" ;
+const String    GUI::LOAD_BTN_HOVERTEXT              = "Load this clip into the waveform display" ;
+const String    GUI::EDIT_BTN_HOVERTEXT              = "Edit this metadata item" ;
+const String    GUI::DELETE_BTN_HOVERTEXT            = "Delete this metadata item" ;
+const String    GUI::METADATA_BTN_HOVERTEXT          = "Add new metadata item" ;
 
 // Alert
 const String GUI::MODAL_WARNING_TITLE = APP::APP_NAME + " Warning" ;

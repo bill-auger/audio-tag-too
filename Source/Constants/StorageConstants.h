@@ -74,6 +74,7 @@ public:
   static const StringArray RootNodes          (void) ;
   static const StringArray RootPersistentKeys (void) ;
   static const StringArray RootKeys           (void) ;
+  static const StringArray MetadataKeys       (void) ;
 
   // storage nodes
   static const Identifier STORAGE_ID ;

@@ -290,8 +290,8 @@ DEBUG_TRACE_STORAGE_CHILD_ADDED
 
 void ClipsTable::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_idx , int curr_idx)
 {
-  // TODO:
 DBG("ClipsTable::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
+  // TODO:
 }
 
 void ClipsTable::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& deleted_node ,
@@ -311,6 +311,9 @@ void ClipsTable::valueTreePropertyChanged(ValueTree& changed_node , const Identi
 {
 DBG("ClipsTable::valueTreePropertyChanged() changed_node=" + changed_node.getType() + " key=" + STRING(key)) ;
 
+  bool is_reserved_key = STORE::MetadataKeys().contains(STRING(key)) ;
+
+  if (!is_reserved_key) ; // TODO:
 //   createLeafItem(changed_node , key) ;
 }
 

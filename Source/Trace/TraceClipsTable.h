@@ -55,7 +55,7 @@
      parent_node.getParent() == this->compilationsStore    )
 
 
-  /* ClipsTableItem */
+  /* ClipsTable */
 
   #define DEBUG_TRACE_NEW_MASTER_ITEM                                    \
     Trace::TraceGui("preparing new master item: '" + filename   + "'") ; \
@@ -110,7 +110,7 @@
     Trace::TraceGui("creating tree items for '" + clips_store.getType()  + "' - ("   + \
                     String(n_masters) + ") masters (" + String(n_clips)  + ") clips" ) ;
 
-  #define DEBUG_TRACE_STORAGE_CHILD(a_node)                                               \
+  #define DEBUG_TRACE_STORAGE_CHILD_DATA(a_node)                                          \
     String    node_id_              = STRING(a_node                 .getType()) ;         \
     String    parent_id_            = STRING(parent_node            .getType()) ;         \
     String    grandparent_id_       = STRING(parent_node.getParent().getType()) ;         \
@@ -134,57 +134,111 @@
                                        (is_clip_node_  ) ? grandparent_id_ : "(unknown)") ;
 
   #define DEBUG_TRACE_STORAGE_CHILD_ADDED                                                 \
-    DEBUG_TRACE_STORAGE_CHILD(new_node)                                                   \
+    DEBUG_TRACE_STORAGE_CHILD_DATA(new_node)                                              \
     Trace::TraceGui     ("new storage node for " + node_role    + "'" + node_id_ + "'") ; \
     Trace::TraceNoPrefix("added to "             + ancestry_msg                       )   ;
 
   #define DEBUG_TRACE_STORAGE_CHILD_REMOVED                                                    \
-    DEBUG_TRACE_STORAGE_CHILD(deleted_node)                                                    \
+    DEBUG_TRACE_STORAGE_CHILD_DATA(deleted_node)                                               \
     Trace::TraceGui     ("storage node for "   + node_role        + "'"    + node_id_ + "'") ; \
     Trace::TraceNoPrefix("deleted from index " + String(prev_idx) + " of " + ancestry_msg  )   ;
 
 
-  /* ClipsTableItem subclasses */
+  /* ClipsTableView subclasses */
 
-  #define DEBUG_TRACE_MASTERCLIPSTABLEITEM                                     \
-    Trace::TraceGui("configuring MasterClipsTableItem (" + label_text + "|n/a)") ;
+  #define DEBUG_TRACE_MASTERCLIPSTABLEVIEW                                       \
+    Trace::TraceGui("configuring MasterClipsTableView (" + label_text + "|n/a)") ;
 
-  #define DEBUG_TRACE_CLIPCLIPSTABLEITEM                                       \
-    Trace::TraceGui("configuring ClipClipsTableItem   (" + label_text + "|n/a)") ;
+  #define DEBUG_TRACE_CLIPCLIPSTABLEVIEW                                         \
+    Trace::TraceGui("configuring ClipClipsTableView   (" + label_text + "|n/a)") ;
 
-  #define DEBUG_TRACE_LEAFCLIPSTABLEITEM                                                   \
-    Trace::TraceGui("configuring LeafClipsTableItem   (" + key_text   + "|" + value_text + \
+  #define DEBUG_TRACE_LEAFCLIPSTABLEVIEW                                                   \
+    Trace::TraceGui("configuring LeafClipsTableView   (" + key_text   + "|" + value_text + \
                     ") " + ((is_standard_metadata) ? "immutable" : "mutable")            ) ;
 
+  #define DEBUG_TRACE_CLIPVIEW_BTN_CLICKED                                         \
+    String button_id = (a_button == load_btn  ) ? "loadButton"   :                 \
+                       (a_button == edit_btn  ) ? "editButton"   :                 \
+                       (a_button == delete_btn) ? "deleteButton" :                 \
+                       (a_button == add_btn   ) ? "addButton"    : "(unhandled)" ; \
+    Trace::TraceEvent("ClipClipsTableView " + button_id + " clicked")              ;
 
-  /* ClipItem */
+  #define DEBUG_TRACE_LEAFVIEW_BTN_CLICKED                                         \
+    String button_id = (a_button == edit_btn  ) ? "editButton"   :                 \
+                       (a_button == delete_btn) ? "deleteButton" : "(unhandled)" ; \
+    Trace::TraceEvent("LeafClipsTableView " + button_id + " clicked")              ;
 
-  #define X___DEBUG_TRACE_CLIPITEM                                                                     \
-    String item_role  = (is_root_item    ) ? "root_item"   :                                       \
-                        (is_master_item  ) ? "master_item" :                                       \
-                        (is_clip_item    ) ? "clip_item"   :                                       \
-                        (this->isLeafItem) ? "leaf_item"   : "invalid_item" ;                      \
-    String item_class = (this->itemClass == GUI::ROOT_ITEM   ) ? "MASTER_ITEM" :                   \
-                        (this->itemClass == GUI::MASTER_ITEM ) ? "MASTER_ITEM" :                   \
-                        (this->itemClass == GUI::CLIP_ITEM   ) ? "CLIP_ITEM"   :                   \
-                        (this->itemClass == GUI::LEAF_ITEM   ) ? "LEAF_ITEM"   :                   \
-                        (this->itemClass == GUI::INVALID_ITEM) ? "LEAF_ITEM"   : "!ERROR!" ;       \
-    Trace::TraceGui     ("adding ClipItem to ClipsTable: " + item_role + "(" + item_class + ")") ; \
-    Trace::TraceNoPrefix("storeId : '" + this->storeId + "'") ;                                    \
-    Trace::TraceNoPrefix("data    : (" + this->keyText + "|" + this->valueText + ")")              ;
+  #define DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR                                     \
+    String clip_id = STRING(this->store.getType()) ;                           \
+    Trace::TraceGui("showing editor for ClipClipsTableView '" + clip_id + "'") ;
+
+  #define DEBUG_TRACE_LEAFVIEW_SHOW_EDITOR                                     \
+    String clip_id = STRING(this->store.getType()) ;                           \
+    Trace::TraceGui("showing editor for ClipClipsTableView '" + clip_id   +    \
+                    "' LeafClipsTableView                  '" + this->key + "'") ;
+
+  #define DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP                                         \
+    Trace::TraceGui("destroying clip '"          + STRING(this->store.getType()) + \
+                    "' via ClipClipsTableView '" + this->getComponentID() + "'"  ) ;
+
+  #define DEBUG_TRACE_LEAFVIEW_SET_METADATA                                        \
+    Trace::TraceGui("adding property '"          + STORE::NEW_KEY_KEY            + \
+                    "' to clip '"                + STRING(this->store.getType()) + \
+                    "' via LeafClipsTableView '" + this->getComponentID() + "'"  ) ;
+
+  #define DEBUG_TRACE_LEAFVIEW_RESET_METADATA                                      \
+    Trace::TraceGui("deleting property '"        + this->key                     + \
+                    "' from clip '"              + STRING(this->store.getType()) + \
+                    "' via LeafClipsTableView '" + this->getComponentID() + "'"  ) ;
+
+
+  /* ClipsTableItem subclasses */
+
+  #define DEBUG_TRACE_MASTERCLIPSTABLEITEM                                                 \
+    bool   is_root_item = STORE::RootNodes().contains(this->itemId) ;                      \
+    String item_class   = (is_root_item) ? "RootClipsTableItem" : "MasterClipsTableItem" ; \
+    String data_l       = (is_root_item) ? "n/a" : this->labelTextL ;                      \
+    String data_r       = "n/a" ;                                                          \
+    Trace::TraceGui     ("adding " + item_class + " to ClipsTable:") ;                     \
+    Trace::TraceNoPrefix("itemId : '" + this->itemId + "'") ;                              \
+    Trace::TraceNoPrefix("data   : (" + data_l + "|" + data_r + ")")                       ;
+
+  #define DEBUG_TRACE_CLIPCLIPSTABLEITEM                               \
+    String data_l       = this->labelTextL ;                           \
+    String data_r       = "n/a" ;                                      \
+    Trace::TraceGui     ("adding ClipClipsTableItem to ClipsTable:") ; \
+    Trace::TraceNoPrefix("itemId : '" + this->itemId          + "'") ; \
+    Trace::TraceNoPrefix("data   : (" + data_l + "|" + data_r + ")")   ;
+
+  #define DEBUG_TRACE_LEAFCLIPSTABLEITEM                               \
+    String data_l       = this->labelTextL ;                           \
+    String data_r       = this->labelTextR ;                           \
+    Trace::TraceGui     ("adding LeafClipsTableItem to ClipsTable:") ; \
+    Trace::TraceNoPrefix("itemId : '" + this->itemId          + "'") ; \
+    Trace::TraceNoPrefix("key    : '" + this->key             + "'") ; \
+    Trace::TraceNoPrefix("data   : (" + data_l + "|" + data_r + ")")   ;
 
 #else // DEBUG_TRACE
 
-  #define DEBUG_TRACE_NEW_MASTER_ITEM       ;
-  #define DEBUG_TRACE_NEW_CLIP_ITEM         ;
-  #define DEBUG_TRACE_CREATE_MASTER_ITEM    ;
-  #define DEBUG_TRACE_CREATE_CLIP_ITEM      ;
-  #define DEBUG_TRACE_INIT_STORAGE(unused)  ;
-  #define DEBUG_TRACE_STORAGE_CHILD_ADDED   ;
-  #define DEBUG_TRACE_STORAGE_CHILD_REMOVED ;
-  #define DEBUG_TRACE_MASTERCLIPSTABLEITEM  ;
-  #define DEBUG_TRACE_CLIPCLIPSTABLEITEM    ;
-  #define DEBUG_TRACE_LEAFCLIPSTABLEITEM    ;
-  #define DEBUG_TRACE_CLIPITEM              ;
+  #define DEBUG_TRACE_NEW_MASTER_ITEM         ;
+  #define DEBUG_TRACE_NEW_CLIP_ITEM           ;
+  #define DEBUG_TRACE_CREATE_MASTER_ITEM      ;
+  #define DEBUG_TRACE_CREATE_CLIP_ITEM        ;
+  #define DEBUG_TRACE_INIT_STORAGE(unused)    ;
+  #define DEBUG_TRACE_STORAGE_CHILD_ADDED     ;
+  #define DEBUG_TRACE_STORAGE_CHILD_REMOVED   ;
+  #define DEBUG_TRACE_MASTERCLIPSTABLEVIEW    ;
+  #define DEBUG_TRACE_CLIPCLIPSTABLEVIEW      ;
+  #define DEBUG_TRACE_LEAFCLIPSTABLEVIEW      ;
+  #define DEBUG_TRACE_CLIPVIEW_BTN_CLICKED    ;
+  #define DEBUG_TRACE_LEAFVIEW_BTN_CLICKED    ;
+  #define DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR    ;
+  #define DEBUG_TRACE_LEAFVIEW_SHOW_EDITOR    ;
+  #define DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP    ;
+  #define DEBUG_TRACE_LEAFVIEW_SET_METADATA   ;
+  #define DEBUG_TRACE_LEAFVIEW_RESET_METADATA ;
+  #define DEBUG_TRACE_MASTERCLIPSTABLEITEM    ;
+  #define DEBUG_TRACE_CLIPCLIPSTABLEITEM      ;
+  #define DEBUG_TRACE_LEAFCLIPSTABLEITEM      ;
 
 #endif // DEBUG_TRACE
