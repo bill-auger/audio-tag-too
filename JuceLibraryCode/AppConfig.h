@@ -23,10 +23,6 @@
 #define UTF8(a_string)      a_string.toUTF8()
 #define UNUSED(x)           (void)(x)
 #define Url                 URL
-#ifndef TRUE
-  #define TRUE              true
-  #define FALSE             false
-#endif // TRUE
 #define CONTROLLER_OWNS_STORAGE
 // [END_USER_CODE_SECTION]
 
