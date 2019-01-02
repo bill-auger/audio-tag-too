@@ -81,6 +81,10 @@ ClipsTable::ClipsTable ()
 ClipsTable::~ClipsTable()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+
+  this->clipsStore       .removeListener(this) ;
+  this->compilationsStore.removeListener(this) ;
+
     //[/Destructor_pre]
 
     compilationsGroup = nullptr;
@@ -132,6 +136,9 @@ void ClipsTable::initialize(ValueTree& clips_store , ValueTree& compilations_sto
   {
     createItemsTree(this->clipsStore        = clips_store       ) ;
     createItemsTree(this->compilationsStore = compilations_store) ;
+
+    this->clipsStore       .addListener(this) ;
+    this->compilationsStore.addListener(this) ;
   }
 }
 

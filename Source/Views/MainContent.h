@@ -97,9 +97,6 @@ private:
   std::vector<Waveform*>                   waveforms ;
 #ifndef CONTROLLER_OWNS_STORAGE
   std::unique_ptr<AudioTagTooStore>        storage ;
-#else // CONTROLLER_OWNS_STORAGE
-  ValueTree                                clips ;
-  ValueTree                                compilations ;
 #endif // CONTROLLER_OWNS_STORAGE
 
   // getters/setters

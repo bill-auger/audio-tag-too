@@ -195,15 +195,7 @@ MainContent::~MainContent()
   this->transportSource .removeChangeListener(this) ;
   this->fileBrowser    ->removeListener      (this) ;
 #ifndef CONTROLLER_OWNS_STORAGE
-  this->storage->clips       .removeListener (this->clipsTable) ;
-  this->storage->compilations.removeListener (this->clipsTable) ;
-
   this->storage = nullptr ;
-#else // CONTROLLER_OWNS_STORAGE
-  if (AudioTagToo::IsInitialized)
-  this->clips           .removeListener      (this->clipsTable) ;
-  if (AudioTagToo::IsInitialized)
-  this->compilations    .removeListener      (this->clipsTable) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
     //[/Destructor_pre]
@@ -303,11 +295,6 @@ void MainContent::initialize(NamedValueSet& features , AudioThumbnailCache& thum
 
 #ifdef CONTROLLER_OWNS_STORAGE
   this->deviceManager.addChangeListener(AudioTagToo::Store.get()) ;
-  this->clips        .addListener      (this->clipsTable) ;
-  this->compilations .addListener      (this->clipsTable) ;
-#else // CONTROLLER_OWNS_STORAGE
-  this->storage->clips        .addListener(this->clipsTable) ;
-  this->storage->compilations .addListener(this->clipsTable) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
   this->fullWaveform->startTimerHz(course_fps) ;
