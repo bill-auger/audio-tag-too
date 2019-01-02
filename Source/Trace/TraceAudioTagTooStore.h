@@ -33,23 +33,32 @@
   #define DEBUG_TRACE_SET_PROPERTY                                                                 \
     if (!node.isValid()) Trace::TraceError("request to set property on invalid tree - ignoring") ;
 
-  #define DEBUG_TRACE_SET_CONFIG                                                     \
-    String node_id            = STRING(config_node.getType()) ;                      \
-    String key_str            = STRING(key) ;                                        \
-    bool   is_not_config_node = config_node != this->root ;                          \
-    bool   is_not_config_key  = !isKnownProperty(this->root , key) ;                 \
-    String change_msg         = Trace::TraceSetValue(config_node , key , value) ;    \
-    String node_error_msg     = "non-config node '"  + node_id + "' - (ignoring) " ; \
-    String key_error_msg      = "unknown key '"      + key_str + "' - (ignoring) " ; \
-    if      (is_not_config_node) Trace::TraceError  (node_error_msg + change_msg) ;  \
-    else if (is_not_config_key ) Trace::TraceError  (key_error_msg  + change_msg) ;  \
-    else                         Trace::TraceStoreVb(                 change_msg)    ;
+  #define DEBUG_TRACE_SET_CONFIG                                                              \
+    /* ASSERT: mirrors AudioTagTooStore->isConfigProperty() implementation */                 \
+    Identifier  node_id           = config_node.getType() ;                                   \
+    String      node_id_str       = STRING(node_id) ;                                         \
+    String      key_str           = STRING(key) ;                                             \
+    var         key_var           = var(key_str) ;                                            \
+    var         keys_var          = STORE::RootNodes[node_id] ;                               \
+    Array<var>* keys_array        = keys_var.getArray() ;                                     \
+    bool        is_node_valid     = config_node.isValid() ;                                   \
+    bool        is_config_node    = keys_array != nullptr ;                                   \
+    bool        is_config_key     = is_config_node && keys_array->contains(key_var) ;         \
+    String      change_msg        = Trace::TraceSetValue(config_node , key , value) ;         \
+    String      ignoring_msg      = "- ignoring)" ;                                           \
+    String      invalid_error_msg = "(invalid node"                          + ignoring_msg ; \
+    String      node_error_msg    = "(non-config node '" + node_id_str + "'" + ignoring_msg ; \
+    String      key_error_msg     = "(unknown key '"     + key_str     + "'" + ignoring_msg ; \
+    if      (!is_node_valid ) Trace::TraceError  (change_msg + " " + invalid_error_msg) ;     \
+    else if (!is_config_node) Trace::TraceError  (change_msg + " " + node_error_msg   ) ;     \
+    else if (!is_config_key ) Trace::TraceError  (change_msg + " " + key_error_msg    ) ;     \
+    else                      Trace::TraceStoreVb(change_msg                          )       ;
 
   #define DEBUG_TRACE_CREATE_CLIP                                                        \
     String master_msg = "master: '" + master_id + "'" ; StringArray warnings ;           \
     if (!does_file_exist ) warnings.add("file not found: " + audio_filename) ;           \
     if (!is_valid_length ) warnings.add("invalid clip length: " + String(end_time  ) +   \
-                                        " - " +                   String(begin_time) ) ; \
+                                        " - "                   + String(begin_time) ) ; \
     if (is_duplicate_clip) warnings.add("duplicate clip exists: " + clip_id) ;           \
     if (is_id_collision  ) warnings.add("ID collision creating " + master_msg) ;         \
     if (!warnings.isEmpty()) for (String warning : warnings)                             \
@@ -88,12 +97,12 @@
 
   #define DEBUG_TRACE_FILTER_ROGUE_KEY                                                     \
     if (!persistent_keys.contains(property_id))                                            \
-      Trace::TraceStore("removing rogue property '" + String(property_id)                + \
+      Trace::TraceStore("removing rogue property '" + STRING(property_id)                + \
                         "' from '"                  + STRING(parent_node.getType()) + "'") ;
 
   #define DEBUG_TRACE_FILTER_ROGUE_NODE                                                \
     if (!persistent_node_ids.contains(node_id))                                        \
-      Trace::TraceStore("removing rogue node '" + String(node_id)                    + \
+      Trace::TraceStore("removing rogue node '" + STRING(node_id)                    + \
                         "' from '"              + STRING(parent_node.getType()) + "'") ;
 
   #define DEBUG_TRACE_SANITIZE_INT_PROPERTY                                                     \

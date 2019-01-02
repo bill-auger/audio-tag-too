@@ -75,13 +75,12 @@ bool AudioTagTooStore::setConfig(ValueTree config_node , const Identifier& key ,
 {
 DEBUG_TRACE_SET_CONFIG
 
-  // validate mutating of critical configuration
-  bool is_valid = STORE::RootNodes().contains(STRING(config_node.getType())) &&
-                  isKnownProperty(config_node , key)                          ;
+  // verify mutation of critical configuration
+  bool is_valid_config_node_and_key = isConfigProperty(config_node , key) ;
 
-  if (is_valid) setProperty(config_node , key , value) ;
+  if (is_valid_config_node_and_key) setProperty(config_node , key , value) ;
 
-  return is_valid ;
+  return is_valid_config_node_and_key ;
 }
 
 ValueTree AudioTagTooStore::getChildNodeById(ValueTree root_store , Identifier node_id)
@@ -319,8 +318,8 @@ void AudioTagTooStore::verifyRoot()
 void AudioTagTooStore::sanitizeRoot()
 {
   // filter any rogue data
-  filterRogueKeys (this->root , STORE::RootPersistentKeys ()) ;
-  filterRogueNodes(this->root , STORE::RootPersistentNodes()) ;
+  filterRogueKeys (this->root , STORE::RootPersistentKeys ) ;
+  filterRogueNodes(this->root , STORE::RootPersistentNodes) ;
 }
 
 /* validation/sanitization helpers */
@@ -352,9 +351,9 @@ void AudioTagTooStore::verifyRootProperty(Identifier key , var default_value)
 
 bool AudioTagTooStore::hasDuplicatedNodes(ValueTree stored_config)
 {
-  StringArray root_node_ids      = STORE::RootPersistentNodes() ;
-  int         n_duplicated_nodes = 0 ;
-  bool        has_duplicates     = false ;
+  NamedValueSet root_node_ids      = STORE::RootPersistentNodes ;
+  int           n_duplicated_nodes = 0 ;
+  bool          has_duplicates     = false ;
 
   n_duplicated_nodes = nDuplicatedNodes(stored_config , root_node_ids) ;
   has_duplicates     = has_duplicates || n_duplicated_nodes > root_node_ids.size() ;
@@ -362,13 +361,13 @@ bool AudioTagTooStore::hasDuplicatedNodes(ValueTree stored_config)
   return has_duplicates ;
 }
 
-int AudioTagTooStore::nDuplicatedNodes(ValueTree parent_node , StringArray node_ids)
+int AudioTagTooStore::nDuplicatedNodes(ValueTree parent_node , NamedValueSet node_ids)
 {
   int n_duplicated_nodes = 0 ;
 
-  for (int node_n = 0 ; node_n < node_ids.size() ; ++node_n)
+  for (int node_id_n = 0 ; node_id_n < node_ids.size() ; ++node_id_n)
   {
-    Identifier node_id = STORE::FilterId(node_ids[node_n]) ;
+    Identifier node_id = STORE::FilterId(STRING(node_ids.getName(node_id_n))) ;
 
     for (int child_n = 0 ; child_n < parent_node.getNumChildren() ; ++child_n)
       if (parent_node.getChild(child_n).hasType(node_id)) ++n_duplicated_nodes ;
@@ -384,11 +383,11 @@ void AudioTagTooStore::removeConflictedNodes(ValueTree parent_node , Identifier 
     parent_node.removeChild(node , nullptr) ;
 }
 
-void AudioTagTooStore::filterRogueKeys(ValueTree parent_node , StringArray persistent_keys)
+void AudioTagTooStore::filterRogueKeys(ValueTree parent_node , NamedValueSet persistent_keys)
 {
   for (int key_n = 0 ; key_n < parent_node.getNumProperties() ; ++key_n)
   {
-    String property_id = STRING(parent_node.getPropertyName(key_n)) ;
+    Identifier property_id = parent_node.getPropertyName(key_n) ;
 
 DEBUG_TRACE_FILTER_ROGUE_KEY
 
@@ -397,15 +396,17 @@ DEBUG_TRACE_FILTER_ROGUE_KEY
   }
 }
 
-void AudioTagTooStore::filterRogueNodes(ValueTree parent_node , StringArray persistent_node_ids)
+void AudioTagTooStore::filterRogueNodes(ValueTree parent_node , NamedValueSet persistent_node_ids)
 {
+  Identifier parent_id = parent_node.getType() ;
+
   for (int child_n = 0 ; child_n < parent_node.getNumChildren() ; ++child_n)
   {
-    String node_id = STRING(parent_node.getChild(child_n).getType()) ;
+    Identifier node_id = parent_node.getChild(child_n).getType() ;
 
 DEBUG_TRACE_FILTER_ROGUE_NODE
 
-    if (!persistent_node_ids.contains(node_id))
+    if (!persistent_node_ids.contains(node_id) || node_id == parent_id)
       parent_node.removeChild(child_n , nullptr) ;
   }
 }
@@ -457,16 +458,20 @@ void AudioTagTooStore::valueTreePropertyChanged(ValueTree& node , const Identifi
 {
 DEBUG_TRACE_CONFIG_TREE_CHANGED
 
-  if (isKnownProperty(node , key)) AudioTagToo::HandleConfigChanged(key) ;
+  if (isConfigProperty(node , key)) AudioTagToo::HandleConfigChanged(key) ;
 }
 
 
-/* private getters/setters */
+/* helpers */
 
-bool AudioTagTooStore::isKnownProperty(ValueTree node , const Identifier& key)
+bool AudioTagTooStore::isConfigProperty(ValueTree node , const Identifier& key)
 {
-  ValueTree parent_node = node.getParent() ;
+  Identifier  node_id       = node.getType() ;
+  var         key_var       = var(STRING(key)) ;
+  var         keys_var      = STORE::RootNodes[node_id] ;
+  Array<var>* keys_array    = keys_var.getArray() ;
+  bool        is_config_key = node.isValid()                                        &&
+                              keys_array != nullptr && keys_array->contains(key_var) ;
 
-  return (node == this->root) ? STORE::RootKeys().contains(key) :
-                                false                           ;
+  return is_config_key ;
 }

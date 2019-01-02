@@ -20,6 +20,7 @@
 
 
 #include "StorageConstants.h"
+#include "../Trace/TraceConstants.h"
 
 
 // sort and filter keys
@@ -33,23 +34,109 @@ const Identifier STORE::FilterId(String a_string , String retain_chars)
                  .toLowerCase()
                  .replaceCharacters(APP::FILTER_CHARS , APP::REPLACE_CHARS) ;
 }
-#define ROOT_PERSISTENT_NODE_IDS STORE::CLIPS_ID            + newLine + \
-                                 STORE::COMPILATIONS_ID
-#define ROOT_TRANSIENT_NODE_IDS  String::empty
-#define ROOT_PERSISTENT_KEYS     STRING(CONFIG_VERSION_KEY) + newLine + \
-                                 STRING(WINDOW_STATE_KEY  )
-#define ROOT_TRANSIENT_KEYS      String::empty
-#define METADATA_KEYS            STRING(FILENAME_KEY  )     + newLine + \
-                                 STRING(BEGIN_TIME_KEY)     + newLine + \
-                                 STRING(END_TIME_KEY  )     + newLine + \
-                                 STRING(DURATION_KEY  )
-const StringArray STORE::RootPersistentNodes() { return StringArray::fromLines(ROOT_PERSISTENT_NODE_IDS           ) ; }
-const StringArray STORE::RootNodes()           { return StringArray::fromLines(ROOT_PERSISTENT_NODE_IDS + newLine +
-                                                                               ROOT_TRANSIENT_NODE_IDS            ) ; }
-const StringArray STORE::RootPersistentKeys()  { return StringArray::fromLines(ROOT_PERSISTENT_KEYS               ) ; }
-const StringArray STORE::RootKeys()            { return StringArray::fromLines(ROOT_PERSISTENT_KEYS     + newLine +
-                                                                               ROOT_TRANSIENT_KEYS                ) ; }
-const StringArray STORE::MetadataKeys()        { return StringArray::fromLines(METADATA_KEYS                      ) ; }
+// #define ROOT_PERSISTENT_NODE_IDS STORE::CLIPS_ID            + newLine + \
+//                                  STORE::COMPILATIONS_ID
+// #define ROOT_TRANSIENT_NODE_IDS  String::empty
+// #define ROOT_PERSISTENT_KEYS     STRING(CONFIG_VERSION_KEY) + newLine + \
+//                                  STRING(WINDOW_STATE_KEY  )
+// #define ROOT_TRANSIENT_KEYS      String::empty
+#define XML_HEADER                     String("<?xml version=\"1.0\"?>")
+#define ROOT_PERSISTENT_NODE_IDS_ATTRS " " + STRING(STORAGE_ID     )    + "=\"\" " + \
+                                       " " + STRING(CLIPS_ID       )    + "=\"\" " + \
+                                       " " + STRING(COMPILATIONS_ID)    + "=\"\" "
+#define ROOT_TRANSIENT_NODE_IDS_ATTRS  ""
+#define ROOT_PERSISTENT_KEYS_ATTRS     " " + STRING(CONFIG_VERSION_KEY) + "=\"\" " + \
+                                       " " + STRING(WINDOW_STATE_KEY  ) + "=\"\" "
+#define ROOT_TRANSIENT_KEYS_ATTRS      ""
+#define METADATA_KEYS_ATTRS            " " + STRING(FILENAME_KEY  )     + "=\"\" " + \
+                                       " " + STRING(BEGIN_TIME_KEY)     + "=\"\" " + \
+                                       " " + STRING(END_TIME_KEY  )     + "=\"\" " + \
+                                       " " + STRING(DURATION_KEY  )     + "=\"\" "
+// (ASSERT: each N_* below matches N XML attributes in corresponding *_ATTRS defines above)
+#define N_ROOT_PERSISTENT_NODES 3
+#define N_ROOT_NODES            3
+#define N_ROOT_PERSISTENT_KEYS  2
+#define N_ROOT_KEYS             2
+#define N_METADATA_KEYS         4
+#define ROOT_PERSISTENT_NODE_IDS_XML   XML_HEADER + "<root-persistent-nodes-xml " + \
+                                         String(ROOT_PERSISTENT_NODE_IDS_ATTRS)   + \
+                                       "/></xml>"
+#define ROOT_NODE_IDS_XML              XML_HEADER + "<root-nodes-xml "            + \
+                                         String(ROOT_PERSISTENT_NODE_IDS_ATTRS)   + \
+                                         String(ROOT_TRANSIENT_NODE_IDS_ATTRS)    + \
+                                       "/></xml>"
+#define ROOT_PERSISTENT_KEYS_XML       XML_HEADER + "<root-persistent-keys-xml "  + \
+                                         String(ROOT_PERSISTENT_KEYS_ATTRS)       + \
+                                       "/></xml>"
+#define ROOT_KEYS_XML                  XML_HEADER + "<root-keys-xml "             + \
+                                         String(ROOT_PERSISTENT_KEYS_ATTRS)       + \
+                                         String(ROOT_TRANSIENT_KEYS_ATTRS )       + \
+                                       "/></xml>"
+#define METADATA_KEYS_XML              XML_HEADER + "<metadata-keys-xml "         + \
+                                         String(METADATA_KEYS_ATTRS)              + \
+                                       "/></xml>"
+const bool STORE::Initialize()
+{
+  RootPersistentNodes = NewNodeKeysDict(STORAGE_ID , String(ROOT_PERSISTENT_NODE_IDS_XML) ,
+                                                     String(ROOT_PERSISTENT_KEYS_XML    ) ) ;
+  RootNodes           = NewNodeKeysDict(STORAGE_ID , String(ROOT_NODE_IDS_XML           ) ,
+                                                     String(ROOT_KEYS_XML               ) ) ;
+  RootPersistentKeys  = NewNodeIdsSet(RootPersistentNodes[STORAGE_ID].getArray()) ;
+  RootKeys            = NewNodeIdsSet(RootNodes          [STORAGE_ID].getArray()) ;
+  MetadataKeys        = NewMetadataKeysSet() ;
+
+  // validations
+  bool is_valid = RootPersistentNodes.size() == N_ROOT_PERSISTENT_NODES &&
+                  RootNodes          .size() == N_ROOT_NODES            &&
+                  RootPersistentKeys .size() == N_ROOT_PERSISTENT_KEYS  &&
+                  RootKeys           .size() == N_ROOT_KEYS             &&
+                  MetadataKeys       .size() == N_METADATA_KEYS          ;
+
+DEBUG_TRACE_STORAGE_INIT
+
+  return is_valid ;
+}
+
+const NamedValueSet STORE::NewNodeKeysDict(Identifier parent_node_id , String node_ids_xml_str ,
+                                                                       String keys_xml_str     )
+{
+  XmlElement*   nodes_xml  = XmlDocument::parse(node_ids_xml_str) ;
+  XmlElement*   keys_xml   = XmlDocument::parse(keys_xml_str    ) ;
+  NamedValueSet nodes_dict = NamedValueSet() ;
+  NamedValueSet keys_set  = NamedValueSet() ;
+  Array<var> keys_array ;
+
+  nodes_dict.setFromXmlAttributes(*nodes_xml) ; delete nodes_xml ;
+  keys_set  .setFromXmlAttributes(*keys_xml ) ; delete keys_xml ;
+
+  for (int key_n = 0 ; key_n < keys_set.size() ; ++key_n)
+    keys_array.add(var(STRING(keys_set.getName(key_n)))) ;
+  nodes_dict.set(parent_node_id , var(keys_array)) ;
+
+  return nodes_dict ;
+}
+
+const NamedValueSet STORE::NewNodeIdsSet(Array<var>* keys)
+{
+  NamedValueSet keys_set ;
+
+  for (int key_n = 0 ; key_n < keys->size() ; ++key_n)
+    keys_set.set(Identifier(STRING(keys->getUnchecked(key_n))) , var::null) ;
+
+  return keys_set ;
+}
+
+const NamedValueSet STORE::NewMetadataKeysSet()
+{
+  XmlElement*   metedata_keys_xml = XmlDocument::parse(String(METADATA_KEYS_XML)) ;
+  NamedValueSet metedata_keys_set = NamedValueSet() ;
+
+  metedata_keys_set.setFromXmlAttributes(*metedata_keys_xml) ;
+
+  delete metedata_keys_xml ;
+
+  return metedata_keys_set ;
+}
 
 
 // storage nodes
@@ -70,6 +157,13 @@ const Identifier STORE::BEGIN_TIME_KEY = "begin-time" ;
 const Identifier STORE::END_TIME_KEY   = "end-time" ;
 const Identifier STORE::DURATION_KEY   = "duration" ;
 const Identifier STORE::NEW_KEY_KEY    = "new-key" ;
+
+// key sets/dicts
+NamedValueSet STORE::RootPersistentNodes ; // Initialize()
+NamedValueSet STORE::RootNodes ;           // Initialize()
+NamedValueSet STORE::RootPersistentKeys ;  // Initialize()
+NamedValueSet STORE::RootKeys ;            // Initialize()
+NamedValueSet STORE::MetadataKeys ;        // Initialize()
 
 // root defaults
 const int STORE::CONFIG_VERSION = 1 ;

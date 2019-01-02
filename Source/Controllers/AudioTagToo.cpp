@@ -70,10 +70,10 @@ String AudioTagToo::GetVersionString()
 void AudioTagToo::SetConfig(const Identifier& a_key , const var a_value)
 {
 #ifdef CONTROLLER_OWNS_STORAGE
-  ValueTree storage_node = (STORE::RootKeys().contains(a_key)) ? Store->root        :
-                                                                 ValueTree::invalid ;
+  ValueTree storage_node = (STORE::RootKeys.contains(key)) ? Store->root        :
+                                                             ValueTree::invalid ;
 
-  Store->setConfig(storage_node , a_key , a_value) ;
+  Store->setConfig(storage_node , key , value) ;
 #endif // CONTROLLER_OWNS_STORAGE
 }
 
@@ -145,7 +145,9 @@ DEBUG_TRACE_INIT_PHASE_1
 
 DEBUG_TRACE_INIT_PHASE_2
 
-DEBUG_TRACE_INIT_PHASE_1
+  if (!STORE::Initialize()) return false ;
+
+DEBUG_TRACE_INIT_PHASE_3
 
   // load persistent configuration
 #ifdef CONTROLLER_OWNS_STORAGE
@@ -153,12 +155,12 @@ DEBUG_TRACE_INIT_PHASE_1
   if (store != nullptr) Store.reset(store) ; else return false ;
 #endif // CONTROLLER_OWNS_STORAGE
 
-DEBUG_TRACE_INIT_PHASE_3
+DEBUG_TRACE_INIT_PHASE_4
 
   // load transient configuration options passed via command line or set defaults
   ProcessCliParams(cli_params) ;
 
-DEBUG_TRACE_INIT_PHASE_4
+DEBUG_TRACE_INIT_PHASE_5
 
   // initialze GUI
 #ifdef CONTROLLER_OWNS_STORAGE
@@ -169,7 +171,7 @@ DEBUG_TRACE_INIT_PHASE_4
   Window->restoreWindowStateFromString(STRING(Gui->storage->root[STORE::WINDOW_STATE_KEY])) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
-DEBUG_TRACE_INIT_PHASE_5
+DEBUG_TRACE_INIT_PHASE_6
 
   // finalize initialization
   IsInitialized = true ;
@@ -179,7 +181,7 @@ DEBUG_TRACE_INIT_PHASE_5
   Store->listen(true) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
-DEBUG_TRACE_INIT_PHASE_6
+DEBUG_TRACE_INIT_PHASE_7
 
   return IsInitialized ;
 }

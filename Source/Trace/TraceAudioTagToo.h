@@ -29,15 +29,17 @@
 
   #define DEBUG_TRACE_INIT_PHASE_1 Trace::TraceState("validating environment") ;
 
-  #define DEBUG_TRACE_INIT_PHASE_2 Trace::TraceState("instantiating model") ;
+  #define DEBUG_TRACE_INIT_PHASE_2 Trace::TraceState("initializing constants") ;
 
-  #define DEBUG_TRACE_INIT_PHASE_3 Trace::TraceState("processing CLI params") ;
+  #define DEBUG_TRACE_INIT_PHASE_3 Trace::TraceState("instantiating model") ;
 
-  #define DEBUG_TRACE_INIT_PHASE_4 Trace::TraceState("initializing GUI") ;
+  #define DEBUG_TRACE_INIT_PHASE_4 Trace::TraceState("processing CLI params") ;
 
-  #define DEBUG_TRACE_INIT_PHASE_5 Trace::TraceState("finalizing initialization") ;
+  #define DEBUG_TRACE_INIT_PHASE_5 Trace::TraceState("initializing GUI") ;
 
-  #define DEBUG_TRACE_INIT_PHASE_6 Trace::TraceState("AudioTagToo ready") ;
+  #define DEBUG_TRACE_INIT_PHASE_6 Trace::TraceState("finalizing initialization") ;
+
+  #define DEBUG_TRACE_INIT_PHASE_7 Trace::TraceState("AudioTagToo ready") ;
 
   #define DEBUG_TRACE_SHUTDOWN_PHASE_1 Trace::TraceState("shutting down audio ") ;
 
@@ -82,6 +84,7 @@
   #define DEBUG_TRACE_INIT_PHASE_4         ;
   #define DEBUG_TRACE_INIT_PHASE_5         ;
   #define DEBUG_TRACE_INIT_PHASE_6         ;
+  #define DEBUG_TRACE_INIT_PHASE_7         ;
   #define DEBUG_TRACE_SHUTDOWN_PHASE_1     ;
   #define DEBUG_TRACE_SHUTDOWN_PHASE_2     ;
   #define DEBUG_TRACE_SHUTDOWN_PHASE_3     ;

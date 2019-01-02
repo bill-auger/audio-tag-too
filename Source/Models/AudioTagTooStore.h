@@ -74,10 +74,10 @@ private:
   void verifyProperty       (ValueTree store , Identifier key , var default_value) ;
   void verifyRootProperty   (Identifier key , var default_value) ;
   bool hasDuplicatedNodes   (ValueTree stored_config) ;
-  int  nDuplicatedNodes     (ValueTree parent_node , StringArray node_ids) ;
+  int  nDuplicatedNodes     (ValueTree parent_node , NamedValueSet node_ids) ;
   void removeConflictedNodes(ValueTree parent_node , Identifier node_id) ;
-  void filterRogueKeys      (ValueTree parent_node , StringArray persistent_keys) ;
-  void filterRogueNodes     (ValueTree parent_node , StringArray persistent_node_ids) ;
+  void filterRogueKeys      (ValueTree parent_node , NamedValueSet persistent_keys) ;
+  void filterRogueNodes     (ValueTree parent_node , NamedValueSet persistent_node_ids) ;
   void sanitizeIntProperty  (ValueTree store , Identifier key , int min_value , int max_value) ;
   void sanitizeComboProperty(ValueTree store , Identifier key , StringArray options) ;
 
@@ -93,8 +93,8 @@ private:
   void valueTreeParentChanged    (ValueTree& /*reparented_node*/                                             ) override { }
   void valueTreeRedirected       (ValueTree& /*target_node*/                                                 ) override { }
 
-  // getters/setters
-  bool isKnownProperty(ValueTree node , const Identifier& key) ;
+  // helpers
+  bool isConfigProperty(ValueTree node , const Identifier& key) ;
 
 
   // configuration/persistence

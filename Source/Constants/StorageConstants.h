@@ -69,12 +69,18 @@ public:
   {
     public: static const int compareElements(const ValueTree& tree_a , const ValueTree& tree_b) ;
   } ;
-  static const Identifier  FilterId           (String a_string , String retain_chars = APP::VALID_ID_CHARS) ;
-  static const StringArray RootPersistentNodes(void) ;
-  static const StringArray RootNodes          (void) ;
-  static const StringArray RootPersistentKeys (void) ;
-  static const StringArray RootKeys           (void) ;
-  static const StringArray MetadataKeys       (void) ;
+  static const Identifier    FilterId          (String a_string                          ,
+                                                String retain_chars = APP::VALID_ID_CHARS) ;
+  static const bool          Initialize        (void) ;
+  static const NamedValueSet NewNodeKeysDict   (Identifier parent_node_id                        ,
+                                                String     node_ids_xml_str , String keys_xml_str) ;
+  static const NamedValueSet NewNodeIdsSet     (Array<var>* keys) ;
+  static const NamedValueSet NewMetadataKeysSet(void) ;
+  static       NamedValueSet RootPersistentNodes ;
+  static       NamedValueSet RootNodes ;
+  static       NamedValueSet RootPersistentKeys ;
+  static       NamedValueSet RootKeys ;
+  static       NamedValueSet MetadataKeys ;
 
   // storage nodes
   static const Identifier STORAGE_ID ;
