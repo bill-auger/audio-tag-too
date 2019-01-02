@@ -41,6 +41,7 @@
 */
 
 
+#include "../Controllers/AudioTagToo.h"
 #include "../Constants/GuiConstants.h"
 #include "../Trace/TraceWaveform.h"
 
@@ -93,8 +94,11 @@ Waveform::~Waveform()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
 
-  this->thumbnail->removeChangeListener(this) ;
-  this->scrollbar->removeListener      (this) ;
+  if (AudioTagToo::GetIsInitialized())
+  {
+    this->thumbnail->removeChangeListener(this) ;
+    this->scrollbar->removeListener      (this) ;
+  }
 
     //[/Destructor_pre]
 
@@ -177,10 +181,12 @@ void Waveform::resized()
 
 /* setup/teardown */
 
-void Waveform::initialize(AudioFormatManager& format_manager , AudioThumbnailCache& thumbnail_cache)
+bool Waveform::initialize(AudioFormatManager& format_manager , AudioThumbnailCache& thumbnail_cache)
 {
   this->thumbnail.reset(new AudioThumbnail(GUI::BIN_N_SAMPLES , format_manager , thumbnail_cache)) ;
   this->thumbnail->addChangeListener(this) ;
+
+  return true ;
 }
 
 

@@ -63,7 +63,7 @@ public:
 
 
 #ifdef CONTROLLER_OWNS_STORAGE
-  void initialize(ValueTree&     clips    , ValueTree&           compilations  ,
+  bool initialize(ValueTree&     clips    , ValueTree&           compilations  ,
                   NamedValueSet& features , AudioThumbnailCache& thumbnailCache) ;
 #else // CONTROLLER_OWNS_STORAGE
   void initialize(NamedValueSet& features , AudioThumbnailCache& thumbnailCache) ;

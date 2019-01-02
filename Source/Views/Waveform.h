@@ -50,7 +50,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 
   // setup/teardown
-  void initialize(AudioFormatManager& format_manager , AudioThumbnailCache& thumbnail_cache) ;
+  bool initialize(AudioFormatManager& format_manager , AudioThumbnailCache& thumbnail_cache) ;
 
   // getters/setters
   void           setUrl             (const Url& url) ;

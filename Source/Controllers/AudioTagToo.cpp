@@ -67,6 +67,8 @@ String AudioTagToo::GetVersionString()
 #endif // DEBUG
 }
 
+bool AudioTagToo::GetIsInitialized() { return IsInitialized ; }
+
 void AudioTagToo::SetConfig(const Identifier& a_key , const var a_value)
 {
 #ifdef CONTROLLER_OWNS_STORAGE
@@ -164,8 +166,9 @@ DEBUG_TRACE_INIT_PHASE_5
 
   // initialze GUI
 #ifdef CONTROLLER_OWNS_STORAGE
-  Gui->initialize(Store->clips , Store->compilations , Features , Store->thumbnailCache) ;
   Window->restoreWindowStateFromString(STRING(Store->root[STORE::WINDOW_STATE_KEY])) ;
+  if (!Gui->initialize(Store->clips , Store->compilations , Features , Store->thumbnailCache))
+    return false ;
 #else // CONTROLLER_OWNS_STORAGE
   Gui->initialize(Features , Store->thumbnailCache) ;
   Window->restoreWindowStateFromString(STRING(Gui->storage->root[STORE::WINDOW_STATE_KEY])) ;

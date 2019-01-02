@@ -47,6 +47,7 @@ public:
   // getters/setters
   static StringArray VersionMsg      (void) ;
   static String      GetVersionString(void) ;
+  static bool        GetIsInitialized(void) ;
   static void        SetConfig       (const Identifier& a_key , const var a_value) ;
   static void        ResetAudio      (void) ;
   static ValueTree   CreateClip      (String audio_filename , double begin_time , double end_time) ;

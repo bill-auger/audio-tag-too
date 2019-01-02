@@ -272,7 +272,7 @@ void MainContent::resized()
 /* setup/teardown */
 
 #ifdef CONTROLLER_OWNS_STORAGE
-void MainContent::initialize(ValueTree&     clips    , ValueTree&           compilations   ,
+bool MainContent::initialize(ValueTree&     clips    , ValueTree&           compilations   ,
                              NamedValueSet& features , AudioThumbnailCache& thumbnail_cache)
 {
   this->clips             = clips ;
@@ -286,19 +286,20 @@ void MainContent::initialize(NamedValueSet& features , AudioThumbnailCache& thum
   int    course_fps       = int   (features[APP::COURSE_FPS_KEY]) ;
   int    fine_fps         = int   (features[APP::FINE_FPS_KEY  ]) ;
   double zoom_factor      = double(features[APP::ZOOM_KEY      ]) ;
+  bool   is_initialized   = false ;
 
 #if ! DISABLE_AUDIO
   if (is_audio_enabled) this->workerThread.startThread(3) ;
 #endif // DISABLE_AUDIO
 
   // restore stored data
-#ifdef CONTROLLER_OWNS_STORAGE
-  this->clipsTable  ->initialize(this->clips , this->compilations) ;
-#endif // CONTROLLER_OWNS_STORAGE
-  this->fullWaveform->initialize(this->formatManager , thumbnail_cache) ;
-  this->clipWaveform->initialize(this->formatManager , thumbnail_cache) ;
   this->fileBrowser ->setRoot(File(initial_dir)) ;
   this->clipWaveform->setZoomFactor(zoom_factor) ;
+#ifdef CONTROLLER_OWNS_STORAGE
+  is_initialized = this->clipsTable  ->initialize(clips , compilations)                  &&
+#endif // CONTROLLER_OWNS_STORAGE
+                   this->fullWaveform->initialize(this->formatManager , thumbnail_cache) &&
+                   this->clipWaveform->initialize(this->formatManager , thumbnail_cache) ;
 
 #ifdef CONTROLLER_OWNS_STORAGE
   this->deviceManager.addChangeListener(AudioTagToo::Store.get()) ;
@@ -311,6 +312,10 @@ void MainContent::initialize(NamedValueSet& features , AudioThumbnailCache& thum
 
   this->fullWaveform->startTimerHz(course_fps) ;
   this->clipWaveform->startTimerHz(fine_fps  ) ;
+
+#ifdef CONTROLLER_OWNS_STORAGE
+  return is_initialized ;
+#endif // CONTROLLER_OWNS_STORAGE
 }
 
 
