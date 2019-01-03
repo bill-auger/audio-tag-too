@@ -108,6 +108,7 @@ ClipsTableView::ClipsTableView ()
     //[Constructor] You can add your own custom stuff here..
 
   this->keySelect->setTextWhenNothingSelected(GUI::NEW_KEY_TEXT) ;
+  this->keySelect->setVisible(false) ;
 
     //[/Constructor]
 }
@@ -247,6 +248,12 @@ if (key == STORE::NEW_KEY_KEY) showEditor() ;
     this->editButton  ->setTooltip(GUI::EDIT_BTN_HOVERTEXT  ) ;
     this->deleteButton->setTooltip(GUI::DELETE_BTN_HOVERTEXT) ;
 
+    // enable new key entry/selection
+    if (key == STORE::NEW_KEY_KEY)
+    {
+      populateKeySelect() ; this->keySelect->setVisible(true) ;
+    }
+
     // enable data change callbacks
 //     this->labelL->addListener(this) ;
     label_r_value.referTo(label_storage) ;
@@ -374,6 +381,33 @@ void LeafClipsTableView::resetMetadata()
 DEBUG_TRACE_LEAFVIEW_RESET_METADATA
 
   this->store.removeProperty(this->key , nullptr) ;
+}
+
+void LeafClipsTableView::populateKeySelect()
+{
+  int           n_properties = this->store.getNumProperties() ;
+  NamedValueSet keys         = AudioTagToo::GetMetadataKeys() ;
+  StringArray   key_options ;
+
+  for (int property_n = 0 ; property_n < n_properties ; ++property_n)
+  {
+    Identifier key = this->store.getPropertyName(property_n) ;
+
+    keys.remove(key) ;
+  }
+
+  int n_keys = keys.size() ;
+
+  for (int key_n = 0 ; key_n < n_keys ; ++key_n)
+  {
+    Identifier key = keys.getName(key_n) ;
+
+    key_options.add(STRING(key)) ;
+  }
+
+  this->keySelect->clear() ;
+  this->keySelect->addItemList(key_options , 1) ;
+  this->keySelect->setSelectedItemIndex(0) ;
 }
 
 

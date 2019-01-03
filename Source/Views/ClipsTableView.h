@@ -165,9 +165,9 @@ private:
 //   void labelTextChanged(Label* a_label)   override ;
 
   // helpers
-  void showEditor   (void) override ;
-  void resetMetadata(void) ;
-
+  void showEditor       (void) override ;
+  void resetMetadata    (void) ;
+  void populateKeySelect(void) ;
 
   ValueTree  store ;
   Identifier key ;
