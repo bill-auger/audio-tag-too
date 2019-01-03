@@ -196,7 +196,7 @@
   /* ClipsTableItem subclasses */
 
   #define DEBUG_TRACE_MASTERCLIPSTABLEITEM                                                 \
-    bool   is_root_item = STORE::RootNodes().contains(this->itemId) ;                      \
+    bool   is_root_item = this->itemId == STRING(STORE::STORAGE_ID) ;                      \
     String item_class   = (is_root_item) ? "RootClipsTableItem" : "MasterClipsTableItem" ; \
     String data_l       = (is_root_item) ? "n/a" : this->labelTextL ;                      \
     String data_r       = "n/a" ;                                                          \

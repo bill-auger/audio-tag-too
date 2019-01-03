@@ -226,8 +226,8 @@ LeafClipsTableView::LeafClipsTableView(String key_text , String value_text ,
 {
   Value label_r_value        = this->labelR->getTextValue() ;
   Value label_storage        = this->store.getPropertyAsValue(this->key , nullptr) ;
-  bool  is_standard_metadata = STORE::MetadataKeys().contains(STRING(this->key)) &&
-                               !this->store.isValid() ;
+  bool  is_standard_metadata = STORE::MetadataKeys.contains(STRING(key)) &&
+                               !this->store.isValid()                     ;
 
 DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 

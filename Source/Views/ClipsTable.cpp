@@ -325,7 +325,7 @@ void ClipsTable::valueTreePropertyChanged(ValueTree& changed_node , const Identi
 {
 DBG("ClipsTable::valueTreePropertyChanged() changed_node=" + changed_node.getType() + " key=" + STRING(key)) ;
 
-  bool is_reserved_key = STORE::MetadataKeys().contains(STRING(key)) ;
+  bool is_reserved_key = STORE::MetadataKeys.contains(STRING(key)) ;
 
   if (!is_reserved_key) ; // TODO:
 //   createLeafItem(changed_node , key) ;
