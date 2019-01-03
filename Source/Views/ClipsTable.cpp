@@ -130,9 +130,11 @@ void ClipsTable::resized()
 
 /* setup */
 
-void ClipsTable::initialize(ValueTree& clips_store , ValueTree& compilations_store)
+bool ClipsTable::initialize(ValueTree& clips_store , ValueTree& compilations_store)
 {
-  if (!this->clipsStore.isValid() && !this->compilationsStore.isValid())
+  bool is_initialized = this->clipsStore.isValid() || this->compilationsStore.isValid() ;
+
+  if (!is_initialized)
   {
     createItemsTree(this->clipsStore        = clips_store       ) ;
     createItemsTree(this->compilationsStore = compilations_store) ;
@@ -140,6 +142,10 @@ void ClipsTable::initialize(ValueTree& clips_store , ValueTree& compilations_sto
     this->clipsStore       .addListener(this) ;
     this->compilationsStore.addListener(this) ;
   }
+
+  is_initialized = this->clipsStore.isValid() || this->compilationsStore.isValid() ;
+
+  return is_initialized ;
 }
 
 

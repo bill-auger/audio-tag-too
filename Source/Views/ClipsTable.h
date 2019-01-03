@@ -51,7 +51,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 
   // setup
-  void initialize(ValueTree& clips_store , ValueTree& compilations_store) ;
+  bool initialize(ValueTree& clips_store , ValueTree& compilations_store) ;
 
     //[/UserMethods]
 

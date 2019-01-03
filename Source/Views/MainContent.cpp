@@ -267,8 +267,6 @@ void MainContent::resized()
 bool MainContent::initialize(ValueTree&     clips    , ValueTree&           compilations   ,
                              NamedValueSet& features , AudioThumbnailCache& thumbnail_cache)
 {
-  this->clips             = clips ;
-  this->compilations      = compilations ;
 #else // CONTROLLER_OWNS_STORAGE
 void MainContent::initialize(NamedValueSet& features , AudioThumbnailCache& thumbnail_cache)
 {
