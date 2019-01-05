@@ -200,9 +200,9 @@ DEBUG_TRACE_SHUTDOWN_PHASE_1
 DEBUG_TRACE_SHUTDOWN_PHASE_2
 
 #ifdef CONTROLLER_OWNS_STORAGE
-  if (IsInitialized) SetConfig(STORE::WINDOW_STATE_KEY , Window->getWindowStateAsString()) ;
+  if (IsInitialized) SetConfig(STORE::WINDOW_STATE_KEY , var(Window->getWindowStateAsString())) ;
 #else // CONTROLLER_OWNS_STORAGE
-  if (IsInitialized) Gui->storage->root.setProperty(STORE::WINDOW_STATE_KEY , Window->getWindowStateAsString() , nullptr) ;
+  if (IsInitialized) Gui->storage->root.setProperty(STORE::WINDOW_STATE_KEY , var(Window->getWindowStateAsString()) , nullptr) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
 DEBUG_TRACE_SHUTDOWN_PHASE_3
