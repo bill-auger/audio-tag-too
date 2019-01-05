@@ -48,7 +48,7 @@ public:
   static StringArray VersionMsg      (void) ;
   static String      GetVersionString(void) ;
   static bool        GetIsInitialized(void) ;
-  static void        SetConfig       (const Identifier& a_key , const var a_value) ;
+  static void        SetConfig       (const Identifier& key , const var value) ;
   static void        ResetAudio      (void) ;
   static ValueTree   CreateClip      (String audio_filename , double begin_time , double end_time) ;
 
@@ -67,7 +67,7 @@ private:
 
   // callbacks and event handlers
   static void HandleTimer        (int timer_id) ;
-  static void HandleConfigChanged(const Identifier& a_key) ;
+  static void HandleConfigChanged(const Identifier& key) ;
 
   // helpers
   static bool HandleCliParams    (StringArray cli_params) ;

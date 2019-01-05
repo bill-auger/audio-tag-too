@@ -69,7 +69,7 @@ String AudioTagToo::GetVersionString()
 
 bool AudioTagToo::GetIsInitialized() { return IsInitialized ; }
 
-void AudioTagToo::SetConfig(const Identifier& a_key , const var a_value)
+void AudioTagToo::SetConfig(const Identifier& key , const var value)
 {
 #ifdef CONTROLLER_OWNS_STORAGE
   ValueTree storage_node = (STORE::RootKeys.contains(key)) ? Store->root        :
@@ -226,7 +226,7 @@ void AudioTagToo::HandleTimer(int timer_id)
   }
 }
 
-void AudioTagToo::HandleConfigChanged(const Identifier& a_key) { }
+void AudioTagToo::HandleConfigChanged(const Identifier& key) { }
 
 bool AudioTagToo::HandleCliParams(StringArray cli_params)
 {
