@@ -232,8 +232,6 @@ LeafClipsTableView::LeafClipsTableView(String key_text , String value_text ,
 
 DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 
-if (key == STORE::NEW_KEY_KEY) showEditor() ;
-
 //   GUI::ConfigureTextEditor(labelR  ->getTextEditor()       , text_listener      ,
 //                            GUI::MAX_KEY_TEXTEDITOR_N_CHARS   , APP::VALID_ID_CHARS) ;
 //   GUI::ConfigureTextEditor(labelL->getTextEditor()       , nullptr            ,
@@ -286,6 +284,9 @@ LeafClipsTableView::~LeafClipsTableView()
   this->deleteButton->removeListener(this) ;
 }
 
+
+/* ClipsTableView subclass event handlers */
+
 void ClipClipsTableView::buttonClicked(Button* a_button)
 {
   Button* load_btn   = this->loadButton  .get() ;
@@ -337,6 +338,10 @@ DBG("LeafClipsTableView::labelTextChanged() isValidIdentifier(key)=" + String((I
   }
 }
 */
+
+
+/* ClipsTableView subclass helpers */
+
 void ClipClipsTableView::showEditor()
 {
 DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR
@@ -449,9 +454,14 @@ LeafClipsTableItem::LeafClipsTableItem(String     item_id , String     key_text 
 DEBUG_TRACE_LEAFCLIPSTABLEITEM
 }
 
-bool MasterClipsTableItem::mightContainSubItems() { return TRUE ; }
-bool ClipClipsTableItem::mightContainSubItems() { return TRUE ; }
-bool LeafClipsTableItem::mightContainSubItems() { return FALSE ; }
+
+/* ClipsTableItem subclass TreeViewItem implementation */
+
+bool MasterClipsTableItem::mightContainSubItems() { return true ; }
+
+bool ClipClipsTableItem::mightContainSubItems() { return true ; }
+
+bool LeafClipsTableItem::mightContainSubItems() { return false ; }
 
 Component* MasterClipsTableItem::createItemComponent()
 {
