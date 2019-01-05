@@ -100,6 +100,34 @@ ValueTree AudioTagToo::CreateClip(String audio_filename , double begin_time , do
   return Store->createClip(audio_filename , begin_time , end_time) ;
 }
 
+NamedValueSet AudioTagToo::GetMetadataKeys()
+{
+  ValueTree     root_store = Store->clips ;
+  int           n_masters  = root_store.getNumChildren() ;
+  NamedValueSet key_options ;
+
+  for (int master_n = 0 ; master_n < n_masters ; ++master_n)
+  {
+    ValueTree master_store = root_store.getChild(master_n) ;
+    int       n_clips      = master_store.getNumChildren() ;
+
+    for (int clip_n = 0 ; clip_n < n_clips ; ++clip_n)
+    {
+      ValueTree clip_store   = master_store.getChild(clip_n) ;
+      int       n_properties = clip_store.getNumProperties() ;
+
+      for (int property_n = 0 ; property_n < n_properties ; ++property_n)
+      {
+        String key = STRING(clip_store.getPropertyName(property_n)) ;
+
+        key_options.set(key , var::null) ;
+      }
+    }
+  }
+
+  return key_options ;
+}
+
 void AudioTagToo::Warning(String message_text) { Alert::Push(GUI::ALERT_TYPE_WARNING , message_text) ; }
 
 void AudioTagToo::Error(String message_text) { Alert::Push(GUI::ALERT_TYPE_ERROR , message_text) ; }
