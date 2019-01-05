@@ -85,8 +85,8 @@ private:
   void valueTreePropertyChanged  (ValueTree& changed_node , const Identifier& key)                 override ;
 
   // unhandled ValueTree::Listener events
-  void valueTreeParentChanged(ValueTree& /*reparented_node*/) override { }
-  void valueTreeRedirected   (ValueTree& /*target_node*/) override { }
+  void valueTreeParentChanged(ValueTree& reparented_node) override { }
+  void valueTreeRedirected   (ValueTree& target_node)     override { }
 
     //[/UserVariables]
 

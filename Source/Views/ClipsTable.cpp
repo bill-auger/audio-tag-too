@@ -285,8 +285,8 @@ void ClipsTable::valueTreeChildAdded(ValueTree& parent_node , ValueTree& new_nod
 /*
   const StringArray STORE::CLIPS_STORES    = StringArray::fromLines(STORE::CLIPS_ID        + newLine +
                                                                     STORE::COMPILATIONS_ID           ) ;
-  bool is_master_node = STORE::CLIPS_STORES.contains(parent_node            .getName()) ;
-  bool is_clip_node   = STORE::CLIPS_STORES.contains(parent_node.getParent().getName()) ;
+  bool is_master_node = STORE::CLIPS_STORES.contains(parent_node            .getType()) ;
+  bool is_clip_node   = STORE::CLIPS_STORES.contains(parent_node.getParent().getType()) ;
 */
 
   bool      is_master_node = parent_node             == this->clipsStore       ||
