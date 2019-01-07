@@ -54,14 +54,7 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 
-  // getters/setters
-  void loadUrl              (File audio_url) ;
-  void setPosition          (double time) ;
-  void setHeadMarker        (void) ;
-  void setTailMarker        (void) ;
-  void updateTransportButton(void) ;
-
-
+  // setup/teardown
 #ifdef CONTROLLER_OWNS_STORAGE
   bool initialize(ValueTree&     clips    , ValueTree&           compilations  ,
                   NamedValueSet& features , AudioThumbnailCache& thumbnailCache) ;
@@ -69,10 +62,20 @@ public:
   void initialize(NamedValueSet& features , AudioThumbnailCache& thumbnailCache) ;
 #endif // CONTROLLER_OWNS_STORAGE
 
-  void setStatusL(String statusText) ;
-  void setStatusC(String statusText) ;
-  void setStatusR(String statusText) ;
-  void setStatus (void) ;
+  // getters/setters
+  void setPosition  (double time) ;
+  void setHeadMarker(void) ;
+  void setTailMarker(void) ;
+
+  // helpers
+  void loadUrl              (File audio_url) ;
+  void updateTransportButton(void) ;
+  void createMetadata       (ValueTree& clip_store) ;
+  void setStatusL           (String statusText) ;
+  void setStatusC           (String statusText) ;
+  void setStatusR           (String statusText) ;
+  void setStatus            (void) ;
+
 
     //[/UserMethods]
 
@@ -100,8 +103,10 @@ private:
 #endif // CONTROLLER_OWNS_STORAGE
 
   // getters/setters
+  void createClip(void) ;
+
+  // helpers
   void toggleTransport(void) ;
-  void createClip     (void) ;
 
   // event handlers
   void paintOverChildren     (Graphics& g)                                override ;

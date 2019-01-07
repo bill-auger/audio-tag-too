@@ -34,12 +34,6 @@ const Identifier STORE::FilterId(String a_string , String retain_chars)
                  .toLowerCase()
                  .replaceCharacters(APP::FILTER_CHARS , APP::REPLACE_CHARS) ;
 }
-// #define ROOT_PERSISTENT_NODE_IDS STORE::CLIPS_ID            + newLine + \
-//                                  STORE::COMPILATIONS_ID
-// #define ROOT_TRANSIENT_NODE_IDS  String::empty
-// #define ROOT_PERSISTENT_KEYS     STRING(CONFIG_VERSION_KEY) + newLine + \
-//                                  STRING(WINDOW_STATE_KEY  )
-// #define ROOT_TRANSIENT_KEYS      String::empty
 #define XML_HEADER                     String("<?xml version=\"1.0\"?>")
 #define ROOT_PERSISTENT_NODE_IDS_ATTRS " " + STRING(STORAGE_ID     )    + "=\"\" " + \
                                        " " + STRING(CLIPS_ID       )    + "=\"\" " + \
@@ -48,49 +42,81 @@ const Identifier STORE::FilterId(String a_string , String retain_chars)
 #define ROOT_PERSISTENT_KEYS_ATTRS     " " + STRING(CONFIG_VERSION_KEY) + "=\"\" " + \
                                        " " + STRING(WINDOW_STATE_KEY  ) + "=\"\" "
 #define ROOT_TRANSIENT_KEYS_ATTRS      ""
-#define METADATA_KEYS_ATTRS            " " + STRING(FILENAME_KEY  )     + "=\"\" " + \
-                                       " " + STRING(BEGIN_TIME_KEY)     + "=\"\" " + \
-                                       " " + STRING(END_TIME_KEY  )     + "=\"\" " + \
-                                       " " + STRING(DURATION_KEY  )     + "=\"\" "
-// (ASSERT: each N_* below matches N XML attributes in corresponding *_ATTRS defines above)
+#define MASTER_KEYS_ATTRS              " " + STRING(FILENAME_KEY  )     + "=\"\" " + \
+                                       " " + STRING(LABEL_TEXT_KEY)     + "=\"\" " + \
+                                       " " + STRING(ITEM_ID_KEY     )   + "=\"\" "
+#define CLIP_IMMUTABLE_KEYS_ATTRS      " " + STRING(FILENAME_KEY    )   + "=\"\" " + \
+                                       " " + STRING(BEGIN_TIME_KEY  )   + "=\"\" " + \
+                                       " " + STRING(END_TIME_KEY    )   + "=\"\" " + \
+                                       " " + STRING(DURATION_KEY    )   + "=\"\" " + \
+                                       " " + STRING(ITEM_ID_KEY     )   + "=\"\" "
+#define CLIP_PERSISTENT_KEYS_ATTRS     " " + STRING(LABEL_TEXT_KEY  )   + "=\"\" "
+#define CLIP_TRANSIENT_KEYS_ATTRS      " " + STRING(NEW_METADATA_KEY)   + "=\"\" "
+// ASSERT: each N_* below tracks the number of XML attributes
+//         in corresponding *_ATTRS defines above
 #define N_ROOT_PERSISTENT_NODES 3
-#define N_ROOT_NODES            3
+#define N_ROOT_TRANSIENT_NODES  0
 #define N_ROOT_PERSISTENT_KEYS  2
-#define N_ROOT_KEYS             2
-#define N_METADATA_KEYS         4
-#define ROOT_PERSISTENT_NODE_IDS_XML   XML_HEADER + "<root-persistent-nodes-xml " + \
-                                         String(ROOT_PERSISTENT_NODE_IDS_ATTRS)   + \
-                                       "/></xml>"
-#define ROOT_NODE_IDS_XML              XML_HEADER + "<root-nodes-xml "            + \
-                                         String(ROOT_PERSISTENT_NODE_IDS_ATTRS)   + \
-                                         String(ROOT_TRANSIENT_NODE_IDS_ATTRS)    + \
-                                       "/></xml>"
-#define ROOT_PERSISTENT_KEYS_XML       XML_HEADER + "<root-persistent-keys-xml "  + \
-                                         String(ROOT_PERSISTENT_KEYS_ATTRS)       + \
-                                       "/></xml>"
-#define ROOT_KEYS_XML                  XML_HEADER + "<root-keys-xml "             + \
-                                         String(ROOT_PERSISTENT_KEYS_ATTRS)       + \
-                                         String(ROOT_TRANSIENT_KEYS_ATTRS )       + \
-                                       "/></xml>"
-#define METADATA_KEYS_XML              XML_HEADER + "<metadata-keys-xml "         + \
-                                         String(METADATA_KEYS_ATTRS)              + \
-                                       "/></xml>"
+#define N_ROOT_TRANSIENT_KEYS   0
+#define N_MASTER_KEYS           3
+#define N_CLIP_IMMUTABLE_KEYS   5
+#define N_CLIP_MUTABLE_KEYS     1
+#define N_CLIP_TRANSIENT_KEYS   1
+// ASSERT: each N_* below is the sum of the counts above
+//         for which the corresponding attribute sets constitute each merged set below
+#define N_ROOT_NODES            (N_ROOT_PERSISTENT_NODES + N_ROOT_TRANSIENT_NODES)
+#define N_ROOT_KEYS             (N_ROOT_PERSISTENT_KEYS  + N_ROOT_TRANSIENT_KEYS )
+#define N_CLIP_PERSISTENT_KEYS  (N_CLIP_IMMUTABLE_KEYS   + N_CLIP_MUTABLE_KEYS   )
+#define ROOT_PERSISTENT_NODE_IDS_XML XML_HEADER + "<root-persistent-nodes-xml " + \
+                                       String(ROOT_PERSISTENT_NODE_IDS_ATTRS)   + \
+                                     "/></xml>"
+#define ROOT_NODE_IDS_XML            XML_HEADER + "<root-nodes-xml "            + \
+                                       String(ROOT_PERSISTENT_NODE_IDS_ATTRS)   + \
+                                       String(ROOT_TRANSIENT_NODE_IDS_ATTRS)    + \
+                                     "/></xml>"
+#define ROOT_PERSISTENT_KEYS_XML     XML_HEADER + "<root-persistent-keys-xml "  + \
+                                       String(ROOT_PERSISTENT_KEYS_ATTRS)       + \
+                                     "/></xml>"
+#define ROOT_KEYS_XML                XML_HEADER + "<root-keys-xml "             + \
+                                       String(ROOT_PERSISTENT_KEYS_ATTRS)       + \
+                                       String(ROOT_TRANSIENT_KEYS_ATTRS )       + \
+                                     "/></xml>"
+#define MASTER_KEYS_XML              XML_HEADER + "<master-keys-xml "           + \
+                                       String(MASTER_KEYS_ATTRS)                + \
+                                     "/></xml>"
+#define CLIP_IMMUTABLE_KEYS_XML      XML_HEADER + "<clip-immutable-keys-xml "   + \
+                                       String(CLIP_IMMUTABLE_KEYS_ATTRS)        + \
+                                     "/></xml>"
+#define CLIP_PERSISTENT_KEYS_XML     XML_HEADER + "<clip-persistent-keys-xml "  + \
+                                       String(CLIP_IMMUTABLE_KEYS_ATTRS )       + \
+                                       String(CLIP_PERSISTENT_KEYS_ATTRS)       + \
+                                     "/></xml>"
+#define CLIP_TRANSIENT_KEYS_XML      XML_HEADER + "<clip-transient-keys-xml "   + \
+                                       String(CLIP_TRANSIENT_KEYS_ATTRS)        + \
+                                     "/></xml>"
 const bool STORE::Initialize()
 {
-  RootPersistentNodes = NewNodeKeysDict(STORAGE_ID , String(ROOT_PERSISTENT_NODE_IDS_XML) ,
-                                                     String(ROOT_PERSISTENT_KEYS_XML    ) ) ;
-  RootNodes           = NewNodeKeysDict(STORAGE_ID , String(ROOT_NODE_IDS_XML           ) ,
-                                                     String(ROOT_KEYS_XML               ) ) ;
-  RootPersistentKeys  = NewNodeIdsSet(RootPersistentNodes[STORAGE_ID].getArray()) ;
-  RootKeys            = NewNodeIdsSet(RootNodes          [STORAGE_ID].getArray()) ;
-  MetadataKeys        = NewMetadataKeysSet() ;
+  // load key sets
+  RootPersistentNodeIds = NewNodeKeysDict(STORAGE_ID , String(ROOT_PERSISTENT_NODE_IDS_XML) ,
+                                                       String(ROOT_PERSISTENT_KEYS_XML    ) ) ;
+  RootNodeIds           = NewNodeKeysDict(STORAGE_ID , String(ROOT_NODE_IDS_XML           ) ,
+                                                       String(ROOT_KEYS_XML               ) ) ;
+  RootPersistentKeys    = NewNodeIdsSet  (RootPersistentNodeIds[STORAGE_ID].getArray()) ;
+  RootKeys              = NewNodeIdsSet  (RootNodeIds          [STORAGE_ID].getArray()) ;
+  MasterKeys            = NewKeysSet     (String(MASTER_KEYS_XML         )) ;
+  ClipImmutableKeys     = NewKeysSet     (String(CLIP_IMMUTABLE_KEYS_XML )) ;
+  ClipPersistentKeys    = NewKeysSet     (String(CLIP_PERSISTENT_KEYS_XML)) ;
+  ClipTransientKeys     = NewKeysSet     (String(CLIP_TRANSIENT_KEYS_XML )) ;
 
   // validations
-  bool is_valid = RootPersistentNodes.size() == N_ROOT_PERSISTENT_NODES &&
-                  RootNodes          .size() == N_ROOT_NODES            &&
-                  RootPersistentKeys .size() == N_ROOT_PERSISTENT_KEYS  &&
-                  RootKeys           .size() == N_ROOT_KEYS             &&
-                  MetadataKeys       .size() == N_METADATA_KEYS          ;
+  bool is_valid = RootPersistentNodeIds.size() == N_ROOT_PERSISTENT_NODES &&
+                  RootNodeIds          .size() == N_ROOT_NODES            &&
+                  RootPersistentKeys   .size() == N_ROOT_PERSISTENT_KEYS  &&
+                  RootKeys             .size() == N_ROOT_KEYS             &&
+                  MasterKeys           .size() == N_MASTER_KEYS           &&
+                  ClipImmutableKeys    .size() == N_CLIP_IMMUTABLE_KEYS   &&
+                  ClipPersistentKeys   .size() == N_CLIP_PERSISTENT_KEYS  &&
+                  ClipTransientKeys    .size() == N_CLIP_TRANSIENT_KEYS    ;
 
 DEBUG_TRACE_STORAGE_INIT
 
@@ -126,9 +152,9 @@ const NamedValueSet STORE::NewNodeIdsSet(Array<var>* keys)
   return keys_set ;
 }
 
-const NamedValueSet STORE::NewMetadataKeysSet()
+const NamedValueSet STORE::NewKeysSet(String metadata_ids_xml_str)
 {
-  XmlElement*   metedata_keys_xml = XmlDocument::parse(String(METADATA_KEYS_XML)) ;
+  XmlElement*   metedata_keys_xml = XmlDocument::parse(metadata_ids_xml_str) ;
   NamedValueSet metedata_keys_set = NamedValueSet() ;
 
   metedata_keys_set.setFromXmlAttributes(*metedata_keys_xml) ;
@@ -150,20 +176,24 @@ const Identifier STORE::CONFIG_VERSION_KEY = "config-version" ;
 const Identifier STORE::WINDOW_STATE_KEY   = "window-state" ;
 
 // clips/compilations keys
-const Identifier STORE::ITEM_ID_KEY    = "item-id" ;
-const Identifier STORE::LABEL_TEXT_KEY = "label-text" ;
-const Identifier STORE::FILENAME_KEY   = "master-filename" ;
-const Identifier STORE::BEGIN_TIME_KEY = "begin-time" ;
-const Identifier STORE::END_TIME_KEY   = "end-time" ;
-const Identifier STORE::DURATION_KEY   = "duration" ;
-const Identifier STORE::NEW_KEY_KEY    = "new-key" ;
+const Identifier STORE::ITEM_ID_KEY       = "item-id" ;
+const Identifier STORE::LABEL_TEXT_KEY    = "label-text" ;
+const Identifier STORE::FILENAME_KEY      = "master-filename" ;
+const Identifier STORE::BEGIN_TIME_KEY    = "begin-time" ;
+const Identifier STORE::END_TIME_KEY      = "end-time" ;
+const Identifier STORE::DURATION_KEY      = "duration" ;
+const Identifier STORE::NEW_METADATA_KEY  = "new-key" ;
+const Identifier STORE::ADD_BTN_STATE_KEY = "add-btn-state" ;
 
 // key sets/dicts
-NamedValueSet STORE::RootPersistentNodes ; // Initialize()
-NamedValueSet STORE::RootNodes ;           // Initialize()
-NamedValueSet STORE::RootPersistentKeys ;  // Initialize()
-NamedValueSet STORE::RootKeys ;            // Initialize()
-NamedValueSet STORE::MetadataKeys ;        // Initialize()
+NamedValueSet STORE::RootPersistentNodeIds ; // Initialize()
+NamedValueSet STORE::RootNodeIds ;           // Initialize()
+NamedValueSet STORE::RootPersistentKeys ;    // Initialize()
+NamedValueSet STORE::RootKeys ;              // Initialize()
+NamedValueSet STORE::MasterKeys ;            // Initialize()
+NamedValueSet STORE::ClipImmutableKeys ;     // Initialize()
+NamedValueSet STORE::ClipPersistentKeys ;    // Initialize()
+NamedValueSet STORE::ClipTransientKeys ;     // Initialize()
 
 // root defaults
 const int STORE::CONFIG_VERSION = 1 ;

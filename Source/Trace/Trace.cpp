@@ -44,6 +44,10 @@ bool Trace::ErrorsEnabled   = DEBUG_TRACE_ERRORS   ;
 
 void Trace::EnableTracing(bool should_enable)
 {
+#if DEBUG_TRACE || DEBUG_TRACE_VB
+Trace::TraceState("debug tracing " + String((should_enable) ? "enabled" : "disabled")) ;
+#endif // DEBUG_TRACE
+
   EventEnabled    = (DEBUG_TRACE_EVENTS  ) && should_enable ;
   GuiEnabled      = (DEBUG_TRACE_GUI     ) && should_enable ;
   GuiVbEnabled    = (DEBUG_TRACE_GUI_VB  ) && should_enable ;

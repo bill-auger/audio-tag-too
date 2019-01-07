@@ -27,10 +27,10 @@
 
 // enable debug/tracing features
 #ifdef DEBUG
-  #define DEBUG_TRACE 1
+  #define DEBUG_TRACE    1
   #define DEBUG_TRACE_VB 0
 #else // DEBUG
-  #define DEBUG_TRACE 0
+  #define DEBUG_TRACE    0
   #define DEBUG_TRACE_VB 0
 #endif // DEBUG
 #define DEBUG_TRACE_EVENTS   (DEBUG_TRACE    && 1)

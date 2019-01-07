@@ -1,23 +1,21 @@
-/*\
-|*|  AudioTagToo - Clip and stitch audio samples
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
-|*|
-|*|  This file is part of the AudioTagToo program.
-|*|
-|*|  AudioTagToo is free software: you can redistribute it and/or modify
-|*|  it under the terms of the GNU General Public License as published by
-|*|  the Free Software Foundation, either version 3 of the License, or
-|*|  (at your option) any later version.
-|*|
-|*|  AudioTagToo is distributed in the hope that it will be useful,
-|*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
-|*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-|*|  GNU General Public License for more details.
-|*|
-|*|  You should have received a copy of the GNU General Public License
-|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
-\*/
+/*
+  ==============================================================================
 
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.3.2
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
+*/
 
 //[Headers] You can add your own extra header files here...
 
@@ -35,7 +33,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-ClipsTableView::ClipsTableView ()
+ClipsTableView::ClipsTableView (TreeView* treeview , const String& item_id)
+    : parentTreeview(treeview) , itemId(item_id)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -107,7 +106,8 @@ ClipsTableView::ClipsTableView ()
 
     //[Constructor] You can add your own custom stuff here..
 
-  this->keySelect->setTextWhenNothingSelected(GUI::NEW_KEY_TEXT) ;
+  this->keySelect->setTextWhenNothingSelected   (GUI::NEW_KEY_TEXT      ) ;
+  this->keySelect->setTextWhenNoChoicesAvailable(GUI::FIRST_NEW_KEY_TEXT) ;
   this->keySelect->setVisible(false) ;
 
     //[/Constructor]
@@ -161,11 +161,23 @@ void ClipsTableView::resized()
 void ClipsTableView::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
     //[UsercomboBoxChanged_Pre]
+
+  ComboBox* key_select = keySelect.get() ;
+
+DEBUG_TRACE_CLIPVIEW_COMBOBOX_CHANGED
+
     //[/UsercomboBoxChanged_Pre]
 
     if (comboBoxThatHasChanged == keySelect.get())
     {
         //[UserComboBoxCode_keySelect] -- add your combo box handling code here..
+
+DBG("ClipsTableView::comboBoxChanged() idx=" + String(key_select->getSelectedItemIndex()) +
+                                      " id=" + String(key_select->getSelectedId())        +
+                                    " text=" + key_select->getText()                      ) ;
+
+
+
         //[/UserComboBoxCode_keySelect]
     }
 
@@ -179,7 +191,9 @@ void ClipsTableView::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 /* ClipsTableView subclasses */
 
-MasterClipsTableView::MasterClipsTableView(String label_text)
+MasterClipsTableView::MasterClipsTableView(TreeView*     treeview   , const String& item_id ,
+                                           const String& label_text                         ) :
+                                           ClipsTableView(treeview  , item_id)
 {
 DEBUG_TRACE_MASTERCLIPSTABLEVIEW
 
@@ -194,13 +208,16 @@ DEBUG_TRACE_MASTERCLIPSTABLEVIEW
   removeChildComponent(this->addButton   .get()) ;
 }
 
-ClipClipsTableView::ClipClipsTableView(String label_text , ValueTree store_) :
-                                                           store(store_)
+ClipClipsTableView::ClipClipsTableView(TreeView*     treeview   , const String& item_id   ,
+                                       const String& label_text , ValueTree     clip_store) :
+                                       ClipsTableView(treeview  , item_id)                ,
+                                                                  clipStore(clip_store)
+
 {
 DEBUG_TRACE_CLIPCLIPSTABLEVIEW
 
   Value label_l_value = this->labelL->getTextValue() ;
-  Value label_storage = this->store.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
+  Value label_storage = this->clipStore.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
 
 //   GUI::ConfigureTextEditor(labelL  ->getTextEditor()       , text_listener      ,
 //                            GUI::MAX_CLIPNAME_TEXTEDITOR_N_CHARS   , APP::VALID_ID_CHARS) ;
@@ -219,55 +236,76 @@ DEBUG_TRACE_CLIPCLIPSTABLEVIEW
   this->editButton  ->addListener(this) ;
   this->deleteButton->addListener(this) ;
   this->addButton   ->addListener(this) ;
+  this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(true) , nullptr) ; // controls addButton enabled state
 }
 
-LeafClipsTableView::LeafClipsTableView(String key_text , String value_text ,
-                                       Identifier key_ , ValueTree store_  ) :
-                                       key(key_)       , store(store_)
+LeafClipsTableView::LeafClipsTableView(TreeView*         treeview   , const String& item_id    ,
+                                       const String&     key_text   , const String& value_text ,
+                                       const Identifier& key_       , ValueTree     clip_store ) :
+                                       ClipsTableView(treeview      , item_id)                 ,
+                                       key(key_)                    , clipStore(clip_store)
 {
-  Value label_r_value        = this->labelR->getTextValue() ;
-  Value label_storage        = this->store.getPropertyAsValue(this->key , nullptr) ;
-  bool  is_standard_metadata = STORE::MetadataKeys.contains(STRING(key)) &&
-                               !this->store.isValid()                     ;
+  bool  is_immutable_metadata  = STORE::ClipImmutableKeys.contains(STRING(this->key)) ;
+  bool  is_new_key_placeholder = this->key == STORE::NEW_METADATA_KEY ;
+  Value label_r_value          = this->labelR->getTextValue() ;
+  Value label_storage          = this->clipStore.getPropertyAsValue(this->key , nullptr) ;
 
 DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 
+  /* configuration */
+
+  if (!is_immutable_metadata)
+  {
+    // enable data change callbacks
+//     this->labelL->addListener(this) ;
+    if (!is_new_key_placeholder)
+    {
+      label_r_value    .referTo    (label_storage) ;
+      this->editButton->addListener(this) ;
+    }
+    this->deleteButton->addListener(this) ;
+  }
+
+
+  /* presentation */
+
+  if (!is_new_key_placeholder)
+  {
 //   GUI::ConfigureTextEditor(labelR  ->getTextEditor()       , text_listener      ,
 //                            GUI::MAX_KEY_TEXTEDITOR_N_CHARS   , APP::VALID_ID_CHARS) ;
 //   GUI::ConfigureTextEditor(labelL->getTextEditor()       , nullptr            ,
 //                            GUI::MAX_VALUE_TEXTEDITOR_N_CHARS , APP::ALPHANEMERIC) ;
-  this->labelL->setText(key_text + ":" , juce::dontSendNotification) ;
-  this->labelR->setText(value_text     , juce::dontSendNotification) ;
-  this->labelL->setFont(Font((float)(GUI::TREE_ITEM_H - 2) , Font::plain).withTypefaceStyle("Regular")) ;
-  this->labelR->setFont(Font((float)(GUI::TREE_ITEM_H - 2) , Font::plain).withTypefaceStyle("Regular")) ;
 
-  if (!is_standard_metadata)
+    this->labelL->setFont(Font((float)(GUI::TREE_ITEM_H - 2) , Font::plain).withTypefaceStyle("Regular")) ;
+    this->labelR->setFont(Font((float)(GUI::TREE_ITEM_H - 2) , Font::plain).withTypefaceStyle("Regular")) ;
+    this->labelL->setText(key_text + ":" , juce::dontSendNotification) ;
+    this->labelR->setText(value_text     , juce::dontSendNotification) ;
+  }
+
+  if (!is_immutable_metadata)
   {
     this->editButton  ->setTooltip(GUI::EDIT_BTN_HOVERTEXT  ) ;
     this->deleteButton->setTooltip(GUI::DELETE_BTN_HOVERTEXT) ;
 
-    // enable new key entry/selection
-    if (key == STORE::NEW_KEY_KEY)
+    if (is_new_key_placeholder)
     {
-      populateKeySelect() ; this->keySelect->setVisible(true) ;
-    }
+      // enable new key entry/selection
+      populateKeySelect() ;
+      this->keySelect->setSelectedItemIndex(0) ;
+      this->keySelect->showPopup() ;
+      this->keySelect->setVisible(true) ;
 
-    // enable data change callbacks
-//     this->labelL->addListener(this) ;
-    label_r_value.referTo(label_storage) ;
+      removeChildComponent(this->editButton  .get()) ;
+    }
   }
   else
   {
-    // enable data change callbacks
-    this->editButton  ->addListener(this) ;
-    this->deleteButton->addListener(this) ;
-
     // ensure basic metadata leaf items are immutable
-    removeChildComponent(this->editButton  .get()) ;
-    removeChildComponent(this->deleteButton.get()) ;
+    removeChildComponent  (this->editButton  .get()) ;
+    removeChildComponent  (this->deleteButton.get()) ;
   }
-  removeChildComponent(  this->loadButton  .get()) ;
-  removeChildComponent(  this->addButton   .get()) ;
+  removeChildComponent    (this->loadButton  .get()) ;
+  removeChildComponent    (this->addButton   .get()) ;
 }
 
 ClipClipsTableView::~ClipClipsTableView()
@@ -285,6 +323,18 @@ LeafClipsTableView::~LeafClipsTableView()
 }
 
 
+/* ValueControlledButton */
+
+ValueControlledButton::ValueControlledButton(const String& button_name , ValueTree clip_store) :
+                                             Button(button_name)
+{
+  Value  label_storage      = clip_store.getPropertyAsValue(STORE::ADD_BTN_STATE_KEY , nullptr) ;
+  Value& toggle_state_value = getToggleStateValue() ;
+
+  label_storage.referTo(toggle_state_value) ;
+}
+
+
 /* ClipsTableView subclass event handlers */
 
 void ClipClipsTableView::buttonClicked(Button* a_button)
@@ -296,10 +346,10 @@ void ClipClipsTableView::buttonClicked(Button* a_button)
 
 DEBUG_TRACE_CLIPVIEW_BTN_CLICKED
 
-  if      (a_button == load_btn  ) AudioTagToo::LoadClip(this->store) ;
+  if      (a_button == load_btn  ) AudioTagToo::LoadClip(this->clipStore) ;
   else if (a_button == edit_btn  ) showEditor() ;
   else if (a_button == delete_btn) removeClip() ;
-  else if (a_button == add_btn   ) setMetadata() ;
+  else if (a_button == add_btn   ) addMetadata() ;
 }
 
 void LeafClipsTableView::buttonClicked(Button* a_button)
@@ -312,7 +362,7 @@ DEBUG_TRACE_LEAFVIEW_BTN_CLICKED
   if      (a_button == edit_btn  ) showEditor() ;
   else if (a_button == delete_btn) resetMetadata() ;
 }
-/*
+
 void LeafClipsTableView::labelTextChanged(Label* a_label) // metadata leaf nodes
 {
 DBG("LeafClipsTableView::labelTextChanged() a_label='" + a_label->getText() + "'") ;
@@ -326,18 +376,22 @@ DBG("LeafClipsTableView::labelTextChanged() isValidIdentifier(key)=" + String((I
   bool       is_valid_key   = Identifier::isValidIdentifier(key_text) ;
   bool       is_valid_value = !value_text.isEmpty() ;
 
-  if (is_valid_key && is_valid_value && new_key != STORE::NEW_KEY_KEY)
+  if (is_valid_key && is_valid_value && new_key != STORE::NEW_METADATA_KEY)
   {
     // trigger destruction of this parent LeafClipsTableItem
-//     if (this->store.hasProperty(key))
-    this->store.removeProperty(this->key , nullptr) ;
-    this->store.removeProperty(STORE::NEW_KEY_KEY , nullptr) ;
+//     if (this->clipStore.hasProperty(key))
+    this->clipStore.removeProperty(this->key , nullptr) ;
+    this->clipStore.removeProperty(STORE::NEW_METADATA_KEY , nullptr) ;
 
     // trigger instantiation of replacement LeafClipsTableItem
-    this->store.setProperty(new_key , String::empty , nullptr) ;
+    this->clipStore.setProperty(new_key , var(String::empty) , nullptr) ;
   }
 }
-*/
+
+
+/* ValueControlledButton event handlers */
+
+void ValueControlledButton::buttonStateChanged() { setEnabled(getToggleState()) ; }
 
 
 /* ClipsTableView subclass helpers */
@@ -371,32 +425,55 @@ void ClipClipsTableView::removeClip()
 {
 DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP
 
-  this->store.getParent().removeChild(this->store , nullptr) ;
+  this->clipStore.getParent().removeChild(this->clipStore , nullptr) ;
 }
 
-void ClipClipsTableView::setMetadata()
+void ClipClipsTableView::addMetadata()
 {
-DEBUG_TRACE_LEAFVIEW_SET_METADATA
+  bool has_orphaned_placeholder = this->clipStore.hasProperty(STORE::NEW_METADATA_KEY) ;
 
-  this->store.setProperty(STORE::NEW_KEY_KEY , String::empty , nullptr) ;
+DEBUG_TRACE_LEAFVIEW_ADD_METADATA
+
+  // trigger addButton enabled state change
+  this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(false) , nullptr) ;
+
+  if (has_orphaned_placeholder) this->clipStore.removeProperty(STORE::NEW_METADATA_KEY , nullptr) ;
+
+this->clipStore.removeProperty("has_orphaned_placeholder-maybe-uneeded" , nullptr) ;
+
+  this->clipStore.setProperty(STORE::NEW_METADATA_KEY , var(String::empty) , nullptr) ;
+
+  AudioTagToo::CreateMetadata(this->clipStore) ;
 }
 
 void LeafClipsTableView::resetMetadata()
 {
+  TreeViewItem* this_item   = this->parentTreeview->findItemFromIdentifierString(this->itemId) ;
+  TreeViewItem* parent_item = (this_item != nullptr) ? this_item->getParentItem()    : nullptr ;
+  int           this_idx    = (this_item != nullptr) ? this_item->getIndexInParent() : -1 ;
+
 DEBUG_TRACE_LEAFVIEW_RESET_METADATA
 
-  this->store.removeProperty(this->key , nullptr) ;
+  this->clipStore.removeProperty(this->key , nullptr) ;
+  if (parent_item != nullptr)
+  {
+    // trigger addButton enabled state change in parent item view
+    this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(true) , nullptr) ;
+
+    // delete this and host item
+    parent_item->removeSubItem(this_idx) ;
+  }
 }
 
 void LeafClipsTableView::populateKeySelect()
 {
-  int           n_properties = this->store.getNumProperties() ;
+  int           n_properties = this->clipStore.getNumProperties() ;
   NamedValueSet keys         = AudioTagToo::GetMetadataKeys() ;
   StringArray   key_options ;
 
   for (int property_n = 0 ; property_n < n_properties ; ++property_n)
   {
-    Identifier key = this->store.getPropertyName(property_n) ;
+    Identifier key = this->clipStore.getPropertyName(property_n) ;
 
     keys.remove(key) ;
   }
@@ -412,44 +489,37 @@ void LeafClipsTableView::populateKeySelect()
 
   this->keySelect->clear() ;
   this->keySelect->addItemList(key_options , 1) ;
-  this->keySelect->setSelectedItemIndex(0) ;
 }
 
 
 /* ClipsTableItem */
 
-ClipsTableItem::ClipsTableItem(String item_id  , String label_text_l      , String label_text_r) :
-                               itemId(item_id) , labelTextL(label_text_l) , labelTextR(label_text_r) { }
+ClipsTableItem::ClipsTableItem(const String& item_id , const String& label_text_l , const String& label_text_r) :
+                               itemId(item_id)       , labelTextL(label_text_l)   , labelTextR(label_text_r)    { }
 
 String ClipsTableItem::getUniqueName() const { return this->itemId ; }
 
 int ClipsTableItem::getItemHeight() const { return GUI::TREE_ITEM_H ; }
 
-ClipsTableView* ClipsTableItem::setId(ClipsTableView* new_view)
-{
-  new_view->setComponentID(this->itemId) ;
-
-  return new_view ;
-}
-
 
 /* ClipsTableItem subclasses */
 
-MasterClipsTableItem::MasterClipsTableItem(String item_id , String label_text) :
-  ClipsTableItem(item_id , label_text)
+MasterClipsTableItem::MasterClipsTableItem(const String& item_id  , const String& label_text) :
+                                           ClipsTableItem(item_id , label_text)
 {
 DEBUG_TRACE_MASTERCLIPSTABLEITEM
 }
 
-ClipClipsTableItem::ClipClipsTableItem(String item_id , String label_text , ValueTree store) :
-  ClipsTableItem(item_id , label_text) , store(store)
+ClipClipsTableItem::ClipClipsTableItem(const String& item_id  , const String& label_text , ValueTree clip_store) :
+                                       ClipsTableItem(item_id , label_text)              , clipStore(clip_store)
 {
 DEBUG_TRACE_CLIPCLIPSTABLEITEM
 }
 
-LeafClipsTableItem::LeafClipsTableItem(String     item_id , String     key_text , String value_text ,
-                                       Identifier key_    , ValueTree  store_                       ) :
-  ClipsTableItem(item_id , key_text , value_text) , key(key_) , store(store_)
+LeafClipsTableItem::LeafClipsTableItem(const String&     item_id , const String& key_text   , const String& value_text ,
+                                       const Identifier& key_    , ValueTree     clip_store                            ) :
+                                       ClipsTableItem(item_id    , key_text                 , value_text)              ,
+                                       key(key_)                 , clipStore(clip_store)
 {
 DEBUG_TRACE_LEAFCLIPSTABLEITEM
 }
@@ -466,19 +536,22 @@ bool LeafClipsTableItem::mightContainSubItems() { return false ; }
 Component* MasterClipsTableItem::createItemComponent()
 {
   // instantiate library-managed, transient GUI component
-  return setId(new MasterClipsTableView(this->labelTextL)) ;
+  return new MasterClipsTableView(getOwnerView() , getItemIdentifierString() , this->labelTextL) ;
 }
 
 Component* ClipClipsTableItem::createItemComponent()
 {
   // instantiate library-managed, transient GUI component
-  return setId(new ClipClipsTableView(this->labelTextL , this->store)) ;
+  return new ClipClipsTableView(getOwnerView()   , getItemIdentifierString() ,
+                                this->labelTextL , this->clipStore           ) ;
 }
 
 Component* LeafClipsTableItem::createItemComponent()
 {
   // instantiate library-managed, transient GUI component
-  return setId(new LeafClipsTableView(this->labelTextL , this->labelTextR , this->key , this->store)) ;
+  return new LeafClipsTableView(getOwnerView()   , getItemIdentifierString() ,
+                                this->labelTextL , this->labelTextR          ,
+                                this->key        , this->clipStore           ) ;
 }
 
 //[/MiscUserCode]
@@ -494,7 +567,8 @@ Component* LeafClipsTableItem::createItemComponent()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ClipsTableView" componentName=""
-                 parentClasses="public Component" constructorParams="" variableInitialisers=""
+                 parentClasses="public Component" constructorParams="TreeView* treeview , const String&amp; item_id"
+                 variableInitialisers="parentTreeview(treeview) , itemId(item_id)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="1" initialHeight="1">
   <BACKGROUND backgroundColour="ff323e44"/>

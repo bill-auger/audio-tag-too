@@ -107,6 +107,7 @@ public:
   static const String NEW_CLIPNAME_TEXT ;
   static const String NEW_KEY_TEXT ;
   static const String NEW_VALUE_TEXT ;
+  static const String FIRST_NEW_KEY_TEXT ;
   static const String LOAD_BTN_HOVERTEXT ;
   static const String EDIT_BTN_HOVERTEXT ;
   static const String DELETE_BTN_HOVERTEXT ;

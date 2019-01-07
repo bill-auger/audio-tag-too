@@ -44,7 +44,7 @@ AudioTagTooStore::AudioTagTooStore() : thumbnailCache(GUI::CACHE_N_THUMBS)
   this->storageTempFile = storage_dir      .getChildFile(APP::APP_CMD + ".temp" ) ;
 
   // create shared config ValueTree from persistent storage or defaults
-  loadConfig() ; verifyConfig() ;
+  loadConfig() ; verifyConfig() ; sanitizeRoot() ; sanitizeClips() ;
 
 DEBUG_PRIME_CLIPS_STORAGE
 
@@ -202,6 +202,9 @@ DEBUG_TRACE_STORE_CONFIG
     return false ;
   }
 
+  // filter transient data
+  sanitizeRoot() ; sanitizeClips() ;
+
 DEBUG_TRACE_DUMP_STORE(this->root , "root")
 
   if (this->root.isValid() && this->clips.isValid() && this->compilations.isValid())
@@ -210,8 +213,10 @@ DEBUG_TRACE_DUMP_STORE(this->root , "root")
 
 DEBUG_WRITE_STORE_XML(this->root , "root")
 
-    // marshall application configuration out to persistent binary storage
+    /* marshall application configuration out to persistent binary storage */
+
     FileOutputStream* storage_stream = new FileOutputStream(this->storageTempFile) ;
+
     if (!storage_stream->failedToOpen())
     {
       this->root.writeToStream(*storage_stream) ;
@@ -229,8 +234,10 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
 
 #else // STORAGE_IS_BINARY
 
-    // marshall application configuration out to persistent XML storage
+    /* marshall application configuration out to persistent XML storage */
+
     XmlElement* storage_xml = this->root.createXml() ;
+
     if (storage_xml->writeToFile(this->storageFile , StringRef() , StringRef("UTF-8") , 0))
       delete storage_xml ;
     else
@@ -244,7 +251,9 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
 #endif // STORAGE_IS_BINARY
   }
 
-  // marshall audio device configuration out to persistent XML storage
+
+  /* marshall audio device configuration out to persistent XML storage */
+
   if (device_state_xml != nullptr)
   {
     this->deviceStateXml.reset(device_state_xml) ;
@@ -258,8 +267,11 @@ DEBUG_WRITE_STORE_XML(this->root , "root")
     }
   }
 
-  // marshall audio file peaks cache out to persistent binary storage
+
+  /* marshall audio file peaks cache out to persistent binary storage */
+
   FileOutputStream* peaks_stream = new FileOutputStream(this->storageTempFile) ;
+
   if (!peaks_stream->failedToOpen())
   {
     this->thumbnailCache.writeToStream(*peaks_stream) ;
@@ -286,7 +298,7 @@ void AudioTagTooStore::verifyConfig()
   // verify stored configuration or reset from defaults
   bool was_storage_found   = this->root.isValid() ;
   bool is_root_valid       = this->root.hasType(STORE::STORAGE_ID) ;
-  bool has_canonical_nodes = !hasDuplicatedNodes(this->root) ;
+  bool has_canonical_nodes = !hasDuplicatedNodes(this->root , STORE::RootPersistentNodeIds) ;
   if      (!was_storage_found || !is_root_valid) this->root = Seeds::DefaultStore() ;
   else if (!has_canonical_nodes                ) removeConflictedNodes(this->root , String::empty) ;
 
@@ -317,10 +329,38 @@ void AudioTagTooStore::verifyRoot()
 
 void AudioTagTooStore::sanitizeRoot()
 {
-  // filter any rogue data
-  filterRogueKeys (this->root , STORE::RootPersistentKeys ) ;
-  filterRogueNodes(this->root , STORE::RootPersistentNodes) ;
+  // filter any transient or rogue data
+  filterKeys (this->root , STORE::RootPersistentKeys    , true ) ;
+  filterNodes(this->root , STORE::RootPersistentNodeIds , true ) ;
 }
+
+void AudioTagTooStore::sanitizeClips()
+{
+  Array<ValueTree> stores = { this->clips , this->compilations } ;
+
+  for (ValueTree* store = stores.begin() ; store != stores.end() ; ++store)
+// {DBG("AudioTagTooStore::sanitizeClips() store=" + STRING(store->getType())) ;
+
+    for (int master_n = 0 ; master_n < store->getNumChildren() ; ++master_n)
+    {
+      ValueTree master_store = store->getChild(master_n) ;
+
+// DBG("  AudioTagTooStore::sanitizeClips() master=" + STRING(master_store.getType())) ;
+
+      filterKeys(master_store , STORE::MasterKeys , true) ;
+      for (int clip_n = 0 ; clip_n < master_store.getNumChildren() ; ++clip_n)
+      {
+        ValueTree clip_store = master_store.getChild(clip_n) ;
+
+// DBG("    AudioTagTooStore::sanitizeClips() clip=" + STRING(clip_store.getType())) ;
+
+        filterKeys(clip_store , STORE::ClipTransientKeys , false) ;
+      }
+    }
+
+// }
+}
+
 
 /* validation/sanitization helpers */
 
@@ -349,19 +389,15 @@ void AudioTagTooStore::verifyRootProperty(Identifier key , var default_value)
   verifyProperty(this->root , key , default_value) ;
 }
 
-bool AudioTagTooStore::hasDuplicatedNodes(ValueTree stored_config)
+bool AudioTagTooStore::hasDuplicatedNodes(ValueTree& parent_node , NamedValueSet& node_ids)
 {
-  NamedValueSet root_node_ids      = STORE::RootPersistentNodes ;
-  int           n_duplicated_nodes = 0 ;
-  bool          has_duplicates     = false ;
-
-  n_duplicated_nodes = nDuplicatedNodes(stored_config , root_node_ids) ;
-  has_duplicates     = has_duplicates || n_duplicated_nodes > root_node_ids.size() ;
+  int  n_duplicated_nodes = nDuplicatedNodes(parent_node , node_ids) ;
+  bool has_duplicates     = n_duplicated_nodes > node_ids.size() ;
 
   return has_duplicates ;
 }
 
-int AudioTagTooStore::nDuplicatedNodes(ValueTree parent_node , NamedValueSet node_ids)
+int AudioTagTooStore::nDuplicatedNodes(ValueTree& parent_node , NamedValueSet& node_ids)
 {
   int n_duplicated_nodes = 0 ;
 
@@ -378,45 +414,53 @@ int AudioTagTooStore::nDuplicatedNodes(ValueTree parent_node , NamedValueSet nod
 
 void AudioTagTooStore::removeConflictedNodes(ValueTree parent_node , Identifier node_id)
 {
-  ValueTree node ;
-  while ((node = parent_node.getChildWithName(node_id)).isValid())
-    parent_node.removeChild(node , nullptr) ;
+  ValueTree a_node ;
+
+  while ((a_node = parent_node.getChildWithName(node_id)).isValid())
+    parent_node.removeChild(a_node , nullptr) ;
 }
 
-void AudioTagTooStore::filterRogueKeys(ValueTree parent_node , NamedValueSet persistent_keys)
+void AudioTagTooStore::filterKeys(ValueTree storage_node , NamedValueSet& keys ,
+                                  bool      is_whitelist                       )
 {
-  for (int key_n = 0 ; key_n < parent_node.getNumProperties() ; ++key_n)
+// DBG("  AudioTagTooStore::filterKeys() nkeys=" + String(storage_node.getNumProperties())) ;
+
+  for (int key_n = 0 ; key_n < storage_node.getNumProperties() ; ++key_n)
   {
-    Identifier property_id = parent_node.getPropertyName(key_n) ;
+    Identifier property_id   = storage_node.getPropertyName(key_n) ;
+    bool       should_remove = is_whitelist != keys.contains(property_id) ;
 
-DEBUG_TRACE_FILTER_ROGUE_KEY
+// DBG("    AudioTagTooStore::filterKeys() key=" + STRING(property_id)) ;
+DEBUG_TRACE_FILTER_KEY
 
-    if (!persistent_keys.contains(property_id))
-      parent_node.removeProperty( property_id , nullptr) ;
+    if (should_remove) storage_node.removeProperty(property_id , nullptr) ;
   }
 }
 
-void AudioTagTooStore::filterRogueNodes(ValueTree parent_node , NamedValueSet persistent_node_ids)
+void AudioTagTooStore::filterNodes(ValueTree parent_node  , NamedValueSet& node_ids ,
+                                   bool      is_whitelist                           )
 {
   Identifier parent_id = parent_node.getType() ;
 
   for (int child_n = 0 ; child_n < parent_node.getNumChildren() ; ++child_n)
   {
-    Identifier node_id = parent_node.getChild(child_n).getType() ;
+    Identifier node_id       = parent_node.getChild(child_n).getType() ;
+    bool       should_remove = node_id      == parent_id                 ||
+                               is_whitelist != node_ids.contains(node_id) ;
 
-DEBUG_TRACE_FILTER_ROGUE_NODE
+DEBUG_TRACE_FILTER_NODE
 
-    if (!persistent_node_ids.contains(node_id) || node_id == parent_id)
-      parent_node.removeChild(child_n , nullptr) ;
+    if (should_remove) parent_node.removeChild(child_n , nullptr) ;
   }
 }
 
 void AudioTagTooStore::sanitizeIntProperty(ValueTree store     , Identifier key      ,
                                            int       min_value , int        max_value)
 {
-  int value = int(store[key]) ;
+  int  value         = int(store[key]) ;
+  bool should_remove = value < min_value || value > max_value ;
 
-  if (value < min_value || value > max_value) store.removeProperty(key , nullptr) ;
+  if (should_remove) store.removeProperty(key , nullptr) ;
 
 DEBUG_TRACE_SANITIZE_INT_PROPERTY
 }
@@ -458,17 +502,31 @@ void AudioTagTooStore::valueTreePropertyChanged(ValueTree& node , const Identifi
 {
 DEBUG_TRACE_CONFIG_TREE_CHANGED
 
-  if (isConfigProperty(node , key)) AudioTagToo::HandleConfigChanged(key) ;
+  if      (isReservedKey   (node , key)) AudioTagToo::App->quit() ; // these should never change
+  else if (isConfigProperty(node , key)) AudioTagToo::HandleConfigChanged(key) ;
 }
 
 
 /* helpers */
 
-bool AudioTagTooStore::isConfigProperty(ValueTree node , const Identifier& key)
+bool AudioTagTooStore::isReservedKey(ValueTree& node , const Identifier& key)
+{
+  ValueTree parent_node     = node.getParent() ;
+  bool      is_master_node  = node        == this->clips       ||
+                              node        == this->compilations ;
+  bool      is_clip_node    = parent_node == this->clips       ||
+                              parent_node == this->compilations ;
+  bool      is_reserved_key = is_master_node && STORE::MasterKeys       .contains(STRING(key)) ||
+                              is_clip_node   && STORE::ClipImmutableKeys.contains(STRING(key))  ;
+
+  return is_reserved_key ;
+}
+
+bool AudioTagTooStore::isConfigProperty(ValueTree& node , const Identifier& key)
 {
   Identifier  node_id       = node.getType() ;
   var         key_var       = var(STRING(key)) ;
-  var         keys_var      = STORE::RootNodes[node_id] ;
+  var         keys_var      = STORE::RootNodeIds[node_id] ;
   Array<var>* keys_array    = keys_var.getArray() ;
   bool        is_config_key = node.isValid()                                        &&
                               keys_array != nullptr && keys_array->contains(key_var) ;

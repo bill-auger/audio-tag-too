@@ -1,23 +1,21 @@
-/*\
-|*|  AudioTagToo - Clip and stitch audio samples
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
-|*|
-|*|  This file is part of the AudioTagToo program.
-|*|
-|*|  AudioTagToo is free software: you can redistribute it and/or modify
-|*|  it under the terms of the GNU General Public License as published by
-|*|  the Free Software Foundation, either version 3 of the License, or
-|*|  (at your option) any later version.
-|*|
-|*|  AudioTagToo is distributed in the hope that it will be useful,
-|*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
-|*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-|*|  GNU General Public License for more details.
-|*|
-|*|  You should have received a copy of the GNU General Public License
-|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
-\*/
+/*
+  ==============================================================================
 
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.3.2
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
+*/
 
 #pragma once
 
@@ -45,7 +43,7 @@ class ClipsTableView  : public Component,
 {
 public:
     //==============================================================================
-    ClipsTableView ();
+    ClipsTableView (TreeView* treeview , const String& item_id);
     ~ClipsTableView();
 
     //==============================================================================
@@ -65,6 +63,10 @@ private:
 protected:
 
   virtual void showEditor(void) = 0 ; // clips and leaf nodes
+
+
+  TreeView* parentTreeview ;
+  String    itemId ;
 
     //[/UserVariables]
 
@@ -95,7 +97,7 @@ class MasterClipsTableView : public ClipsTableView
 {
 public:
 
-  MasterClipsTableView(String label_text) ;
+  MasterClipsTableView(TreeView* treeview , const String& item_id , const String& label_text) ;
 
 
 private:
@@ -119,7 +121,8 @@ class ClipClipsTableView : public ClipsTableView    ,
 {
 public:
 
-  ClipClipsTableView(String label_text , ValueTree store_) ;
+  ClipClipsTableView(TreeView*     treeview   , const String& item_id   ,
+                     const String& label_text , ValueTree     clip_store) ;
   ~ClipClipsTableView() ;
 
 
@@ -131,10 +134,10 @@ private:
   // helpers
   void showEditor (void) override ;
   void removeClip (void) ;
-  void setMetadata(void) ;
+  void addMetadata(void) ;
 
 
-  ValueTree store ;
+  ValueTree clipStore ;
 } ;
 
 
@@ -145,15 +148,17 @@ private:
   It is always a bottom-level (visible) child item of a ClipClipsTableView.
 */
 class LeafClipsTableView : public  ClipsTableView   ,
-                           private Button::Listener/* ,
-                           private Label::Listener*/
+                           private Button::Listener ,
+                           private Label::Listener
 {
 public:
 
-  LeafClipsTableView(String     key_text                      ,
-                     String     value_text                    ,
-                     Identifier key_   = Identifier("unused") ,
-                     ValueTree  store_ = ValueTree::invalid   ) ;
+  LeafClipsTableView(TreeView*         treeview                       ,
+                     const String&     item_id                        ,
+                     const String&     key_text                       ,
+                     const String&     value_text                     ,
+                     const Identifier& key_                           ,
+                     ValueTree         clip_store = ValueTree::invalid) ;
 
   ~LeafClipsTableView() ;
 
@@ -162,21 +167,35 @@ private:
 
   // event handlers
   void buttonClicked   (Button* a_button) override ;
-//   void labelTextChanged(Label* a_label)   override ;
+  void labelTextChanged(Label* a_label)   override ;
 
   // helpers
   void showEditor       (void) override ;
   void resetMetadata    (void) ;
   void populateKeySelect(void) ;
 
-  ValueTree  store ;
+
+  ValueTree  clipStore ;
   Identifier key ;
 } ;
 
 
+/**
+  ValueControlledButton is a customized Button for the AudioTagToo application.
+  It's toggled state is governed by the Value of a clip store ValueTree property;
+  which is a work-around to, in turn, control it's enabled/disabled state.
+*/
+class ValueControlledButton : public Button
+{
+  ValueControlledButton(const String& button_name , ValueTree clip_store) ;
+
+  // event handler
+  void buttonStateChanged() override ;
+} ;
+
 
 /**
-  ClipsTableItem is the TreeViewItem place-holder component for the AudioTagToo application.
+  ClipsTableItem is the TreeViewItem component host for the AudioTagToo application.
   It's purpose is to spawn and destroy ClipsTableView components on demand.
   This is an abstract class with three implementations:
     MasterClipsTableItem , ClipClipsTableItem, and LeafClipsTableItem
@@ -187,7 +206,7 @@ class ClipsTableItem : public TreeViewItem
 {
 public:
 
-  ClipsTableItem(String item_id , String label_text_l , String label_text_r = String::empty) ;
+  ClipsTableItem(const String& item_id , const String& label_text_l , const String& label_text_r = String::empty) ;
 
 
   // TreeViewItem implementation
@@ -195,9 +214,6 @@ public:
   int                getItemHeight       (void) const override ;
   virtual bool       mightContainSubItems(void) = 0 ;
   virtual Component* createItemComponent (void) = 0 ;
-
-  // helpers
-  ClipsTableView* setId(ClipsTableView* new_view) ;
 
 
 protected:
@@ -211,14 +227,14 @@ protected:
 
 
 /**
-  MasterClipsTableItem is a specialized ClipsTableItem component.
+  MasterClipsTableItem is a specialized ClipsTableItem.
   It's purpose is to spawn and manage a transient MasterClipsTableView.
 */
 class MasterClipsTableItem : public ClipsTableItem
 {
 public:
 
-  MasterClipsTableItem(String item_id , String label_text = String::empty) ;
+  MasterClipsTableItem(const String& item_id , const String& label_text = String::empty) ;
 
   bool       mightContainSubItems(void) override ;
   Component* createItemComponent (void) override ;
@@ -227,23 +243,23 @@ public:
 
 /**
   RootClipsTableItem is an alias for MasterClipsTableItem, merely for comvenience.
-  It is the TreeView single root TreeViewItem holding any number of MasterClipsTableItem components.
-  It is not itself a visible GUI component (per the ClipsTable constructor);
-    but is nonetheless, always in the 'open' state in order to present its child components
-    as if they were themselves (logical) tree roots.
+  It is the TreeView single root TreeViewItem holding any number of MasterClipsTableItems.
+  It spawns no visible GUI component (per the ClipsTable constructor);
+    but is nonetheless, always in the 'open' state in order to present its child
+    MasterClipsTableItems views as if they were themselves (logical) tree roots.
 */
 typedef MasterClipsTableItem RootClipsTableItem ;
 
 
 /**
-  ClipClipsTableItem is a specialized ClipsTableItem component.
+  ClipClipsTableItem is a specialized ClipsTableItem.
   It's purpose is to spawn and manage a transient ClipClipsTableView.
 */
 class ClipClipsTableItem : public ClipsTableItem
 {
 public:
 
-  ClipClipsTableItem(String item_id , String label_text , ValueTree store) ;
+  ClipClipsTableItem(const String& item_id , const String& label_text , ValueTree clip_store) ;
 
   bool       mightContainSubItems(void) override ;
   Component* createItemComponent (void) override ;
@@ -251,23 +267,23 @@ public:
 
 private:
 
-  ValueTree store ;
+  ValueTree clipStore ;
 } ;
 
 
 /**
-  LeafClipsTableItem is a specialized ClipsTableItem component.
+  LeafClipsTableItem is a specialized ClipsTableItem.
   It's purpose is to spawn and manage a transient LeafClipsTableView.
 */
 class LeafClipsTableItem : public ClipsTableItem
 {
 public:
 
-  LeafClipsTableItem(String     item_id                       ,
-                     String     key_text                      ,
-                     String     value_text                    ,
-                     Identifier key_   = Identifier("unused") ,
-                     ValueTree  store_ = ValueTree::invalid   ) ;
+  LeafClipsTableItem(const String&     item_id                        ,
+                     const String&     key_text                       ,
+                     const String&     value_text                     ,
+                     const Identifier& key_                           ,
+                     ValueTree         clip_store = ValueTree::invalid) ;
 
   bool       mightContainSubItems(void) override ;
   Component* createItemComponent (void) override ;
@@ -275,7 +291,7 @@ public:
 
 private:
 
-  ValueTree  store ;
+  ValueTree  clipStore ;
   Identifier key ;
 } ;
 

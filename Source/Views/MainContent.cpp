@@ -284,28 +284,27 @@ void MainContent::initialize(NamedValueSet& features , AudioThumbnailCache& thum
 }
 
 
-/* getters/setters */
+/* public getters/setters */
 
-void MainContent::setStatusL(String statusText) { this->statusbar->setStatusL(statusText) ; }
-
-void MainContent::setStatusC(String statusText) { this->statusbar->setStatusC(statusText) ; }
-
-void MainContent::setStatusR(String statusText) { this->statusbar->setStatusR(statusText) ; }
-
-void MainContent::setStatus()
+void MainContent::setPosition(double time)
 {
-  double head_time      = this->clipWaveform->getHeadTime() ;
-  double tail_time      = this->clipWaveform->getTailTime() ;
-  double cursor_time    = this->transportSource.getCurrentPosition() ;
-  double clip_time      = tail_time - head_time ;
-  bool   is_playing     = this->transportSource.isPlaying() ;
-  double status_c_time  = (is_playing) ? cursor_time       : clip_time ;
-  Colour status_c_color = (is_playing) ? GUI::CURSOR_COLOR : GUI::CURSOR_COLOR.darker(0.5) ;
-
-  this->statusbar->setStatusL(AudioTagToo::DurationString(head_time    ) , GUI::HEAD_COLOR) ;
-  this->statusbar->setStatusC(AudioTagToo::DurationString(status_c_time) , status_c_color ) ;
-  this->statusbar->setStatusR(AudioTagToo::DurationString(tail_time    ) , GUI::TAIL_COLOR) ;
+  this->transportSource.setPosition(jmax(0.0 , time)) ;
 }
+
+void MainContent::setHeadMarker()
+{
+  for (Waveform* waveform : this->waveforms) { waveform->setHeadMarker() ; }
+}
+
+void MainContent::setTailMarker()
+{
+  for (Waveform* waveform : this->waveforms) waveform->setTailMarker() ;
+  if (!this->transportSource.isPlaying())
+    for (Waveform* waveform : this->waveforms) waveform->resetPosition() ;
+}
+
+
+/* public helpers */
 
 void MainContent::loadUrl(File audio_file)
 {
@@ -334,12 +333,6 @@ void MainContent::loadUrl(File audio_file)
   AudioTagToo::ResetAudio() ;
 }
 
-void MainContent::toggleTransport()
-{
-  if (this->transportSource.isPlaying()) this->transportSource.stop()  ;
-  else                                   this->transportSource.start() ;
-}
-
 void MainContent::updateTransportButton()
 {
   bool is_rolling = this->transportSource.isPlaying() ;
@@ -349,22 +342,34 @@ void MainContent::updateTransportButton()
   transportButton->setToggleState(is_rolling , juce::dontSendNotification) ;
 }
 
-void MainContent::setPosition(double time)
+void MainContent::createMetadata(ValueTree& clip_store)
 {
-  this->transportSource.setPosition(jmax(0.0 , time)) ;
+  this->clipsTable->createLeafItem(clip_store , STORE::NEW_METADATA_KEY) ;
 }
 
-void MainContent::setHeadMarker()
+void MainContent::setStatusL(String statusText) { this->statusbar->setStatusL(statusText) ; }
+
+void MainContent::setStatusC(String statusText) { this->statusbar->setStatusC(statusText) ; }
+
+void MainContent::setStatusR(String statusText) { this->statusbar->setStatusR(statusText) ; }
+
+void MainContent::setStatus()
 {
-  for (Waveform* waveform : this->waveforms) { waveform->setHeadMarker() ; }
+  double head_time      = this->clipWaveform->getHeadTime() ;
+  double tail_time      = this->clipWaveform->getTailTime() ;
+  double cursor_time    = this->transportSource.getCurrentPosition() ;
+  double clip_time      = tail_time - head_time ;
+  bool   is_playing     = this->transportSource.isPlaying() ;
+  double status_c_time  = (is_playing) ? cursor_time       : clip_time ;
+  Colour status_c_color = (is_playing) ? GUI::CURSOR_COLOR : GUI::CURSOR_COLOR.darker(0.5) ;
+
+  this->statusbar->setStatusL(AudioTagToo::DurationString(head_time    ) , GUI::HEAD_COLOR) ;
+  this->statusbar->setStatusC(AudioTagToo::DurationString(status_c_time) , status_c_color ) ;
+  this->statusbar->setStatusR(AudioTagToo::DurationString(tail_time    ) , GUI::TAIL_COLOR) ;
 }
 
-void MainContent::setTailMarker()
-{
-  for (Waveform* waveform : this->waveforms) waveform->setTailMarker() ;
-  if (!this->transportSource.isPlaying())
-    for (Waveform* waveform : this->waveforms) waveform->resetPosition() ;
-}
+
+/* private getters/setters */
 
 void MainContent::createClip()
 {
@@ -377,6 +382,15 @@ void MainContent::createClip()
                           this->fullWaveform->getHeadTime() ,
                           this->fullWaveform->getTailTime() ) ;
 #endif // CONTROLLER_OWNS_STORAGE
+}
+
+
+/* private helpers */
+
+void MainContent::toggleTransport()
+{
+  if (this->transportSource.isPlaying()) this->transportSource.stop()  ;
+  else                                   this->transportSource.start() ;
 }
 
 

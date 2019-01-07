@@ -69,18 +69,21 @@ public:
   {
     public: static const int compareElements(const ValueTree& tree_a , const ValueTree& tree_b) ;
   } ;
-  static const Identifier    FilterId          (String a_string                          ,
-                                                String retain_chars = APP::VALID_ID_CHARS) ;
-  static const bool          Initialize        (void) ;
-  static const NamedValueSet NewNodeKeysDict   (Identifier parent_node_id                        ,
-                                                String     node_ids_xml_str , String keys_xml_str) ;
-  static const NamedValueSet NewNodeIdsSet     (Array<var>* keys) ;
-  static const NamedValueSet NewMetadataKeysSet(void) ;
-  static       NamedValueSet RootPersistentNodes ;
-  static       NamedValueSet RootNodes ;
-  static       NamedValueSet RootPersistentKeys ;
-  static       NamedValueSet RootKeys ;
-  static       NamedValueSet MetadataKeys ;
+  static const Identifier    FilterId       (String a_string                          ,
+                                             String retain_chars = APP::VALID_ID_CHARS) ;
+  static const bool          Initialize     (void) ;
+  static const NamedValueSet NewNodeKeysDict(Identifier parent_node_id                        ,
+                                             String     node_ids_xml_str , String keys_xml_str) ;
+  static const NamedValueSet NewNodeIdsSet  (Array<var>* keys) ;
+  static const NamedValueSet NewKeysSet     (String metadata_ids_xml_str) ;
+  static       NamedValueSet RootPersistentNodeIds ; // persistent node IDs for children of root
+  static       NamedValueSet RootNodeIds ;           // allowed IDs for children of root
+  static       NamedValueSet RootPersistentKeys ;    // persistent data keys of root
+  static       NamedValueSet RootKeys ;              // allowed data keys of root
+  static       NamedValueSet MasterKeys ;            // persistent, required immutable data keys of masters
+  static       NamedValueSet ClipImmutableKeys ;     // persistent, required, immutable data keys of clips
+  static       NamedValueSet ClipPersistentKeys ;    // persistent, required, mutable data keys of clips
+  static       NamedValueSet ClipTransientKeys ;     // transient, internal data keys of clips
 
   // storage nodes
   static const Identifier STORAGE_ID ;
@@ -99,7 +102,8 @@ public:
   static const Identifier BEGIN_TIME_KEY ;
   static const Identifier END_TIME_KEY ;
   static const Identifier DURATION_KEY ;
-  static const Identifier NEW_KEY_KEY ;
+  static const Identifier NEW_METADATA_KEY ;
+  static const Identifier ADD_BTN_STATE_KEY ;
 
   // root defaults
   static const String STORAGE_DIRNAME ;

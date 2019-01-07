@@ -51,6 +51,7 @@ public:
   static void          SetConfig       (const Identifier& key , const var value) ;
   static void          ResetAudio      (void) ;
   static ValueTree     CreateClip      (String audio_filename , double begin_time , double end_time) ;
+  static void          CreateMetadata  (ValueTree& clip_store) ;
   static NamedValueSet GetMetadataKeys (void) ;
 
   // view helpers

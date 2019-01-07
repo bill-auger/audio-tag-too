@@ -64,20 +64,21 @@ private:
   bool storeConfig(XmlElement* device_state_xml = nullptr) ;
 
   // validations
-  void verifyConfig(void) ;
-  void verifyRoot  (void) ;
-  void sanitizeRoot(void) ;
+  void verifyConfig (void) ;
+  void verifyRoot   (void) ;
+  void sanitizeRoot (void) ;
+  void sanitizeClips(void) ;
 
   // validation/sanitization helpers
   void verifyChildNode      (ValueTree store , Identifier node_id) ;
   void verifyRootChildNode  (Identifier node_id) ;
   void verifyProperty       (ValueTree store , Identifier key , var default_value) ;
   void verifyRootProperty   (Identifier key , var default_value) ;
-  bool hasDuplicatedNodes   (ValueTree stored_config) ;
-  int  nDuplicatedNodes     (ValueTree parent_node , NamedValueSet node_ids) ;
+  bool hasDuplicatedNodes   (ValueTree& parent_node , NamedValueSet& node_ids) ;
+  int  nDuplicatedNodes     (ValueTree& parent_node , NamedValueSet& node_ids) ;
   void removeConflictedNodes(ValueTree parent_node , Identifier node_id) ;
-  void filterRogueKeys      (ValueTree parent_node , NamedValueSet persistent_keys) ;
-  void filterRogueNodes     (ValueTree parent_node , NamedValueSet persistent_node_ids) ;
+  void filterKeys           (ValueTree storage_node , NamedValueSet& keys , bool is_whitelist) ;
+  void filterNodes          (ValueTree parent_node , NamedValueSet& node_ids , bool is_whitelist) ;
   void sanitizeIntProperty  (ValueTree store , Identifier key , int min_value , int max_value) ;
   void sanitizeComboProperty(ValueTree store , Identifier key , StringArray options) ;
 
@@ -93,8 +94,9 @@ private:
   void valueTreeParentChanged    (ValueTree& /*reparented_node*/                                             ) override { }
   void valueTreeRedirected       (ValueTree& /*target_node*/                                                 ) override { }
 
-  // helpers
-  bool isConfigProperty(ValueTree node , const Identifier& key) ;
+  // schema helpers
+  bool isReservedKey   (ValueTree& node , const Identifier& key) ;
+  bool isConfigProperty(ValueTree& node , const Identifier& key) ;
 
 
   // configuration/persistence

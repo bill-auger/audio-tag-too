@@ -50,6 +50,9 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 
+friend class MainContent ;
+
+
   // setup
   bool initialize(ValueTree& clips_store , ValueTree& compilations_store) ;
 
@@ -69,24 +72,29 @@ private:
   std::unique_ptr<TreeViewItem> compilationItems ;
 
   // model helpers
+  void          storeItemId     (TreeViewItem* an_item , ValueTree a_store) ;
   TreeViewItem* getViewItemFor  (ValueTree& root_store) ;
-  TreeViewItem* newMasterItem   (ValueTree& master_node) ;
-  TreeViewItem* newClipItem     (ValueTree& clip_node) ;
-  TreeViewItem* newLeafItem     (ValueTree& clip_node , const Identifier& key) ;
-  void          createMasterItem(ValueTree& root_store , ValueTree master_node) ;
-  void          createClipItem  (ValueTree& root_store , ValueTree clip_node) ;
-  void          createLeafItem  (ValueTree clip_node , const Identifier& key) ;
+  TreeViewItem* newMasterItem   (ValueTree& master_store) ;
+  TreeViewItem* newClipItem     (ValueTree& clip_store) ;
+  TreeViewItem* newLeafItem     (const String&     leaf_id                        ,
+                                 const String&     key_text                       ,
+                                 const String&     value_text                     ,
+                                 const Identifier& key                            ,
+                                 ValueTree         clip_store = ValueTree::invalid) ;
+  void          createMasterItem(ValueTree& root_store , ValueTree master_store) ;
+  void          createClipItem  (ValueTree& root_store , ValueTree clip_store) ;
+  void          createLeafItem  (ValueTree& clip_store , const Identifier& key) ;
   void          createItemsTree (ValueTree& root_store) ;
 
   // event handlers
   void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node)                    override ;
   void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override ;
   void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
-  void valueTreePropertyChanged  (ValueTree& changed_node , const Identifier& key)                 override ;
 
   // unhandled ValueTree::Listener events
-  void valueTreeParentChanged(ValueTree& reparented_node) override { }
-  void valueTreeRedirected   (ValueTree& target_node)     override { }
+  void valueTreeParentChanged  (ValueTree& /*reparented_node*/)                          override { }
+  void valueTreePropertyChanged(ValueTree& /*changed_node*/ , const Identifier& /*key*/) override { }
+  void valueTreeRedirected     (ValueTree& /*target_node*/)                              override { }
 
     //[/UserVariables]
 

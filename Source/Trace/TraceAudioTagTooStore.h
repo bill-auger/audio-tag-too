@@ -39,7 +39,7 @@
     String      node_id_str       = STRING(node_id) ;                                         \
     String      key_str           = STRING(key) ;                                             \
     var         key_var           = var(key_str) ;                                            \
-    var         keys_var          = STORE::RootNodes[node_id] ;                               \
+    var         keys_var          = STORE::RootNodeIds[node_id] ;                             \
     Array<var>* keys_array        = keys_var.getArray() ;                                     \
     bool        is_node_valid     = config_node.isValid() ;                                   \
     bool        is_config_node    = keys_array != nullptr ;                                   \
@@ -95,20 +95,20 @@
   #define DEBUG_TRACE_VERIFY_MISSING_PROPERTY                \
     Trace::TraceMissingProperty(store , key , default_value) ;
 
-  #define DEBUG_TRACE_FILTER_ROGUE_KEY                                                     \
-    if (!persistent_keys.contains(property_id))                                            \
-      Trace::TraceStore("removing rogue property '" + STRING(property_id)                + \
-                        "' from '"                  + STRING(parent_node.getType()) + "'") ;
+  #define DEBUG_TRACE_FILTER_KEY                                                            \
+    if (should_remove)                                                                      \
+      Trace::TraceStore("removing rogue property '" + STRING(property_id)                 + \
+                        "' from '"                  + STRING(storage_node.getType()) + "'") ;
 
-  #define DEBUG_TRACE_FILTER_ROGUE_NODE                                                \
-    if (!persistent_node_ids.contains(node_id))                                        \
+  #define DEBUG_TRACE_FILTER_NODE                                                      \
+    if (should_remove)                                                                 \
       Trace::TraceStore("removing rogue node '" + STRING(node_id)                    + \
                         "' from '"              + STRING(parent_node.getType()) + "'") ;
 
   #define DEBUG_TRACE_SANITIZE_INT_PROPERTY                                                     \
     String relation = String(min_value) + " <= " + String(value) + " <= " + String(max_value) ; \
-    String node_id = STRING(store.getType()) ; String property_id = STRING(key) ;               \
-    if (value < min_value || value > max_value)                                                 \
+    String node_id  = STRING(store.getType()) ; String property_id = STRING(key) ;              \
+    if (should_remove)                                                                          \
       Trace::TraceStore("value (" + relation + ") out of range for '"  +                        \
                         node_id + "['" + property_id + "'] - removing" )                        ;
 
@@ -124,9 +124,11 @@
 
   #define DEBUG_TRACE_LISTEN                                   \
     String state = (should_listen) ? "resumed" : "suspended" ; \
-    Trace::TraceStore(state + " listening for model changes")  ;
+    Trace::TraceState(state + " listening for model changes")  ;
 
-  #define DEBUG_TRACE_CONFIG_TREE_CHANGED Trace::TraceTreeChanged(node , key) ;
+  #define DEBUG_TRACE_CONFIG_TREE_CHANGED                                                                 \
+    if (isReservedKey(node , key)) Trace::TraceError("attempt to modify immutable metadata - quitting") ; \
+    else                           Trace::TraceTreeChanged(node , key)                                    ;
 
   #define DEBUG_TRACE_DEVICE_STATE_CHANGED                                                           \
     Trace::TraceState("audio device state changed: " + String((is_device_ready) ? "ready" : "idle")) ;
@@ -140,8 +142,8 @@
   #define DEBUG_TRACE_VERIFY_STORED_CONFIG    ;
   #define DEBUG_TRACE_VERIFY_MISSING_NODE     ;
   #define DEBUG_TRACE_VERIFY_MISSING_PROPERTY ;
-  #define DEBUG_TRACE_FILTER_ROGUE_KEY        ;
-  #define DEBUG_TRACE_FILTER_ROGUE_NODE       ;
+  #define DEBUG_TRACE_FILTER_KEY              ;
+  #define DEBUG_TRACE_FILTER_NODE             ;
   #define DEBUG_TRACE_SANITIZE_INT_PROPERTY   ;
   #define DEBUG_TRACE_DUMP_STORE_ROOT         ;
   #define DEBUG_TRACE_DUMP_STORE_ALL          ;

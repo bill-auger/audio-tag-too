@@ -100,6 +100,8 @@ ValueTree AudioTagToo::CreateClip(String audio_filename , double begin_time , do
   return Store->createClip(audio_filename , begin_time , end_time) ;
 }
 
+void AudioTagToo::CreateMetadata(ValueTree& clip_store) { Gui->createMetadata(clip_store) ; }
+
 NamedValueSet AudioTagToo::GetMetadataKeys()
 {
   ValueTree     root_store = Store->clips ;
@@ -161,13 +163,16 @@ String AudioTagToo::DurationString(double duration)
 
 bool AudioTagToo::Initialize(DocumentWindow* main_window , MainContent* main_content)
 {
-  App                    = JUCEApplication::getInstance() ;
-  Window                 = main_window ;
-  Gui                    = main_content ;
-  StringArray cli_params = JUCEApplication::getCommandLineParameterArray() ;
+  App                          = JUCEApplication::getInstance() ;
+  Window                       = main_window ;
+  Gui                          = main_content ;
+  StringArray cli_params       = JUCEApplication::getCommandLineParameterArray() ;
+  bool        should_terminate ;
 
   // detect and handle terminating command line switches
-  if (HandleCliParams(cli_params)) { Trace::EnableTracing(false) ; return false ; }
+  should_terminate = HandleCliParams(cli_params) ;
+  Trace::EnableTracing(!should_terminate) ;
+  if (should_terminate) return false ;
 
 DEBUG_TRACE_INIT_PHASE_1
 
