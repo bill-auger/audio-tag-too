@@ -22,8 +22,9 @@
 //[Headers]     -- You can add your own extra header files here --
 
 #include "../../JuceLibraryCode/JuceHeader.h"
-
 #include "../Constants/GuiConstants.h"
+
+class ValueControlledButton ;
 
 //[/Headers]
 
@@ -76,7 +77,7 @@ protected:
     std::unique_ptr<ImageButton> loadButton;
     std::unique_ptr<ImageButton> editButton;
     std::unique_ptr<ImageButton> deleteButton;
-    std::unique_ptr<ImageButton> addButton;
+    std::unique_ptr<ValueControlledButton> addButton;
     std::unique_ptr<ComboBox> keySelect;
 
 
@@ -185,11 +186,16 @@ private:
   It's toggled state is governed by the Value of a clip store ValueTree property;
   which is a work-around to, in turn, control it's enabled/disabled state.
 */
-class ValueControlledButton : public Button
+class ValueControlledButton : public ImageButton
 {
-  ValueControlledButton(const String& button_name , ValueTree clip_store) ;
+public:
 
-  // event handler
+  ValueControlledButton(const String& item_id) ;
+
+  // setup
+  void initialize(Value label_storage) ;
+
+  // event handlers
   void buttonStateChanged() override ;
 } ;
 

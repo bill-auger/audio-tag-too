@@ -82,13 +82,9 @@ ClipsTableView::ClipsTableView (TreeView* treeview , const String& item_id)
                              ImageCache::getFromMemory (BinaryData::processstop_png, BinaryData::processstop_pngSize), 1.000f, Colour (0x00000000),
                              Image(), 1.000f, Colour (0x00000000),
                              Image(), 1.000f, Colour (0x00000000));
-    addButton.reset (new ImageButton (String()));
+    addButton.reset (new ValueControlledButton (item_id));
     addAndMakeVisible (addButton.get());
 
-    addButton->setImages (false, true, false,
-                          ImageCache::getFromMemory (BinaryData::listadd_png, BinaryData::listadd_pngSize), 1.000f, Colour (0x00000000),
-                          Image(), 1.000f, Colour (0x00000000),
-                          Image(), 1.000f, Colour (0x00000000));
     keySelect.reset (new ComboBox (String()));
     addAndMakeVisible (keySelect.get());
     keySelect->setEditableText (true);
@@ -105,6 +101,15 @@ ClipsTableView::ClipsTableView (TreeView* treeview , const String& item_id)
 
 
     //[Constructor] You can add your own custom stuff here..
+
+  Image add_btn_normal_img  = ImageCache::getFromMemory(BinaryData::listadd_png , BinaryData::listadd_pngSize) ;
+  Image add_btn_hover_img   = ImageCache::getFromMemory(BinaryData::listadd_png , BinaryData::listadd_pngSize) ;
+  Image add_btn_pressed_img = ImageCache::getFromMemory(BinaryData::listadd_png , BinaryData::listadd_pngSize) ;
+
+  this->addButton->setImages(false , true , false ,
+                             add_btn_normal_img  , 1.000f , Colour(0x00000000) ,
+                             add_btn_hover_img   , 1.000f , Colour(0x00000000) ,
+                             add_btn_pressed_img , 1.000f , Colour(0x00000000) ) ;
 
   this->keySelect->setTextWhenNothingSelected   (GUI::NEW_KEY_TEXT      ) ;
   this->keySelect->setTextWhenNoChoicesAvailable(GUI::FIRST_NEW_KEY_TEXT) ;
@@ -216,8 +221,9 @@ ClipClipsTableView::ClipClipsTableView(TreeView*     treeview   , const String& 
 {
 DEBUG_TRACE_CLIPCLIPSTABLEVIEW
 
-  Value label_l_value = this->labelL->getTextValue() ;
-  Value label_storage = this->clipStore.getPropertyAsValue(STORE::LABEL_TEXT_KEY , nullptr) ;
+  Value label_l_value      = this->labelL->getTextValue() ;
+  Value label_storage      = this->clipStore.getPropertyAsValue(STORE::LABEL_TEXT_KEY    , nullptr) ;
+  Value toggle_state_value = this->clipStore.getPropertyAsValue(STORE::ADD_BTN_STATE_KEY , nullptr) ;
 
 //   GUI::ConfigureTextEditor(labelL  ->getTextEditor()       , text_listener      ,
 //                            GUI::MAX_CLIPNAME_TEXTEDITOR_N_CHARS   , APP::VALID_ID_CHARS) ;
@@ -236,7 +242,10 @@ DEBUG_TRACE_CLIPCLIPSTABLEVIEW
   this->editButton  ->addListener(this) ;
   this->deleteButton->addListener(this) ;
   this->addButton   ->addListener(this) ;
-  this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(true) , nullptr) ; // controls addButton enabled state
+
+  // pass toggle trigger value to addButton to govern enabled state
+  this->addButton->initialize(toggle_state_value) ;
+  this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(true) , nullptr) ;
 }
 
 LeafClipsTableView::LeafClipsTableView(TreeView*         treeview   , const String& item_id    ,
@@ -245,10 +254,10 @@ LeafClipsTableView::LeafClipsTableView(TreeView*         treeview   , const Stri
                                        ClipsTableView(treeview      , item_id)                 ,
                                        key(key_)                    , clipStore(clip_store)
 {
-  bool  is_immutable_metadata  = STORE::ClipImmutableKeys.contains(STRING(this->key)) ;
-  bool  is_new_key_placeholder = this->key == STORE::NEW_METADATA_KEY ;
-  Value label_r_value          = this->labelR->getTextValue() ;
-  Value label_storage          = this->clipStore.getPropertyAsValue(this->key , nullptr) ;
+  bool   is_immutable_metadata  = STORE::ClipImmutableKeys.contains(STRING(this->key)) ;
+  bool   is_new_key_dummy       = this->key == STORE::NEW_METADATA_KEY ;
+  Value  label_storage          = this->clipStore.getPropertyAsValue(this->key , nullptr) ;
+  Value& label_r_value          = this->labelR->getTextValue() ;
 
 DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 
@@ -258,9 +267,9 @@ DEBUG_TRACE_LEAFCLIPSTABLEVIEW
   {
     // enable data change callbacks
 //     this->labelL->addListener(this) ;
-    if (!is_new_key_placeholder)
+    if (!is_new_key_dummy)
     {
-      label_r_value    .referTo    (label_storage) ;
+      label_storage    .referTo    (label_r_value) ;
       this->editButton->addListener(this) ;
     }
     this->deleteButton->addListener(this) ;
@@ -269,7 +278,7 @@ DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 
   /* presentation */
 
-  if (!is_new_key_placeholder)
+  if (!is_new_key_dummy)
   {
 //   GUI::ConfigureTextEditor(labelR  ->getTextEditor()       , text_listener      ,
 //                            GUI::MAX_KEY_TEXTEDITOR_N_CHARS   , APP::VALID_ID_CHARS) ;
@@ -287,7 +296,7 @@ DEBUG_TRACE_LEAFCLIPSTABLEVIEW
     this->editButton  ->setTooltip(GUI::EDIT_BTN_HOVERTEXT  ) ;
     this->deleteButton->setTooltip(GUI::DELETE_BTN_HOVERTEXT) ;
 
-    if (is_new_key_placeholder)
+    if (is_new_key_dummy)
     {
       // enable new key entry/selection
       populateKeySelect() ;
@@ -325,13 +334,22 @@ LeafClipsTableView::~LeafClipsTableView()
 
 /* ValueControlledButton */
 
-ValueControlledButton::ValueControlledButton(const String& button_name , ValueTree clip_store) :
-                                             Button(button_name)
-{
-  Value  label_storage      = clip_store.getPropertyAsValue(STORE::ADD_BTN_STATE_KEY , nullptr) ;
-  Value& toggle_state_value = getToggleStateValue() ;
+ValueControlledButton::ValueControlledButton(const String& item_id) : ImageButton(item_id) { }
 
-  label_storage.referTo(toggle_state_value) ;
+void ValueControlledButton::initialize(Value label_storage)
+{
+  Value toggle_state_value = getToggleStateValue() ;
+
+  toggle_state_value.referTo(label_storage) ;
+
+//   this->labelStorage       = label_storage ;
+//   Value toggle_state_value = getToggleStateValue() ;
+
+#define DEBUG_TRACE_ENABLE_ADDBTN_TOGGLE_VALUE                                              \
+  Trace::TraceGui("enabling shared storage for addButton '" + getName() + "' toggle state") ;
+DEBUG_TRACE_ENABLE_ADDBTN_TOGGLE_VALUE
+
+//   this->labelStorage.referTo(toggle_state_value) ;
 }
 
 
@@ -343,7 +361,7 @@ void ClipClipsTableView::buttonClicked(Button* a_button)
   Button* edit_btn   = this->editButton  .get() ;
   Button* delete_btn = this->deleteButton.get() ;
   Button* add_btn    = this->addButton   .get() ;
-
+DBG("clicked");
 DEBUG_TRACE_CLIPVIEW_BTN_CLICKED
 
   if      (a_button == load_btn  ) AudioTagToo::LoadClip(this->clipStore) ;
@@ -391,7 +409,7 @@ DBG("LeafClipsTableView::labelTextChanged() isValidIdentifier(key)=" + String((I
 
 /* ValueControlledButton event handlers */
 
-void ValueControlledButton::buttonStateChanged() { setEnabled(getToggleState()) ; }
+void ValueControlledButton::buttonStateChanged() { setEnabled(!getToggleState()) ; }
 
 
 /* ClipsTableView subclass helpers */
@@ -430,18 +448,23 @@ DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP
 
 void ClipClipsTableView::addMetadata()
 {
+  TreeViewItem* this_item  = this->parentTreeview->findItemFromIdentifierString(this->itemId) ;
   bool has_orphaned_placeholder = this->clipStore.hasProperty(STORE::NEW_METADATA_KEY) ;
 
 DEBUG_TRACE_LEAFVIEW_ADD_METADATA
 
+  if (has_orphaned_placeholder) this->clipStore.removeProperty(STORE::NEW_METADATA_KEY , nullptr) ;
+
+DBG("removing storage property has_orphaned_placeholder-maybe-uneeded");
+this->clipStore.removeProperty("has_orphaned_placeholder-maybe-uneeded" , nullptr) ;
+DBG("removed storage property has_orphaned_placeholder-maybe-uneeded");
+
   // trigger addButton enabled state change
   this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(false) , nullptr) ;
 
-  if (has_orphaned_placeholder) this->clipStore.removeProperty(STORE::NEW_METADATA_KEY , nullptr) ;
-
-this->clipStore.removeProperty("has_orphaned_placeholder-maybe-uneeded" , nullptr) ;
-
+  // trigger presentation of dummy item for new key definition
   this->clipStore.setProperty(STORE::NEW_METADATA_KEY , var(String::empty) , nullptr) ;
+  if (this_item != nullptr) this_item->setOpen(true) ;
 
   AudioTagToo::CreateMetadata(this->clipStore) ;
 }
@@ -598,19 +621,15 @@ BEGIN_JUCER_METADATA
                opacityOver="1.00000000000000000000" colourOver="0" resourceDown=""
                opacityDown="1.00000000000000000000" colourDown="0"/>
   <IMAGEBUTTON name="" id="5519a8f967bbfc3e" memberName="deleteButton" virtualName=""
-               explicitFocusOrder="0" pos="0r 0 24 24" posRelativeX="1d6dab7d33774e55"
+               explicitFocusOrder="0" pos="0r 0 24 24" posRelativeX="75e098fccc4e97e"
                posRelativeY="53e00129390ce15c" buttonText="" connectedEdges="0"
                needsCallback="0" radioGroupId="0" keepProportions="0" resourceNormal="BinaryData::processstop_png"
                opacityNormal="1.00000000000000000000" colourNormal="0" resourceOver=""
                opacityOver="1.00000000000000000000" colourOver="0" resourceDown=""
                opacityDown="1.00000000000000000000" colourDown="0"/>
-  <IMAGEBUTTON name="" id="1d6dab7d33774e55" memberName="addButton" virtualName=""
-               explicitFocusOrder="0" pos="0Rr 0 24 24" posRelativeY="53e00129390ce15c"
-               buttonText="" connectedEdges="0" needsCallback="0" radioGroupId="0"
-               keepProportions="0" resourceNormal="BinaryData::listadd_png"
-               opacityNormal="1.00000000000000000000" colourNormal="0" resourceOver=""
-               opacityOver="1.00000000000000000000" colourOver="0" resourceDown=""
-               opacityDown="1.00000000000000000000" colourDown="0"/>
+  <GENERICCOMPONENT name="" id="75e098fccc4e97e" memberName="addButton" virtualName=""
+                    explicitFocusOrder="0" pos="0Rr 0 24 24" posRelativeY="53e00129390ce15c"
+                    class="ValueControlledButton" params="item_id"/>
   <COMBOBOX name="" id="e14bf58725f7ec5a" memberName="keySelect" virtualName=""
             explicitFocusOrder="0" pos="0 0 0M 0M" posRelativeX="53e00129390ce15c"
             posRelativeY="53e00129390ce15c" posRelativeW="53e00129390ce15c"

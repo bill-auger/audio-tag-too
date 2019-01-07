@@ -176,8 +176,8 @@
   #define DEBUG_TRACE_LEAFCLIPSTABLEVIEW                                                       \
     Trace::TraceGui     ("instantiating LeafClipsTableView for item '" + this->itemId + "'") ; \
     Trace::TraceNoPrefix("data: (" + key_text + "|" + value_text + ") "              +         \
-                         String((is_new_key_placeholder) ? "placeholder" :                     \
-                                (is_immutable_metadata ) ? "immutable"   : "mutable"))         ;
+                         String((is_new_key_dummy     ) ? "placeholder" :                      \
+                                (is_immutable_metadata) ? "immutable"   : "mutable"))          ;
 
   #define DEBUG_TRACE_CLIPVIEW_COMBOBOX_CHANGED                                               \
     String select_id = (comboBoxThatHasChanged == key_select) ? "keySelect" : "(unhandled)" ; \
