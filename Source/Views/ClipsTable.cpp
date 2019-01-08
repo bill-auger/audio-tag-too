@@ -153,7 +153,7 @@ bool ClipsTable::initialize(ValueTree& clips_store , ValueTree& compilations_sto
 
 /* model helpers */
 
-void ClipsTable::storeItemId(TreeViewItem* an_item , ValueTree a_store)
+void ClipsTable::storeItemId(ValueTree a_store , TreeViewItem* an_item)
 {
   String item_id = an_item->getItemIdentifierString() ;
 
@@ -226,14 +226,14 @@ DEBUG_TRACE_NEW_LEAF_ITEM
 
 void ClipsTable::createMasterItem(ValueTree& root_store , ValueTree master_store)
 {
+DEBUG_TRACE_CREATE_MASTER_ITEM
+
   TreeViewItem* root_item   = getViewItemFor(root_store) ;
   TreeViewItem* master_item = newMasterItem(master_store) ;
   int           master_idx  = root_store.indexOf(master_store) ;
 
   root_item->addSubItem(master_item , master_idx) ;
-  storeItemId(master_item , master_store) ;
-
-DEBUG_TRACE_CREATE_MASTER_ITEM
+  storeItemId(master_store , master_item) ;
 
   for (int clip_n = 0 ; clip_n < master_store.getNumChildren() ; ++clip_n)
     createClipItem(root_store , master_store.getChild(clip_n)) ;
@@ -241,26 +241,38 @@ DEBUG_TRACE_CREATE_MASTER_ITEM
 
 void ClipsTable::createClipItem(ValueTree& root_store , ValueTree clip_store)
 {
-  TreeViewItem* root_item              = getViewItemFor(root_store) ;
-  ValueTree     master_store           = clip_store.getParent() ;
-  int           master_idx             = root_store.indexOf(master_store) ;
-  int           clip_idx               = master_store.indexOf(clip_store) ;
-  TreeViewItem* master_item            = root_item->getSubItem(master_idx) ;
-  TreeViewItem* clip_item              = newClipItem(clip_store) ;
-  bool          does_master_item_exist = master_item != nullptr ;
+  TreeViewItem* root_item    = getViewItemFor(root_store) ;
+  ValueTree     master_store = clip_store.getParent() ;
+  int           master_idx   = root_store  .indexOf(master_store) ;
+  int           clip_idx     = master_store.indexOf(clip_store  ) ;
+  TreeViewItem* master_item  = root_item->getSubItem(master_idx) ;
 
-  if (!does_master_item_exist)
+DEBUG_TRACE_CREATE_CLIP_ITEM
+
+  // create new master item if necessary
+  if (master_item == nullptr)
   {
     master_item = newMasterItem(master_store) ;
 
     root_item->addSubItem(master_item , master_idx) ;
-    storeItemId(master_item , master_store) ;
+    storeItemId(master_store , master_item) ;
   }
 
-  master_item->addSubItem(clip_item , clip_idx) ;
-  storeItemId(clip_item , clip_store) ;
+  // create new clip item
+  TreeViewItem* clip_item    = newClipItem(clip_store) ;
+  int           n_properties = clip_store.getNumProperties() ;
 
-DEBUG_TRACE_CREATE_CLIP_ITEM
+  master_item->addSubItem(clip_item , clip_idx) ;
+  storeItemId(clip_store , clip_item) ;
+
+  // create new leaf items for user-defined metadata if necessary
+//   for (int property_n = 0 ; property_n < n_properties ; ++property_n)
+//   {
+//     String key = STRING(clip_store.getPropertyName(property_n)) ;
+//
+//     if (!STORE::ClipPersistentKeys.contains(key) &&
+//         !STORE::ClipTransientKeys .contains(key)  ) createLeafItem(clip_store , key) ;
+//   }
 }
 
 void ClipsTable::createLeafItem(ValueTree& clip_store , const Identifier& key)
@@ -269,13 +281,17 @@ void ClipsTable::createLeafItem(ValueTree& clip_store , const Identifier& key)
   String        leaf_id      = STRING(key) ;
   String        key_text     = STRING(key) ;
   String        value_text   = STRING(clip_store[key]) ;
-  TreeViewItem* leaf_item    = newLeafItem(leaf_id , key_text , value_text , key , clip_store) ;
   String        clip_item_id = STRING(clip_store[STORE::ITEM_ID_KEY]) ;
   TreeViewItem* clip_item    = this->clipsTreeview->findItemFromIdentifierString(clip_item_id) ;
 
 DEBUG_TRACE_CREATE_LEAF_ITEM
 
-  if (clip_item != nullptr) clip_item->addSubItem(leaf_item , 0) ;
+  if (clip_item != nullptr)
+  {
+    TreeViewItem* leaf_item = newLeafItem(leaf_id , key_text , value_text , key , clip_store) ;
+
+    clip_item->addSubItem(leaf_item , 0) ;
+  }
 }
 
 void ClipsTable::createItemsTree(ValueTree& root_store)

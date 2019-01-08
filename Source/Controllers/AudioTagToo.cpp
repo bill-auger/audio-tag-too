@@ -100,13 +100,16 @@ ValueTree AudioTagToo::CreateClip(String audio_filename , double begin_time , do
   return Store->createClip(audio_filename , begin_time , end_time) ;
 }
 
-void AudioTagToo::CreateMetadata(ValueTree& clip_store) { Gui->createMetadata(clip_store) ; }
+void AudioTagToo::CreateMetadata(ValueTree& clip_store , const Identifier& key)
+{
+  Gui->createMetadata(clip_store , key) ;
+}
 
 NamedValueSet AudioTagToo::GetMetadataKeys()
 {
   ValueTree     root_store = Store->clips ;
   int           n_masters  = root_store.getNumChildren() ;
-  NamedValueSet key_options ;
+  NamedValueSet keys ;
 
   for (int master_n = 0 ; master_n < n_masters ; ++master_n)
   {
@@ -122,12 +125,12 @@ NamedValueSet AudioTagToo::GetMetadataKeys()
       {
         String key = STRING(clip_store.getPropertyName(property_n)) ;
 
-        key_options.set(key , var::null) ;
+        keys.set(key , var::null) ;
       }
     }
   }
 
-  return key_options ;
+  return keys ;
 }
 
 void AudioTagToo::Warning(String message_text) { Alert::Push(GUI::ALERT_TYPE_WARNING , message_text) ; }

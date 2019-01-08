@@ -163,7 +163,7 @@ DEBUG_TRACE_DUMP_STORE(master_node , "master_node")
 
 void AudioTagTooStore::loadConfig()
 {
-// DEBUG_TRACE_LOAD_CONFIG
+DEBUG_TRACE_LOAD_CONFIG
 
   // load application configuration from persistent storage
 #ifdef STORAGE_IS_BINARY
@@ -339,26 +339,18 @@ void AudioTagTooStore::sanitizeClips()
   Array<ValueTree> stores = { this->clips , this->compilations } ;
 
   for (ValueTree* store = stores.begin() ; store != stores.end() ; ++store)
-// {DBG("AudioTagTooStore::sanitizeClips() store=" + STRING(store->getType())) ;
-
     for (int master_n = 0 ; master_n < store->getNumChildren() ; ++master_n)
     {
       ValueTree master_store = store->getChild(master_n) ;
-
-// DBG("  AudioTagTooStore::sanitizeClips() master=" + STRING(master_store.getType())) ;
 
       filterKeys(master_store , STORE::MasterKeys , true) ;
       for (int clip_n = 0 ; clip_n < master_store.getNumChildren() ; ++clip_n)
       {
         ValueTree clip_store = master_store.getChild(clip_n) ;
 
-// DBG("    AudioTagTooStore::sanitizeClips() clip=" + STRING(clip_store.getType())) ;
-
         filterKeys(clip_store , STORE::ClipTransientKeys , false) ;
       }
     }
-
-// }
 }
 
 
@@ -423,14 +415,11 @@ void AudioTagTooStore::removeConflictedNodes(ValueTree parent_node , Identifier 
 void AudioTagTooStore::filterKeys(ValueTree storage_node , NamedValueSet& keys ,
                                   bool      is_whitelist                       )
 {
-// DBG("  AudioTagTooStore::filterKeys() nkeys=" + String(storage_node.getNumProperties())) ;
-
   for (int key_n = 0 ; key_n < storage_node.getNumProperties() ; ++key_n)
   {
     Identifier property_id   = storage_node.getPropertyName(key_n) ;
     bool       should_remove = is_whitelist != keys.contains(property_id) ;
 
-// DBG("    AudioTagTooStore::filterKeys() key=" + STRING(property_id)) ;
 DEBUG_TRACE_FILTER_KEY
 
     if (should_remove) storage_node.removeProperty(property_id , nullptr) ;
@@ -511,13 +500,14 @@ DEBUG_TRACE_CONFIG_TREE_CHANGED
 
 bool AudioTagTooStore::isReservedKey(ValueTree& node , const Identifier& key)
 {
-  ValueTree parent_node     = node.getParent() ;
-  bool      is_master_node  = node        == this->clips       ||
-                              node        == this->compilations ;
-  bool      is_clip_node    = parent_node == this->clips       ||
-                              parent_node == this->compilations ;
-  bool      is_reserved_key = is_master_node && STORE::MasterKeys       .contains(STRING(key)) ||
-                              is_clip_node   && STORE::ClipImmutableKeys.contains(STRING(key))  ;
+  ValueTree parent_node      = node.getParent() ;
+  ValueTree grandparent_node = parent_node.getParent() ;
+  bool      is_master_node   = parent_node      == this->clips       ||
+                               parent_node      == this->compilations ;
+  bool      is_clip_node     = grandparent_node == this->clips       ||
+                               grandparent_node == this->compilations ;
+  bool      is_reserved_key  = is_master_node && STORE::MasterKeys       .contains(STRING(key)) ||
+                               is_clip_node   && STORE::ClipImmutableKeys.contains(STRING(key))  ;
 
   return is_reserved_key ;
 }

@@ -342,9 +342,9 @@ void MainContent::updateTransportButton()
   transportButton->setToggleState(is_rolling , juce::dontSendNotification) ;
 }
 
-void MainContent::createMetadata(ValueTree& clip_store)
+  void MainContent::createMetadata(ValueTree& clip_store , const Identifier& key)
 {
-  this->clipsTable->createLeafItem(clip_store , STORE::NEW_METADATA_KEY) ;
+  this->clipsTable->createLeafItem(clip_store , key) ;
 }
 
 void MainContent::setStatusL(String statusText) { this->statusbar->setStatusL(statusText) ; }

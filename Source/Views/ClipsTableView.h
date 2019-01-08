@@ -39,8 +39,8 @@ class ValueControlledButton ;
   Subclass constructors are called by their corresponding ClipsTableItem subclass constructors.
                                                                     //[/Comments]
 */
-class ClipsTableView  : public Component,
-                        public ComboBox::Listener
+class ClipsTableView  : public Component/*,
+                        public ComboBox::Listener*/
 {
 public:
     //==============================================================================
@@ -53,7 +53,7 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+//     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
@@ -133,9 +133,9 @@ private:
   void buttonClicked(Button* a_button) override ;
 
   // helpers
+  void addMetadata(void) ;
   void showEditor (void) override ;
   void removeClip (void) ;
-  void addMetadata(void) ;
 
 
   ValueTree clipStore ;
@@ -150,7 +150,8 @@ private:
 */
 class LeafClipsTableView : public  ClipsTableView   ,
                            private Button::Listener ,
-                           private Label::Listener
+                           private ComboBox::Listener/*
+                           private Label::Listener*/
 {
 public:
 
@@ -167,13 +168,15 @@ public:
 private:
 
   // event handlers
-  void buttonClicked   (Button* a_button) override ;
-  void labelTextChanged(Label* a_label)   override ;
+  void buttonClicked  (Button* a_button)     override ;
+  void comboBoxChanged(ComboBox* a_combobox) override ;
+//   void labelTextChanged(Label* a_label)   override ;
 
   // helpers
-  void showEditor       (void) override ;
   void resetMetadata    (void) ;
   void populateKeySelect(void) ;
+  void handleComboBox   (const String& key_text) ;
+  void showEditor       (void) override ;
 
 
   ValueTree  clipStore ;

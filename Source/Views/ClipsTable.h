@@ -71,7 +71,7 @@ private:
   std::unique_ptr<TreeViewItem> compilationItems ;
 
   // model helpers
-  void          storeItemId     (TreeViewItem* an_item , ValueTree a_store) ;
+  void          storeItemId     (ValueTree a_store , TreeViewItem* an_item) ;
   TreeViewItem* getViewItemFor  (ValueTree& root_store) ;
   TreeViewItem* newMasterItem   (ValueTree& master_store) ;
   TreeViewItem* newClipItem     (ValueTree& clip_store) ;

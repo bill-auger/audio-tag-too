@@ -58,64 +58,66 @@
 
   /* ClipsTable */
 
-  #define DEBUG_TRACE_NEW_MASTER_ITEM                                    \
-    Trace::TraceGui("prepared new master item: '" + filename   + "'") ;  \
-    Trace::TraceNoPrefix("master_id: '"            + master_id  + "'") ; \
-    Trace::TraceNoPrefix("data     : ("            + label_text + "|)")  ;
+  #define DEBUG_TRACE_NEW_MASTER_ITEM                                      \
+    String item_id = master_item->getItemIdentifierString() ;              \
+    Trace::TraceGui     ("created new master item '" + master_id  + "'") ; \
+    Trace::TraceNoPrefix("itemId: '"                 + item_id    + "'") ; \
+    Trace::TraceNoPrefix("data  : ("                 + label_text + "|)")  ;
 
-  #define DEBUG_TRACE_NEW_CLIP_ITEM                                                              \
-    Trace::TraceGui     ("prepared new clip item:") ;                                            \
-    Trace::TraceNoPrefix("clip_id: '" + clip_id             + "'") ;                             \
-    Trace::TraceNoPrefix("data   : (" + clip_label_text     + "|n/a"                    + ")") ; \
-    Trace::TraceNoPrefix("         (" + file_label_text     + "|" + file_value_text     + ")") ; \
-    Trace::TraceNoPrefix("         (" + begin_label_text    + "|" + begin_value_text    + ")") ; \
-    Trace::TraceNoPrefix("         (" + end_label_text      + "|" + end_value_text      + ")") ; \
-    Trace::TraceNoPrefix("         (" + duration_label_text + "|" + duration_value_text + ")")   ;
+  #define DEBUG_TRACE_NEW_CLIP_ITEM                                                             \
+    String clip_item_id = clip_item  ->getItemIdentifierString() ;                              \
+    Trace::TraceGui     ("created new clip item '" + clip_id                           + "'") ; \
+    Trace::TraceNoPrefix("itemId: '" + clip_item_id                                    + "'") ; \
+    Trace::TraceNoPrefix("data  : (" + clip_label_text     + "|n/a"                    + ")") ; \
+    Trace::TraceNoPrefix("        (" + file_label_text     + "|" + file_value_text     + ")") ; \
+    Trace::TraceNoPrefix("        (" + begin_label_text    + "|" + begin_value_text    + ")") ; \
+    Trace::TraceNoPrefix("        (" + end_label_text      + "|" + end_value_text      + ")") ; \
+    Trace::TraceNoPrefix("        (" + duration_label_text + "|" + duration_value_text + ")")   ;
 
-  #define DEBUG_TRACE_NEW_LEAF_ITEM                                       \
-    Trace::TraceGui("prepared new leaf item: '"     + key        + "'") ; \
-    Trace::TraceNoPrefix("data: (" + key_text + "|" + value_text + ")")   ;
+  #define DEBUG_TRACE_NEW_LEAF_ITEM                                         \
+    String item_id = leaf_item->getItemIdentifierString() ;                 \
+    Trace::TraceGui     ("created new leaf item '"    + leaf_id    + "'") ; \
+    Trace::TraceNoPrefix("itemId: '"                  + item_id    + "'") ; \
+    Trace::TraceNoPrefix("data  : (" + key_text + "|" + value_text + ")")   ;
 
-  #define DEBUG_TRACE_CREATE_MASTER_ITEM                                       \
-    String item_id   = master_item->getItemIdentifierString() ;                \
-    String master_id = STRING(master_store.getType()) ;                        \
-    String root_id   = STRING(root_store  .getType()) ;                        \
-    Trace::TraceGui(     "created master item '" + item_id            + "'") ; \
-    Trace::TraceNoPrefix("for source '"          + master_id          + "'") ; \
-    Trace::TraceNoPrefix("at index "             + String(master_idx) +        \
-                         " of root store '"      + root_id            + "'")   ;
+  #define DEBUG_TRACE_CREATE_MASTER_ITEM                               \
+    String master_id = STRING(master_store.getType()) ;                \
+    String root_id   = STRING(root_store  .getType()) ;                \
+    String filename  = STRING(master_store[STORE::FILENAME_KEY]) ;     \
+    String masteridx = String(root_store.indexOf(master_store)) ;      \
+    Trace::TraceGui(     "creating master item '" + master_id + "'") ; \
+    Trace::TraceNoPrefix("for source '"           + filename  + "'") ; \
+    Trace::TraceNoPrefix("at index "              + masteridx +        \
+                         " of root store '"       + root_id   + "'")   ;
 
-  #define DEBUG_TRACE_CREATE_CLIP_ITEM                                              \
-    String master_item_id      = master_item->getItemIdentifierString() ;           \
-    String clip_item_id        = clip_item  ->getItemIdentifierString() ;           \
-    String master_id           = STRING(master_store.getType()) ;                   \
-    String root_id             = STRING(root_store  .getType()) ;                   \
-    String clip_id             = STRING(clip_store  .getType()) ;                   \
-    String existing_master_msg = (does_master_item_exist) ? "existing" : "new" ;    \
-    if (!does_master_item_exist)                                                    \
-    { Trace::TraceGui     ("created master item '" + master_item_id      + "'") ;   \
-      Trace::TraceNoPrefix("for source '"          + master_id           +          \
-                           "' at index "           + String(master_idx)  +          \
-                           " of root store '"      + root_id             + "'") ; } \
-    Trace::TraceGui       ("created clip item '"   + clip_item_id        + "'") ;   \
-    Trace::TraceNoPrefix  ("for source '"          + clip_id             + "'") ;   \
-    Trace::TraceNoPrefix  ("at index "             + String(clip_idx)    +          \
-                           " of "                  + existing_master_msg +          \
-                           " master item '"        + master_item_id      + "'") ;   \
-    Trace::TraceNoPrefix  ("for source '"          + master_id           + "'") ;   \
-    Trace::TraceNoPrefix  ("at index "             + String(master_idx)  +          \
-                           " of root store '"      + root_id + "'"       ) ;        \
-    DEBUG_TRACE_DUMP_ITEMS_TREE(root_item , STRING(root_store.getType()))           ;
+  #define DEBUG_TRACE_CREATE_CLIP_ITEM                                               \
+    String filename               = STRING(master_store[STORE::FILENAME_KEY]) ;      \
+    String master_id              = STRING(master_store.getType()) ;                 \
+    String root_id                = STRING(root_store  .getType()) ;                 \
+    String clip_id                = STRING(clip_store  .getType()) ;                 \
+    bool   does_master_item_exist = master_item != nullptr ;                         \
+    String existing_master_msg    = (does_master_item_exist) ? "existing" : "new" ;  \
+    if (does_master_item_exist)                                                      \
+    { Trace::TraceGui     ("creating master item '" + filename            + "'") ;   \
+      Trace::TraceNoPrefix("for source '"           + master_id           +          \
+                           "' at index "            + String(master_idx)  +          \
+                           " of root store '"       + root_id             + "'") ; } \
+    Trace::TraceGui       ("creating clip item '"   + clip_id             + "'") ;   \
+    Trace::TraceNoPrefix  ("at index "              + String(clip_idx)    +          \
+                           " of "                   + existing_master_msg +          \
+                           " master store '"        + master_id           + "'") ;   \
+    Trace::TraceNoPrefix  ("at index "              + String(master_idx)  +          \
+                           " of root store '"       + root_id + "'"       ) ;        \
+    DEBUG_TRACE_DUMP_ITEMS_TREE(root_item , STRING(root_store.getType()))            ;
 
   #define DEBUG_TRACE_CREATE_LEAF_ITEM                                         \
-    String item_id = leaf_item->getItemIdentifierString() ;                    \
     if (clip_item == nullptr)                                                  \
       Trace::TraceError("unable to find parent clip item '" + clip_item_id +   \
-                        "' for new leaf item '" + item_id + "' (ignoring)" ) ; \
+                        "' for new leaf item '" + leaf_id + "' (ignoring)" ) ; \
     else                                                                       \
-    { Trace::TraceGui(       "created leaf item '" + item_id + "'") ;          \
-      Trace::TraceNoPrefix(  "for clip '"          + clip_id + "'") ;          \
-      Trace::TraceNoPrefix(  "leaf '"              + key     + "'") ;          }
+    { Trace::TraceGui     ("creating leaf item '" + leaf_id + "'") ;           \
+      Trace::TraceNoPrefix("for clip '"           + clip_id + "'") ;           \
+      Trace::TraceNoPrefix("leaf '"               + key     + "'") ;           }
 
   #define DEBUG_TRACE_INIT_STORAGE(clips_store)                                                     \
     int n_masters = clips_store.getNumChildren() ; int n_clips = 0 ;                   \
@@ -180,8 +182,12 @@
                                 (is_immutable_metadata) ? "immutable"   : "mutable"))          ;
 
   #define DEBUG_TRACE_CLIPVIEW_COMBOBOX_CHANGED                                               \
-    String select_id = (comboBoxThatHasChanged == key_select) ? "keySelect" : "(unhandled)" ; \
-    Trace::TraceEvent("ClipClipsTableView " + select_id + " clicked")                         ;
+    String select_id   = (a_combobox == key_select) ? "keySelect" : "(unhandled)" ;           \
+    String option_idx  = String(key_select->getSelectedItemIndex()) ;                         \
+    String option_id   = String(key_select->getSelectedId()) ;                                \
+    String option_text = String(key_select->getText()) ;                                      \
+    Trace::TraceEvent("ClipClipsTableView " + select_id + " selection changed: " +            \
+                      " option[" + option_idx + "] '" + option_id + "::" + option_text + "'") ;
 
   #define DEBUG_TRACE_CLIPVIEW_BTN_CLICKED                                         \
     String button_id = (a_button == load_btn  ) ? "loadButton"   :                 \
@@ -194,6 +200,14 @@
     String button_id = (a_button == edit_btn  ) ? "editButton"   :                 \
                        (a_button == delete_btn) ? "deleteButton" : "(unhandled)" ; \
     Trace::TraceEvent("LeafClipsTableView " + button_id + " clicked")              ;
+
+  #define DEBUG_TRACE_POPULATE_KEYSELECT                                                   \
+    Trace::TraceGui("populating keySelect with (" + String(n_keys) + ") known properties") ;
+
+  #define DEBUG_TRACE_HANDLE_COMBOBOX                                                   \
+    String valid_key_msg   = "adding new property '"    + key_text + "' to store" ;     \
+    String invalid_key_msg = "invalid property entry '" + key_text + "' - (ignoring)" ; \
+    Trace::TraceGui((is_acceptable_key) ? valid_key_msg : invalid_key_msg)              ;
 
   #define DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR                                     \
     String clip_id = STRING(this->clipStore.getType()) ;                       \
@@ -209,13 +223,14 @@
     Trace::TraceGui     ("destroying clip '"        + clip_id      + "'") ; \
     Trace::TraceNoPrefix("via ClipClipsTableView '" + this->itemId + "'")   ;
 
-  #define DEBUG_TRACE_LEAFVIEW_ADD_METADATA                                                 \
-    String clip_id = STRING(this->clipStore.getType()) ;                                    \
-    if (has_orphaned_placeholder)                                                           \
-      Trace::TraceError ("replacing orphaned placeholder property") ;                       \
-    Trace::TraceGui     ("adding placeholder property '" + STORE::NEW_METADATA_KEY + "'") ; \
-    Trace::TraceNoPrefix("to clip '"                     + clip_id                 + "'") ; \
-    Trace::TraceNoPrefix("via LeafClipsTableView '"      + this->itemId            + "'")   ;
+  #define DEBUG_TRACE_LEAFVIEW_ADD_METADATA                                                  \
+    bool   has_orphaned_placeholder = this->clipStore.hasProperty(STORE::NEW_METADATA_KEY) ; \
+    String clip_id                  = STRING(this->clipStore.getType()) ;                    \
+    if (has_orphaned_placeholder)                                                            \
+      Trace::TraceError ("replacing orphaned placeholder property") ;                        \
+    Trace::TraceGui     ("adding placeholder property '" + STORE::NEW_METADATA_KEY + "'") ;  \
+    Trace::TraceNoPrefix("to clip '"                     + clip_id                 + "'") ;  \
+    Trace::TraceNoPrefix("via LeafClipsTableView '"      + this->itemId            + "'")    ;
 
   #define DEBUG_TRACE_LEAFVIEW_RESET_METADATA                                          \
     String missing_item_msg = (this_item   == nullptr) ? "this item"                 : \
@@ -228,6 +243,7 @@
     if (!missing_item_msg.isEmpty())                                                   \
       Trace::TraceError("unable to find " + missing_item_msg + " '" +                  \
                         this->itemId + "' (ignoring)"               )                  ;
+
 
   /* ClipsTableItem subclasses */
 
@@ -271,6 +287,8 @@
   #define DEBUG_TRACE_LEAFCLIPSTABLEVIEW      ;
   #define DEBUG_TRACE_CLIPVIEW_BTN_CLICKED    ;
   #define DEBUG_TRACE_LEAFVIEW_BTN_CLICKED    ;
+  #define DEBUG_TRACE_POPULATE_KEYSELECT      ;
+  #define DEBUG_TRACE_HANDLE_COMBOBOX         ;
   #define DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR    ;
   #define DEBUG_TRACE_LEAFVIEW_SHOW_EDITOR    ;
   #define DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP    ;

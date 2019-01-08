@@ -105,9 +105,9 @@ public:
   static const uint8  MAX_KEY_TEXTEDITOR_N_CHARS ;
   static const uint16 MAX_VALUE_TEXTEDITOR_N_CHARS ;
   static const String NEW_CLIPNAME_TEXT ;
+  static const String NEW_FIRST_KEY_TEXT ;
   static const String NEW_KEY_TEXT ;
   static const String NEW_VALUE_TEXT ;
-  static const String FIRST_NEW_KEY_TEXT ;
   static const String LOAD_BTN_HOVERTEXT ;
   static const String EDIT_BTN_HOVERTEXT ;
   static const String DELETE_BTN_HOVERTEXT ;

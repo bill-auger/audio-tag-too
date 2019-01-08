@@ -70,7 +70,7 @@ public:
   // helpers
   void loadUrl              (File audio_url) ;
   void updateTransportButton(void) ;
-  void createMetadata       (ValueTree& clip_store) ;
+  void createMetadata       (ValueTree& clip_store , const Identifier& key) ;
   void setStatusL           (String statusText) ;
   void setStatusC           (String statusText) ;
   void setStatusR           (String statusText) ;

@@ -30,8 +30,8 @@
   #define DEBUG_PRIME_CLIPS_STORAGE if (DEBUG_PRIME_STORAGE)              \
     createClip(String("/path/to/dummy_audio_file") , 0.123456 , 6.543210) ;
 
-  #define DEBUG_TRACE_SET_PROPERTY                                                                 \
-    if (!node.isValid()) Trace::TraceError("request to set property on invalid tree - ignoring") ;
+  #define DEBUG_TRACE_SET_PROPERTY if (!node.isValid())                       \
+    Trace::TraceError("request to set property on invalid tree - (ignoring)") ;
 
   #define DEBUG_TRACE_SET_CONFIG                                                              \
     /* ASSERT: mirrors AudioTagTooStore->isConfigProperty() implementation */                 \
@@ -62,7 +62,7 @@
     if (is_duplicate_clip) warnings.add("duplicate clip exists: " + clip_id) ;           \
     if (is_id_collision  ) warnings.add("ID collision creating " + master_msg) ;         \
     if (!warnings.isEmpty()) for (String warning : warnings)                             \
-           Trace::TraceWarning   (warning            + " - ignoring") ;                  \
+           Trace::TraceWarning   (warning            + " - (ignoring)") ;                \
     else { if (is_new_master)                                                            \
            Trace::TraceStore     ("created "         + master_msg) ;                     \
            Trace::TraceStore     ("creating clip: '" + clip_id + "'") ;                  \
@@ -70,6 +70,9 @@
            Trace::TraceNoPrefixVb("audio_filename="  + audio_filename     +              \
                                   " begin_time="     + String(begin_time) +              \
                                   " end_time="       + String(end_time  ) ) ;            }
+
+  #define DEBUG_TRACE_LOAD_CONFIG                                                             \
+    Trace::TraceStore("looking for stored config at: " + this->storageFile.getFullPathName()) ;
 
   #define DEBUG_TRACE_VERIFY_STORED_CONFIG                                                     \
     String not_found_msg = "stored config not found - restoring defaults" ;                    \
@@ -81,13 +84,12 @@
     int    n_masters     = this->clips.getNumChildren() ;                                      \
     int    n_clips       = 0 ; for (int master_n = 0 ; master_n < n_masters ; ++master_n)      \
            n_clips      += this->clips.getChild(master_n).getNumChildren() ;                   \
-    Trace::TraceStore("looking for stored config at " + this->storageFile.getFullPathName()) ; \
     Trace::TraceStore((!was_storage_found  ) ? not_found_msg :                                 \
                       (!is_root_valid      ) ? invalid_msg   :                                 \
                       (!has_canonical_nodes) ? corrupt_msg   :                                 \
                       (!do_versions_match  ) ? upgraded_msg  : success_msg) ;                  \
-    Trace::TraceStore(String(n_clips  ) + " clips declared from " +                            \
-                      String(n_masters) + " master sources"       )                            ;
+    Trace::TraceStore("verified (" + String(n_clips  ) + ") clips declared from (" +           \
+                                     String(n_masters) + ") master sources"        )           ;
 
   #define DEBUG_TRACE_VERIFY_MISSING_NODE    \
     Trace::TraceMissingNode(store , node_id) ;
@@ -95,13 +97,11 @@
   #define DEBUG_TRACE_VERIFY_MISSING_PROPERTY                \
     Trace::TraceMissingProperty(store , key , default_value) ;
 
-  #define DEBUG_TRACE_FILTER_KEY                                                            \
-    if (should_remove)                                                                      \
+  #define DEBUG_TRACE_FILTER_KEY  if (should_remove)                                        \
       Trace::TraceStore("removing rogue property '" + STRING(property_id)                 + \
                         "' from '"                  + STRING(storage_node.getType()) + "'") ;
 
-  #define DEBUG_TRACE_FILTER_NODE                                                      \
-    if (should_remove)                                                                 \
+  #define DEBUG_TRACE_FILTER_NODE if (should_remove)                                   \
       Trace::TraceStore("removing rogue node '" + STRING(node_id)                    + \
                         "' from '"              + STRING(parent_node.getType()) + "'") ;
 
