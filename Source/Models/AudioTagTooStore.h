@@ -83,21 +83,25 @@ private:
   void sanitizeComboProperty(ValueTree store , Identifier key , StringArray options) ;
 
   // event handlers
-  void listen                  (bool should_listen) ;
-  void changeListenerCallback  (ChangeBroadcaster* source) ;
-  void valueTreePropertyChanged(ValueTree& node , const Identifier& key) override ;
+  void listen                    (bool should_listen) ;
+  void changeListenerCallback    (ChangeBroadcaster* source) ;
+  void valueTreeChildAdded       (ValueTree& parent_node , ValueTree& new_node                   ) override ;
+  void valueTreeChildOrderChanged(ValueTree& parent_node , int        prev_idx     , int curr_idx) override ;
+  void valueTreeChildRemoved     (ValueTree& parent_node , ValueTree& deleted_node , int prev_idx) override ;
+  void valueTreePropertyChanged  (ValueTree& node , const Identifier& key) override ;
 
   // unhandled ValueTree::Listener events
-  void valueTreeChildAdded       (ValueTree& /*parent_node*/ , ValueTree& /*new_node*/                       ) override { }
-  void valueTreeChildOrderChanged(ValueTree& /*parent_node*/ , int        /*prev_idx*/     , int /*curr_idx*/) override { }
-  void valueTreeChildRemoved     (ValueTree& /*parent_node*/ , ValueTree& /*deleted_node*/ , int /*prev_idx*/) override { }
-  void valueTreeParentChanged    (ValueTree& /*reparented_node*/                                             ) override { }
-  void valueTreeRedirected       (ValueTree& /*target_node*/                                                 ) override { }
+  void valueTreeParentChanged    (ValueTree& /*reparented_node*/ ) override { }
+  void valueTreeRedirected       (ValueTree& /*target_node*/     ) override { }
 
   // schema helpers
-  bool isReservedKey   (ValueTree& node , const Identifier& key) ;
-  bool isConfigProperty(ValueTree& node , const Identifier& key) ;
-
+  bool      isConfigProperty  (ValueTree& node , const Identifier& key) ;
+  bool      isReservedKey     (ValueTree& node , const Identifier& key) ;
+  bool      isMasterNode      (ValueTree& parent_node) ;
+  bool      isClipNode        (ValueTree& parent_node) ;
+  bool      isClipsNode       (ValueTree& parent_node) ;
+  bool      isCompilationsNode(ValueTree& parent_node) ;
+  ValueTree getClipsRootNode  (ValueTree& parent_node) ;
 
   // configuration/persistence
   File                        storageFile ;

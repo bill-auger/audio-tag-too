@@ -342,7 +342,22 @@ void MainContent::updateTransportButton()
   transportButton->setToggleState(is_rolling , juce::dontSendNotification) ;
 }
 
-  void MainContent::createMetadata(ValueTree& clip_store , const Identifier& key)
+void MainContent::createMasterItem(ValueTree& root_store , ValueTree master_store)
+{
+  this->clipsTable->createMasterItem(root_store , master_store) ;
+}
+
+void MainContent::createClipItem(ValueTree& root_store , ValueTree clip_store)
+{
+  this->clipsTable->createClipItem(root_store , clip_store) ;
+}
+
+void MainContent::destroyItem(const String& item_id)
+{
+  this->clipsTable->destroyItem(item_id) ;
+}
+
+void MainContent::createMetadata(ValueTree& clip_store , const Identifier& key)
 {
   this->clipsTable->createLeafItem(clip_store , key) ;
 }

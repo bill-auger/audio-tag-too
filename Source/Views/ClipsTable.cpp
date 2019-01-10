@@ -1,23 +1,21 @@
-/*\
-|*|  AudioTagToo - Clip and stitch audio samples
-|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
-|*|
-|*|  This file is part of the AudioTagToo program.
-|*|
-|*|  AudioTagToo is free software: you can redistribute it and/or modify
-|*|  it under the terms of the GNU General Public License as published by
-|*|  the Free Software Foundation, either version 3 of the License, or
-|*|  (at your option) any later version.
-|*|
-|*|  AudioTagToo is distributed in the hope that it will be useful,
-|*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
-|*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-|*|  GNU General Public License for more details.
-|*|
-|*|  You should have received a copy of the GNU General Public License
-|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
-\*/
+/*
+  ==============================================================================
 
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.3.2
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
+
+  ==============================================================================
+*/
 
 //[Headers] You can add your own extra header files here...
 
@@ -81,10 +79,6 @@ ClipsTable::ClipsTable ()
 ClipsTable::~ClipsTable()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-
-  this->clipsStore       .removeListener(this) ;
-  this->compilationsStore.removeListener(this) ;
-
     //[/Destructor_pre]
 
     compilationsGroup = nullptr;
@@ -132,38 +126,44 @@ void ClipsTable::resized()
 
 bool ClipsTable::initialize(ValueTree& clips_store , ValueTree& compilations_store)
 {
-  bool is_initialized = this->clipsStore.isValid() || this->compilationsStore.isValid() ;
+  bool should_initialize = !AudioTagToo::GetIsInitialized() && clips_store       .isValid() &&
+                                                               compilations_store.isValid()  ;
 
-  if (!is_initialized)
+  if (should_initialize)
   {
-    createItemsTree(this->clipsStore        = clips_store       ) ;
-    createItemsTree(this->compilationsStore = compilations_store) ;
-
-    this->clipsStore       .addListener(this) ;
-    this->compilationsStore.addListener(this) ;
+    createItemsTree(clips_store       ) ;
+    createItemsTree(compilations_store) ;
   }
 
-  is_initialized = this->clipsStore.isValid() || this->compilationsStore.isValid() ;
+DEBUG_TRACE_INIT_GUI
 
-  return is_initialized ;
+  return should_initialize ;
+}
+
+void ClipsTable::createItemsTree(ValueTree& root_store)
+{
+DEBUG_TRACE_CREATE_ITEMS_TREE(root_store)
+
+  for (int master_n = 0 ; master_n < root_store.getNumChildren() ; ++master_n)
+    createMasterItem(root_store , root_store.getChild(master_n)) ;
 }
 
 
 /* ClipsTable private instance methods */
 
-/* model helpers */
+/* model/view helpers */
+
+TreeViewItem* ClipsTable::getViewItemFor(const Identifier& root_store_id)
+{
+  return (root_store_id == STORE::CLIPS_ID       ) ? this->clipItems       .get() :
+         (root_store_id == STORE::COMPILATIONS_ID) ? this->compilationItems.get() : nullptr ;
+}
 
 void ClipsTable::storeItemId(ValueTree a_store , TreeViewItem* an_item)
 {
   String item_id = an_item->getItemIdentifierString() ;
 
   a_store.setProperty(STORE::ITEM_ID_KEY , var(item_id) , nullptr) ;
-}
-
-TreeViewItem* ClipsTable::getViewItemFor(ValueTree& root_store)
-{
-  return (root_store == this->clipsStore       ) ? this->clipItems.get()        :
-         (root_store == this->compilationsStore) ? this->compilationItems.get() : nullptr ;
 }
 
 TreeViewItem* ClipsTable::newMasterItem(ValueTree& master_store)
@@ -228,7 +228,7 @@ void ClipsTable::createMasterItem(ValueTree& root_store , ValueTree master_store
 {
 DEBUG_TRACE_CREATE_MASTER_ITEM
 
-  TreeViewItem* root_item   = getViewItemFor(root_store) ;
+  TreeViewItem* root_item   = getViewItemFor(root_store.getType()) ;
   TreeViewItem* master_item = newMasterItem(master_store) ;
   int           master_idx  = root_store.indexOf(master_store) ;
 
@@ -241,7 +241,7 @@ DEBUG_TRACE_CREATE_MASTER_ITEM
 
 void ClipsTable::createClipItem(ValueTree& root_store , ValueTree clip_store)
 {
-  TreeViewItem* root_item    = getViewItemFor(root_store) ;
+  TreeViewItem* root_item    = getViewItemFor(root_store.getType()) ;
   ValueTree     master_store = clip_store.getParent() ;
   int           master_idx   = root_store  .indexOf(master_store) ;
   int           clip_idx     = master_store.indexOf(clip_store  ) ;
@@ -266,13 +266,13 @@ DEBUG_TRACE_CREATE_CLIP_ITEM
   storeItemId(clip_store , clip_item) ;
 
   // create new leaf items for user-defined metadata if necessary
-//   for (int property_n = 0 ; property_n < n_properties ; ++property_n)
-//   {
-//     String key = STRING(clip_store.getPropertyName(property_n)) ;
-//
-//     if (!STORE::ClipPersistentKeys.contains(key) &&
-//         !STORE::ClipTransientKeys .contains(key)  ) createLeafItem(clip_store , key) ;
-//   }
+  for (int property_n = 0 ; property_n < n_properties ; ++property_n)
+  {
+    String key = STRING(clip_store.getPropertyName(property_n)) ;
+
+    if (!STORE::ClipPersistentKeys.contains(key) &&
+        !STORE::ClipTransientKeys .contains(key)  ) createLeafItem(clip_store , key) ;
+  }
 }
 
 void ClipsTable::createLeafItem(ValueTree& clip_store , const Identifier& key)
@@ -294,54 +294,13 @@ DEBUG_TRACE_CREATE_LEAF_ITEM
   }
 }
 
-void ClipsTable::createItemsTree(ValueTree& root_store)
+void ClipsTable::destroyItem(const String& item_id)
 {
-DEBUG_TRACE_INIT_STORAGE(root_store)
-
-  for (int master_n = 0 ; master_n < root_store.getNumChildren() ; ++master_n)
-    createMasterItem(root_store , root_store.getChild(master_n)) ;
-}
-
-
-/* event handlers */
-
-void ClipsTable::valueTreeChildAdded(ValueTree& parent_node , ValueTree& new_node)
-{
-/*
-  const StringArray STORE::CLIPS_STORES    = StringArray::fromLines(STORE::CLIPS_ID        + newLine +
-                                                                    STORE::COMPILATIONS_ID           ) ;
-  bool is_master_node = STORE::CLIPS_STORES.contains(parent_node            .getType()) ;
-  bool is_clip_node   = STORE::CLIPS_STORES.contains(parent_node.getParent().getType()) ;
-*/
-
-  bool      is_master_node = parent_node             == this->clipsStore       ||
-                             parent_node             == this->compilationsStore ;
-  bool      is_clip_node   = parent_node.getParent() == this->clipsStore       ||
-                             parent_node.getParent() == this->compilationsStore ;
-  ValueTree root_node      = (is_master_node) ? parent_node             :
-                             (is_clip_node  ) ? parent_node.getParent() : ValueTree::invalid ;
-
-DEBUG_TRACE_STORAGE_CHILD_ADDED
-
-  if      (is_master_node) createMasterItem(root_node , new_node) ;
-  else if (is_clip_node  ) createClipItem  (root_node , new_node) ;
-}
-
-void ClipsTable::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_idx , int curr_idx)
-{
-DBG("ClipsTable::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
-  // TODO:
-}
-
-void ClipsTable::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& deleted_node ,
-                                       int        prev_idx                              )
-{
-  String        item_id      = STRING(deleted_node[STORE::ITEM_ID_KEY]) ;
   TreeViewItem* deleted_item = this->clipsTreeview->findItemFromIdentifierString(item_id) ;
   TreeViewItem* parent_item  = (deleted_item != nullptr) ? deleted_item->getParentItem()    : nullptr ;
   int           deleted_idx  = (deleted_item != nullptr) ? deleted_item->getIndexInParent() : -1 ;
 
-DEBUG_TRACE_STORAGE_CHILD_REMOVED
+DEBUG_TRACE_DESTROY_ITEM
 
   if (parent_item != nullptr) parent_item->removeSubItem(deleted_idx) ;
 }
@@ -359,10 +318,9 @@ DEBUG_TRACE_STORAGE_CHILD_REMOVED
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ClipsTable" componentName=""
-                 parentClasses="public Component, public ValueTree::Listener"
-                 constructorParams="" variableInitialisers="" snapPixels="8" snapActive="1"
-                 snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="600"
-                 initialHeight="400">
+                 parentClasses="public Component" constructorParams="" variableInitialisers=""
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="" id="9d12890fad74e332" memberName="compilationsGroup"
                   virtualName="" explicitFocusOrder="0" pos="50.065% 0 50.065% 0M"

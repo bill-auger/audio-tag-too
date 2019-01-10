@@ -487,9 +487,43 @@ DEBUG_TRACE_DEVICE_STATE_CHANGED
   }
 }
 
+void AudioTagTooStore::valueTreeChildAdded(ValueTree& parent_node , ValueTree& new_node)
+{
+  bool      is_master_node = isMasterNode    (parent_node) ;
+  bool      is_clip_node   = isClipNode      (parent_node) ;
+  ValueTree root_node      = getClipsRootNode(parent_node) ;
+
+DEBUG_TRACE_STORAGE_CHILD_ADDED
+
+  if      (is_master_node) AudioTagToo::Gui->createMasterItem(root_node , new_node) ;
+  else if (is_clip_node  ) AudioTagToo::Gui->createClipItem  (root_node , new_node) ;
+}
+
+void AudioTagTooStore::valueTreeChildOrderChanged(ValueTree& parent_node , int prev_idx , int curr_idx)
+{
+DBG("AudioTagTooStore::valueTreeChildOrderChanged() parent_node=" + parent_node.getType() + " prev_idx=" + String(prev_idx) + " curr_idx=" + String(curr_idx)) ;
+DEBUG_TRACE_STORAGE_CHILD_REORDERED
+
+  if (!isClipsNode(parent_node) && !isCompilationsNode(parent_node)) return ;
+
+  // TODO:
+}
+
+void AudioTagTooStore::valueTreeChildRemoved(ValueTree& parent_node , ValueTree& deleted_node ,
+                                             int        prev_idx                              )
+{
+DEBUG_TRACE_STORAGE_CHILD_REMOVED
+
+  if (!isClipsNode(parent_node)) return ;
+
+  String item_id = STRING(deleted_node[STORE::ITEM_ID_KEY]) ;
+
+  AudioTagToo::Gui->destroyItem(item_id) ;
+}
+
 void AudioTagTooStore::valueTreePropertyChanged(ValueTree& node , const Identifier& key)
 {
-DEBUG_TRACE_CONFIG_TREE_CHANGED
+DEBUG_TRACE_CONFIG_PROPERTY_CHANGED
 
   if      (isReservedKey   (node , key)) AudioTagToo::App->quit() ; // these should never change
   else if (isConfigProperty(node , key)) AudioTagToo::HandleConfigChanged(key) ;
@@ -497,20 +531,6 @@ DEBUG_TRACE_CONFIG_TREE_CHANGED
 
 
 /* helpers */
-
-bool AudioTagTooStore::isReservedKey(ValueTree& node , const Identifier& key)
-{
-  ValueTree parent_node      = node.getParent() ;
-  ValueTree grandparent_node = parent_node.getParent() ;
-  bool      is_master_node   = parent_node      == this->clips       ||
-                               parent_node      == this->compilations ;
-  bool      is_clip_node     = grandparent_node == this->clips       ||
-                               grandparent_node == this->compilations ;
-  bool      is_reserved_key  = is_master_node && STORE::MasterKeys       .contains(STRING(key)) ||
-                               is_clip_node   && STORE::ClipImmutableKeys.contains(STRING(key))  ;
-
-  return is_reserved_key ;
-}
 
 bool AudioTagTooStore::isConfigProperty(ValueTree& node , const Identifier& key)
 {
@@ -522,4 +542,58 @@ bool AudioTagTooStore::isConfigProperty(ValueTree& node , const Identifier& key)
                               keys_array != nullptr && keys_array->contains(key_var) ;
 
   return is_config_key ;
+}
+
+bool AudioTagTooStore::isReservedKey(ValueTree& node , const Identifier& key)
+{
+  ValueTree parent_node     = node.getParent() ;
+  bool      is_reserved_key = (isMasterNode(parent_node) && STORE::MasterKeys       .contains(STRING(key))) ||
+                              (isClipNode  (parent_node) && STORE::ClipImmutableKeys.contains(STRING(key)))  ;
+
+  return is_reserved_key ;
+}
+
+bool AudioTagTooStore::isMasterNode(ValueTree& parent_node)
+{
+  bool is_master_node = parent_node == this->clips       ||
+                        parent_node == this->compilations ;
+
+  return is_master_node ;
+}
+
+bool AudioTagTooStore::isClipNode(ValueTree& parent_node)
+{
+  ValueTree grandparent_node = parent_node.getParent() ;
+  bool      is_clip_node     = grandparent_node == this->clips       ||
+                               grandparent_node == this->compilations ;
+
+  return is_clip_node ;
+}
+
+bool AudioTagTooStore::isClipsNode(ValueTree& parent_node)
+{
+  ValueTree grandparent_node = parent_node.getParent() ;
+  bool      is_clips_node    = parent_node      == this->clips ||
+                               grandparent_node == this->clips  ;
+
+  return is_clips_node ;
+}
+
+bool AudioTagTooStore::isCompilationsNode(ValueTree& parent_node)
+{
+  ValueTree grandparent_node     = parent_node.getParent() ;
+  bool      is_compilations_node = parent_node      == this->compilations ||
+                                   grandparent_node == this->compilations  ;
+
+  return is_compilations_node ;
+}
+
+ValueTree AudioTagTooStore::getClipsRootNode(ValueTree& parent_node)
+{
+  bool      is_master_node  = isMasterNode(parent_node) ;
+  bool      is_clip_node    = isClipNode  (parent_node) ;
+  ValueTree clips_root_node = (is_master_node) ? parent_node             :
+                              (is_clip_node  ) ? parent_node.getParent() : ValueTree::invalid ;
+
+  return clips_root_node ;
 }

@@ -27,36 +27,19 @@
 
 #if DEBUG_TRACE
 
-  /* helpers */
+ /* ClipsTable */
 
-/*
-  #define ANCESTOR_NODE_IDS StringArray::fromLines(parent_node.           .getName() + newLine + \
-                                                   parent_node.getParent().getName()           ) ;
+  #define DEBUG_TRACE_INIT_GUI                                                              \
+    if      (AudioTagToo::GetIsInitialized()) Trace::TraceGui("GUI already initialized") ;  \
+    else if (should_initialize              ) Trace::TraceGui("GUI initialized") ;          \
+    else                                      Trace::TraceError("failed to initialize GUI") ;
 
-  #define isClipsNode       (parent_node) ANCESTOR_NODE_IDS  .contains(STORE::CLIPS_ID       )
-  #define isCompilationsNode(parent_node) ANCESTOR_NODE_IDS  .contains(STORE::COMPILATIONS_ID)
-  #define isMasterNode      (parent_node) STORE::CLIPS_STORES.contains(parent_node            .getName())
-  #define isClipNode        (parent_node) STORE::CLIPS_STORES.contains(parent_node.getParent().getName())
-*/
-
-  #define isClipsNode(parent_node)                  \
-    (parent_node             == this->clipsStore || \
-     parent_node.getParent() == this->clipsStore    )
-
-  #define isCompilationsNode(parent_node)                  \
-    (parent_node             == this->compilationsStore || \
-     parent_node.getParent() == this->compilationsStore    )
-
-  #define isMasterNode(parent_node)            \
-    (parent_node == this->clipsStore        || \
-     parent_node == this->compilationsStore    )
-
-  #define isClipNode(parent_node)                          \
-    (parent_node.getParent() == this->clipsStore        || \
-     parent_node.getParent() == this->compilationsStore    )
-
-
-  /* ClipsTable */
+  #define DEBUG_TRACE_CREATE_ITEMS_TREE(clips_store)                                   \
+    int n_masters = clips_store.getNumChildren() ; int n_clips = 0 ;                   \
+    for (int master_n = 0 ; master_n < n_masters ; ++master_n)                         \
+      n_clips += clips_store.getChild(master_n).getNumChildren() ;                     \
+    Trace::TraceGui("creating tree items for '" + clips_store.getType()  + "' - ("   + \
+                    String(n_masters) + ") masters (" + String(n_clips)  + ") clips" ) ;
 
   #define DEBUG_TRACE_NEW_MASTER_ITEM                                      \
     String item_id = master_item->getItemIdentifierString() ;              \
@@ -119,49 +102,13 @@
       Trace::TraceNoPrefix("for clip '"           + clip_id + "'") ;           \
       Trace::TraceNoPrefix("leaf '"               + key     + "'") ;           }
 
-  #define DEBUG_TRACE_INIT_STORAGE(clips_store)                                                     \
-    int n_masters = clips_store.getNumChildren() ; int n_clips = 0 ;                   \
-    for (int master_n = 0 ; master_n < n_masters ; ++master_n)                         \
-      n_clips += clips_store.getChild(master_n).getNumChildren() ;                     \
-    Trace::TraceGui("creating tree items for '" + clips_store.getType()  + "' - ("   + \
-                    String(n_masters) + ") masters (" + String(n_clips)  + ") clips" ) ;
-
-  #define DEBUG_TRACE_STORAGE_CHILD_DATA(a_node)                                          \
-    String    node_id_              = STRING(a_node                 .getType()) ;         \
-    String    parent_id_            = STRING(parent_node            .getType()) ;         \
-    String    grandparent_id_       = STRING(parent_node.getParent().getType()) ;         \
-    bool      is_master_node_       = isMasterNode      (parent_node) ;                   \
-    bool      is_clip_node_         = isClipNode        (parent_node) ;                   \
-    bool      is_clips_node_        = isClipsNode       (parent_node) ;                   \
-    bool      is_compilations_node_ = isCompilationsNode(parent_node) ;                   \
-    ValueTree root_store_           = (is_clips_node_       ) ? this->clipsStore        : \
-                                      (is_compilations_node_) ? this->compilationsStore : \
-                                                                ValueTree::invalid ;      \
-    ValueTree master_node_          = (is_master_node_) ? a_node             :            \
-                                      (is_clip_node_  ) ? a_node.getParent() :            \
-                                                          ValueTree::invalid ;            \
-    String    master_idx_           = String(root_store_.indexOf(master_node_)) ;         \
-    String    node_role             = (is_master_node_) ? "master " :                     \
-                                      (is_clip_node_  ) ? "clip"    : "(unknown)" ;       \
-    String    master_msg            = "master '"    + parent_id_  +                       \
-                                      "' at index " + master_idx_ + " of " ;              \
-    String    ancestry_msg          = ((is_clip_node_  ) ? master_msg : "")             + \
-                                      ((is_master_node_) ? parent_id_      :              \
-                                       (is_clip_node_  ) ? grandparent_id_ : "(unknown)") ;
-
-  #define DEBUG_TRACE_STORAGE_CHILD_ADDED                                                 \
-    DEBUG_TRACE_STORAGE_CHILD_DATA(new_node)                                              \
-    Trace::TraceGui     ("new storage node for " + node_role    + "'" + node_id_ + "'") ; \
-    Trace::TraceNoPrefix("added to "             + ancestry_msg                       )   ;
-
-  #define DEBUG_TRACE_STORAGE_CHILD_REMOVED                                                     \
-    DEBUG_TRACE_STORAGE_CHILD_DATA(deleted_node)                                                \
+  #define DEBUG_TRACE_DESTROY_ITEM                                                              \
     String missing_item_msg = (deleted_item == nullptr) ? "deleted item"                :       \
                               (parent_item  == nullptr) ? "parent item of deleted item" :       \
                                                           String::empty                 ;       \
-    Trace::TraceGui     ("storage node for "   + node_role        + "'"    + node_id_ + "'") ;  \
-    Trace::TraceNoPrefix("deleted from index " + String(prev_idx) + " of " + ancestry_msg  ) ;  \
-    if (!missing_item_msg.isEmpty())                                                            \
+    if (missing_item_msg.isEmpty())                                                             \
+      Trace::TraceGui("destroying view item '" + item_id + "'") ;                               \
+    else                                                                                        \
       Trace::TraceError("unable to find " + missing_item_msg + " '" + item_id + "' (ignoring)") ;
 
 
@@ -273,29 +220,29 @@
 
 #else // DEBUG_TRACE
 
-  #define DEBUG_TRACE_NEW_MASTER_ITEM         ;
-  #define DEBUG_TRACE_NEW_CLIP_ITEM           ;
-  #define DEBUG_TRACE_NEW_LEAF_ITEM           ;
-  #define DEBUG_TRACE_CREATE_MASTER_ITEM      ;
-  #define DEBUG_TRACE_CREATE_CLIP_ITEM        ;
-  #define DEBUG_TRACE_CREATE_LEAF_ITEM        ;
-  #define DEBUG_TRACE_INIT_STORAGE(unused)    ;
-  #define DEBUG_TRACE_STORAGE_CHILD_ADDED     ;
-  #define DEBUG_TRACE_STORAGE_CHILD_REMOVED   ;
-  #define DEBUG_TRACE_MASTERCLIPSTABLEVIEW    ;
-  #define DEBUG_TRACE_CLIPCLIPSTABLEVIEW      ;
-  #define DEBUG_TRACE_LEAFCLIPSTABLEVIEW      ;
-  #define DEBUG_TRACE_CLIPVIEW_BTN_CLICKED    ;
-  #define DEBUG_TRACE_LEAFVIEW_BTN_CLICKED    ;
-  #define DEBUG_TRACE_POPULATE_KEYSELECT      ;
-  #define DEBUG_TRACE_HANDLE_COMBOBOX         ;
-  #define DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR    ;
-  #define DEBUG_TRACE_LEAFVIEW_SHOW_EDITOR    ;
-  #define DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP    ;
-  #define DEBUG_TRACE_LEAFVIEW_ADD_METADATA   ;
-  #define DEBUG_TRACE_LEAFVIEW_RESET_METADATA ;
-  #define DEBUG_TRACE_MASTERCLIPSTABLEITEM    ;
-  #define DEBUG_TRACE_CLIPCLIPSTABLEITEM      ;
-  #define DEBUG_TRACE_LEAFCLIPSTABLEITEM      ;
+  #define DEBUG_TRACE_INIT_GUI                  ;
+  #define DEBUG_TRACE_CREATE_ITEMS_TREE(unused) ;
+  #define DEBUG_TRACE_NEW_MASTER_ITEM           ;
+  #define DEBUG_TRACE_NEW_CLIP_ITEM             ;
+  #define DEBUG_TRACE_NEW_LEAF_ITEM             ;
+  #define DEBUG_TRACE_CREATE_MASTER_ITEM        ;
+  #define DEBUG_TRACE_CREATE_CLIP_ITEM          ;
+  #define DEBUG_TRACE_CREATE_LEAF_ITEM          ;
+  #define DEBUG_TRACE_DESTROY_ITEM              ;
+  #define DEBUG_TRACE_MASTERCLIPSTABLEVIEW      ;
+  #define DEBUG_TRACE_CLIPCLIPSTABLEVIEW        ;
+  #define DEBUG_TRACE_LEAFCLIPSTABLEVIEW        ;
+  #define DEBUG_TRACE_CLIPVIEW_BTN_CLICKED      ;
+  #define DEBUG_TRACE_LEAFVIEW_BTN_CLICKED      ;
+  #define DEBUG_TRACE_POPULATE_KEYSELECT        ;
+  #define DEBUG_TRACE_HANDLE_COMBOBOX           ;
+  #define DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR      ;
+  #define DEBUG_TRACE_LEAFVIEW_SHOW_EDITOR      ;
+  #define DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP      ;
+  #define DEBUG_TRACE_LEAFVIEW_ADD_METADATA     ;
+  #define DEBUG_TRACE_LEAFVIEW_RESET_METADATA   ;
+  #define DEBUG_TRACE_MASTERCLIPSTABLEITEM      ;
+  #define DEBUG_TRACE_CLIPCLIPSTABLEITEM        ;
+  #define DEBUG_TRACE_LEAFCLIPSTABLEITEM        ;
 
 #endif // DEBUG_TRACE

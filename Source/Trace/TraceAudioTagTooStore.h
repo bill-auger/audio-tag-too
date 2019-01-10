@@ -126,7 +126,46 @@
     String state = (should_listen) ? "resumed" : "suspended" ; \
     Trace::TraceState(state + " listening for model changes")  ;
 
-  #define DEBUG_TRACE_CONFIG_TREE_CHANGED                                                                 \
+  #define DEBUG_TRACE_STORAGE_CHILD_DATA(a_node)                                          \
+    String    node_id_              = STRING(a_node                 .getType()) ;         \
+    String    parent_id_            = STRING(parent_node            .getType()) ;         \
+    String    grandparent_id_       = STRING(parent_node.getParent().getType()) ;         \
+    bool      is_master_node_       = isMasterNode      (parent_node) ;                   \
+    bool      is_clip_node_         = isClipNode        (parent_node) ;                   \
+    bool      is_clips_node_        = isClipsNode       (parent_node) ;                   \
+    bool      is_compilations_node_ = isCompilationsNode(parent_node) ;                   \
+    ValueTree root_store_           = (is_clips_node_       ) ? this->clips        :      \
+                                      (is_compilations_node_) ? this->compilations :      \
+                                                                ValueTree::invalid ;      \
+    ValueTree master_node_          = (is_master_node_) ? a_node             :            \
+                                      (is_clip_node_  ) ? a_node.getParent() :            \
+                                                          ValueTree::invalid ;            \
+    String    master_idx_           = String(root_store_.indexOf(master_node_)) ;         \
+    String    node_role             = (is_master_node_) ? "master " :                     \
+                                      (is_clip_node_  ) ? "clip"    : "(unknown)" ;       \
+    String    master_msg            = "master '"    + parent_id_  +                       \
+                                      "' at index " + master_idx_ + " of " ;              \
+    String    ancestry_msg          = ((is_clip_node_  ) ? master_msg : "")             + \
+                                      ((is_master_node_) ? parent_id_      :              \
+                                       (is_clip_node_  ) ? grandparent_id_ : "(unknown)") ;
+
+  #define DEBUG_TRACE_STORAGE_CHILD_ADDED                                                 \
+    DEBUG_TRACE_STORAGE_CHILD_DATA(new_node)                                              \
+    Trace::TraceStore   ("new storage node for " + node_role    + "'" + node_id_ + "'") ; \
+    Trace::TraceNoPrefix("added to "             + ancestry_msg                       )   ;
+
+  #define DEBUG_TRACE_STORAGE_CHILD_REORDERED             \
+    if (!isClipsNode(parent_node))                        \
+      Trace::TraceStore("not a clips node - (ignoring)") ;
+
+  #define DEBUG_TRACE_STORAGE_CHILD_REMOVED                                                    \
+    DEBUG_TRACE_STORAGE_CHILD_DATA(deleted_node)                                               \
+    Trace::TraceStore   ("storage node for "   + node_role        + "'"    + node_id_ + "'") ; \
+    Trace::TraceNoPrefix("deleted from index " + String(prev_idx) + " of " + ancestry_msg  ) ; \
+    if (!isClipsNode(parent_node))                                                             \
+      Trace::TraceStore ("not a clips node - (ignoring)")                                      ;
+
+  #define DEBUG_TRACE_CONFIG_PROPERTY_CHANGED                                                                 \
     if (isReservedKey(node , key)) Trace::TraceError("attempt to modify immutable metadata - quitting") ; \
     else                           Trace::TraceTreeChanged(node , key)                                    ;
 
@@ -149,7 +188,10 @@
   #define DEBUG_TRACE_DUMP_STORE_ALL          ;
   #define DEBUG_TRACE_STORE_CONFIG            ;
   #define DEBUG_TRACE_LISTEN                  ;
-  #define DEBUG_TRACE_CONFIG_TREE_CHANGED     ;
+  #define DEBUG_TRACE_STORAGE_CHILD_ADDED     ;
+  #define DEBUG_TRACE_STORAGE_CHILD_REORDERED ;
+  #define DEBUG_TRACE_STORAGE_CHILD_REMOVED   ;
+  #define DEBUG_TRACE_CONFIG_PROPERTY_CHANGED ;
   #define DEBUG_TRACE_DEVICE_STATE_CHANGED    ;
 
 #endif // DEBUG_TRACE
