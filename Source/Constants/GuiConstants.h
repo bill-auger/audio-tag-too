@@ -50,6 +50,7 @@ public:
   static const Colour TEXT_FOCUS_COLOR ;
   static const Colour TEXT_SHADOW_COLOR ;
   static const Colour TEXT_BG_COLOR ;
+  static const Colour COMBOBOX_INVALID_COLOR ;
 
   // MainWindow
   static const uint8  BORDERS_W ;

@@ -46,20 +46,21 @@ void GUI::ConfigureTextEditor(TextEditor*           a_text_editor   ,
 */
 
 // common
-const uint8  GUI::PAD                 = 4 ;
-const uint8  GUI::PAD2                = PAD * 2 ;
-const uint8  GUI::PAD4                = PAD * 4 ;
-const uint8  GUI::STROKE_W            = 1 ;
-const float  GUI::FONT_SIZE           = 16.0 ;
-const Colour GUI::TEXT_NORMAL_COLOR   = Colour(0xFFC0C0C0) ;
-const Colour GUI::TEXT_DISABLED_COLOR = Colour(0xFF606060) ;
-const Colour GUI::TEXT_INVALID_COLOR  = Colour(0xFFFF0000) ;
-const Colour GUI::TEXT_HILITE_COLOR   = Colour(0xFFFFFFFF) ;
-const Colour GUI::TEXT_HILITEBG_COLOR = Colour(0xFF000040) ;
-const Colour GUI::TEXT_CARET_COLOR    = Colour(0xFFFFFFFF) ;
-const Colour GUI::TEXT_FOCUS_COLOR    = Colour(0xFF000000) ;
-const Colour GUI::TEXT_SHADOW_COLOR   = Colour(0xFF000000) ;
-const Colour GUI::TEXT_BG_COLOR       = Colour(0xFF000000) ;
+const uint8  GUI::PAD                    = 4 ;
+const uint8  GUI::PAD2                   = PAD * 2 ;
+const uint8  GUI::PAD4                   = PAD * 4 ;
+const uint8  GUI::STROKE_W               = 1 ;
+const float  GUI::FONT_SIZE              = 16.0 ;
+const Colour GUI::TEXT_NORMAL_COLOR      = Colour(0xFFC0C0C0) ;
+const Colour GUI::TEXT_DISABLED_COLOR    = Colour(0xFF606060) ;
+const Colour GUI::TEXT_INVALID_COLOR     = Colour(0xFFFF0000) ;
+const Colour GUI::TEXT_HILITE_COLOR      = Colour(0xFFFFFFFF) ;
+const Colour GUI::TEXT_HILITEBG_COLOR    = Colour(0xFF000040) ;
+const Colour GUI::TEXT_CARET_COLOR       = Colour(0xFFFFFFFF) ;
+const Colour GUI::TEXT_FOCUS_COLOR       = Colour(0xFF000000) ;
+const Colour GUI::TEXT_SHADOW_COLOR      = Colour(0xFF000000) ;
+const Colour GUI::TEXT_BG_COLOR          = Colour(0xFF000000) ;
+const Colour GUI::COMBOBOX_INVALID_COLOR = Colour(0xFF440000) ;
 
 // MainContent
 const uint8  GUI::BORDERS_W                    = 2 ;

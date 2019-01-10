@@ -228,6 +228,7 @@ LeafClipsTableView::LeafClipsTableView(TreeView*         treeview , const String
   bool   is_new_key_dummy      = this->key == STORE::NEW_METADATA_KEY ;
   Value  label_storage         = this->clipStore.getPropertyAsValue(this->key , nullptr) ;
   Value& label_r_value         = this->labelR->getTextValue() ;
+  bool   should_show_editor    = isAcceptableUserKey(STRING(this->key)) ;
 
 DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 
@@ -281,18 +282,23 @@ DEBUG_TRACE_LEAFCLIPSTABLEVIEW
       this->keySelect->setSelectedItemIndex(0) ;
       this->keySelect->showPopup() ;
       this->keySelect->setVisible(true) ;
-
-      removeChildComponent(this->editButton  .get()) ;
     }
+    else if (should_show_editor) showEditor() ;
   }
-  else
+
+  if (is_immutable_metadata)
   {
     // ensure basic metadata leaf items are immutable
-    removeChildComponent  (this->editButton  .get()) ;
-    removeChildComponent  (this->deleteButton.get()) ;
+    removeChildComponent(this->editButton  .get()) ;
+    removeChildComponent(this->deleteButton.get()) ;
   }
-  removeChildComponent    (this->loadButton  .get()) ;
-  removeChildComponent    (this->addButton   .get()) ;
+  else if (is_new_key_dummy)
+  {
+    removeChildComponent(this->labelR      .get()) ;
+    removeChildComponent(this->editButton  .get()) ;
+  }
+  removeChildComponent  (this->loadButton  .get()) ;
+  removeChildComponent  (this->addButton   .get()) ;
 }
 
 ClipClipsTableView::~ClipClipsTableView()
@@ -441,19 +447,14 @@ DEBUG_TRACE_POPULATE_KEYSELECT
   this->keySelect->addItemList(key_options , 1) ;
 }
 
-void LeafClipsTableView::handleComboBox(const String& key_text)
+void LeafClipsTableView::handleComboBox(const String& key_string)
 {
-DBG("LeafClipsTableView::handleComboBox() this->key='"                  + STRING(this->key) + "'") ;
-DBG("LeafClipsTableView::handleComboBox() key_text='"                   + key_text + "'") ;
-DBG("LeafClipsTableView::handleComboBox() isValidIdentifier(key_text)=" + String((Identifier::isValidIdentifier(key_text)) ? "true" : "false")) ;
-
-  Identifier new_key           = Identifier(key_text) ;
-  bool       is_valid_key      = Identifier::isValidIdentifier(key_text) ;
-  bool       is_acceptable_key = is_valid_key && new_key != STORE::NEW_METADATA_KEY ;
+  Identifier new_key          = Identifier(key_string) ;
+  bool       should_store_key = isAcceptableUserKey(key_string) ;
 
 DEBUG_TRACE_HANDLE_COMBOBOX
 
-  if (is_acceptable_key)
+  if (should_store_key)
   {
     // trigger addButton enabled-state change in parent item view
     this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(true) , nullptr) ;
@@ -464,8 +465,22 @@ DEBUG_TRACE_HANDLE_COMBOBOX
 
     // destroy this dummy LeafClipsTableItem
     resetMetadata() ;
-//     this->clipStore.removeProperty(STORE::NEW_METADATA_KEY , nullptr) ;
   }
+  else
+  {
+    this->keySelect->setColour(ComboBox::backgroundColourId , GUI::TEXT_INVALID_COLOR    ) ;
+    this->keySelect->setColour(ComboBox::outlineColourId    , GUI::COMBOBOX_INVALID_COLOR) ;
+  }
+}
+
+bool LeafClipsTableView::isAcceptableUserKey(const String& key_string)
+{
+  Identifier key               = Identifier(key_string) ;
+  bool       is_valid_key      = Identifier::isValidIdentifier(key_string) ;
+  bool       is_acceptable_key = is_valid_key && !STORE::ClipPersistentKeys.contains(key) &&
+                                                 !STORE::ClipTransientKeys .contains(key)  ;
+
+  return is_acceptable_key ;
 }
 
 void ClipClipsTableView::showEditor()
@@ -483,13 +498,10 @@ void LeafClipsTableView::showEditor()
 {
 DEBUG_TRACE_LEAFVIEW_SHOW_EDITOR
 
-//   this->labelL->showEditor() ;
   this->labelR->showEditor() ;
 
-//   TextEditor* editor_l = this->labelL->getCurrentTextEditor() ;
   TextEditor* editor_r = this->labelR->getCurrentTextEditor() ;
 
-//   editor_l->setTextToShowWhenEmpty(GUI::NEW_KEY_TEXT   , GUI::TEXT_DISABLED_COLOR) ;
   editor_r->setTextToShowWhenEmpty(GUI::NEW_VALUE_TEXT , GUI::TEXT_DISABLED_COLOR) ;
 }
 

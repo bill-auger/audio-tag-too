@@ -237,6 +237,8 @@ DEBUG_TRACE_CREATE_MASTER_ITEM
 
   for (int clip_n = 0 ; clip_n < master_store.getNumChildren() ; ++clip_n)
     createClipItem(root_store , master_store.getChild(clip_n)) ;
+
+  master_item->setOpen(false) ;
 }
 
 void ClipsTable::createClipItem(ValueTree& root_store , ValueTree clip_store)
@@ -290,7 +292,7 @@ DEBUG_TRACE_CREATE_LEAF_ITEM
   {
     TreeViewItem* leaf_item = newLeafItem(leaf_id , key_text , value_text , key , clip_store) ;
 
-    clip_item->addSubItem(leaf_item , 0) ;
+    clip_item->addSubItem(leaf_item) ;
   }
 }
 

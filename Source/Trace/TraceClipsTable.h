@@ -151,10 +151,10 @@
   #define DEBUG_TRACE_POPULATE_KEYSELECT                                                   \
     Trace::TraceGui("populating keySelect with (" + String(n_keys) + ") known properties") ;
 
-  #define DEBUG_TRACE_HANDLE_COMBOBOX                                                   \
-    String valid_key_msg   = "adding new property '"    + key_text + "' to store" ;     \
-    String invalid_key_msg = "invalid property entry '" + key_text + "' - (ignoring)" ; \
-    Trace::TraceGui((is_acceptable_key) ? valid_key_msg : invalid_key_msg)              ;
+  #define DEBUG_TRACE_HANDLE_COMBOBOX                                                     \
+    String valid_key_msg   = "adding new property '"    + key_string + "' to store" ;     \
+    String invalid_key_msg = "invalid property entry '" + key_string + "' - (ignoring)" ; \
+    Trace::TraceGui((should_store_key) ? valid_key_msg : invalid_key_msg)                 ;
 
   #define DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR                                     \
     String clip_id = STRING(this->clipStore.getType()) ;                       \

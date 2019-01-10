@@ -173,10 +173,11 @@ private:
 //   void labelTextChanged(Label* a_label)   override ;
 
   // helpers
-  void resetMetadata    (void) ;
-  void populateKeySelect(void) ;
-  void handleComboBox   (const String& key_text) ;
-  void showEditor       (void) override ;
+  void resetMetadata      (void) ;
+  void populateKeySelect  (void) ;
+  void handleComboBox     (const String& key_string) ;
+  bool isAcceptableUserKey(const String& key_string) ;
+  void showEditor         (void) override ;
 
 
   ValueTree  clipStore ;
