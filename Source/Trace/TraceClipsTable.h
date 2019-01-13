@@ -128,12 +128,17 @@
                          String((is_new_key_dummy     ) ? "placeholder" :                      \
                                 (is_immutable_metadata) ? "immutable"   : "mutable"))          ;
 
-  #define DEBUG_TRACE_CLIPVIEW_COMBOBOX_CHANGED                                               \
+  #define DEBUG_TRACE_LEAFVIEW_VISIBILITY_CHANGED                                       \
+    Trace::TraceGui("configuring LeafClipsTableView for item '" + this->itemId + "' " + \
+                    String((is_new_key_dummy     ) ? "(placeholder)" :                  \
+                           (is_immutable_metadata) ? "(immutable)"   : "(mutable)")   ) ;
+
+  #define DEBUG_TRACE_LEAFVIEW_COMBOBOX_CHANGED                                               \
     String select_id   = (a_combobox == key_select) ? "keySelect" : "(unhandled)" ;           \
     String option_idx  = String(key_select->getSelectedItemIndex()) ;                         \
     String option_id   = String(key_select->getSelectedId()) ;                                \
     String option_text = String(key_select->getText()) ;                                      \
-    Trace::TraceEvent("ClipClipsTableView " + select_id + " selection changed: " +            \
+    Trace::TraceEvent("LeafClipsTableView combobox '" + select_id + "' selection changed: " + \
                       " option[" + option_idx + "] '" + option_id + "::" + option_text + "'") ;
 
   #define DEBUG_TRACE_CLIPVIEW_BTN_CLICKED                                         \
@@ -141,12 +146,12 @@
                        (a_button == edit_btn  ) ? "editButton"   :                 \
                        (a_button == delete_btn) ? "deleteButton" :                 \
                        (a_button == add_btn   ) ? "addButton"    : "(unhandled)" ; \
-    Trace::TraceEvent("ClipClipsTableView " + button_id + " clicked")              ;
+    Trace::TraceEvent("ClipClipsTableView button '" + button_id + "' clicked")     ;
 
   #define DEBUG_TRACE_LEAFVIEW_BTN_CLICKED                                         \
     String button_id = (a_button == edit_btn  ) ? "editButton"   :                 \
                        (a_button == delete_btn) ? "deleteButton" : "(unhandled)" ; \
-    Trace::TraceEvent("LeafClipsTableView " + button_id + " clicked")              ;
+    Trace::TraceEvent("LeafClipsTableView button '" + button_id + "' clicked")     ;
 
   #define DEBUG_TRACE_POPULATE_KEYSELECT                                                   \
     Trace::TraceGui("populating keySelect with (" + String(n_keys) + ") known properties") ;
@@ -220,29 +225,30 @@
 
 #else // DEBUG_TRACE
 
-  #define DEBUG_TRACE_INIT_GUI                  ;
-  #define DEBUG_TRACE_CREATE_ITEMS_TREE(unused) ;
-  #define DEBUG_TRACE_NEW_MASTER_ITEM           ;
-  #define DEBUG_TRACE_NEW_CLIP_ITEM             ;
-  #define DEBUG_TRACE_NEW_LEAF_ITEM             ;
-  #define DEBUG_TRACE_CREATE_MASTER_ITEM        ;
-  #define DEBUG_TRACE_CREATE_CLIP_ITEM          ;
-  #define DEBUG_TRACE_CREATE_LEAF_ITEM          ;
-  #define DEBUG_TRACE_DESTROY_ITEM              ;
-  #define DEBUG_TRACE_MASTERCLIPSTABLEVIEW      ;
-  #define DEBUG_TRACE_CLIPCLIPSTABLEVIEW        ;
-  #define DEBUG_TRACE_LEAFCLIPSTABLEVIEW        ;
-  #define DEBUG_TRACE_CLIPVIEW_BTN_CLICKED      ;
-  #define DEBUG_TRACE_LEAFVIEW_BTN_CLICKED      ;
-  #define DEBUG_TRACE_POPULATE_KEYSELECT        ;
-  #define DEBUG_TRACE_HANDLE_COMBOBOX           ;
-  #define DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR      ;
-  #define DEBUG_TRACE_LEAFVIEW_SHOW_EDITOR      ;
-  #define DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP      ;
-  #define DEBUG_TRACE_LEAFVIEW_ADD_METADATA     ;
-  #define DEBUG_TRACE_LEAFVIEW_RESET_METADATA   ;
-  #define DEBUG_TRACE_MASTERCLIPSTABLEITEM      ;
-  #define DEBUG_TRACE_CLIPCLIPSTABLEITEM        ;
-  #define DEBUG_TRACE_LEAFCLIPSTABLEITEM        ;
+  #define DEBUG_TRACE_INIT_GUI                    ;
+  #define DEBUG_TRACE_CREATE_ITEMS_TREE(unused)   ;
+  #define DEBUG_TRACE_NEW_MASTER_ITEM             ;
+  #define DEBUG_TRACE_NEW_CLIP_ITEM               ;
+  #define DEBUG_TRACE_NEW_LEAF_ITEM               ;
+  #define DEBUG_TRACE_CREATE_MASTER_ITEM          ;
+  #define DEBUG_TRACE_CREATE_CLIP_ITEM            ;
+  #define DEBUG_TRACE_CREATE_LEAF_ITEM            ;
+  #define DEBUG_TRACE_DESTROY_ITEM                ;
+  #define DEBUG_TRACE_MASTERCLIPSTABLEVIEW        ;
+  #define DEBUG_TRACE_CLIPCLIPSTABLEVIEW          ;
+  #define DEBUG_TRACE_LEAFCLIPSTABLEVIEW          ;
+  #define DEBUG_TRACE_LEAFVIEW_VISIBILITY_CHANGED ;
+  #define DEBUG_TRACE_CLIPVIEW_BTN_CLICKED        ;
+  #define DEBUG_TRACE_LEAFVIEW_BTN_CLICKED        ;
+  #define DEBUG_TRACE_POPULATE_KEYSELECT          ;
+  #define DEBUG_TRACE_HANDLE_COMBOBOX             ;
+  #define DEBUG_TRACE_CLIPVIEW_SHOW_EDITOR        ;
+  #define DEBUG_TRACE_LEAFVIEW_SHOW_EDITOR        ;
+  #define DEBUG_TRACE_CLIPVIEW_REMOVE_CLIP        ;
+  #define DEBUG_TRACE_LEAFVIEW_ADD_METADATA       ;
+  #define DEBUG_TRACE_LEAFVIEW_RESET_METADATA     ;
+  #define DEBUG_TRACE_MASTERCLIPSTABLEITEM        ;
+  #define DEBUG_TRACE_CLIPCLIPSTABLEITEM          ;
+  #define DEBUG_TRACE_LEAFCLIPSTABLEITEM          ;
 
 #endif // DEBUG_TRACE

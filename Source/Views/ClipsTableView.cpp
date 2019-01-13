@@ -218,17 +218,16 @@ DEBUG_TRACE_CLIPCLIPSTABLEVIEW
   this->addButton->initialize(toggle_state_value) ;
 }
 
-LeafClipsTableView::LeafClipsTableView(TreeView*         treeview , const String& item_id    ,
-                                       const String&     key_text , const String& value_text ,
-                                       const Identifier& key_     , ValueTree     clip_store ) :
-                                       ClipsTableView(treeview    , item_id)                 ,
-                                       key(key_)                  , clipStore(clip_store)
+LeafClipsTableView::LeafClipsTableView(TreeView*         treeview     , const String& item_id    ,
+                                       const String&     key_text     , const String& value_text ,
+                                       const Identifier& key_         , ValueTree     clip_store ) :
+                                       ClipsTableView(treeview        , item_id)                 ,
+                                       key(key_)                      , clipStore(clip_store)
 {
   bool   is_immutable_metadata = STORE::ClipImmutableKeys.contains(STRING(this->key)) ;
   bool   is_new_key_dummy      = this->key == STORE::NEW_METADATA_KEY ;
-  Value  label_storage         = this->clipStore.getPropertyAsValue(this->key , nullptr) ;
-  Value& label_r_value         = this->labelR->getTextValue() ;
-  bool   should_show_editor    = isAcceptableUserKey(STRING(this->key)) ;
+  Value  label_storage         = this->clipStore.getPropertyAsValue(this->key            , nullptr) ;
+  Value& label_r_value         = this->labelR  ->getTextValue() ;
 
 DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 
@@ -240,12 +239,12 @@ DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 //     this->labelL->addListener(this) ;
     if (!is_new_key_dummy)
     {
-      label_storage    .referTo    (label_r_value) ;
-      this->editButton->addListener(this) ;
+      label_r_value      .referTo    (label_storage       ) ;
+      this->editButton  ->addListener(this) ;
     }
     else
-      this->keySelect ->addListener(this) ;
-    this->deleteButton->addListener(this) ;
+      this->keySelect   ->addListener(this) ;
+    this->deleteButton  ->addListener(this) ;
   }
 
 
@@ -279,11 +278,9 @@ DEBUG_TRACE_LEAFCLIPSTABLEVIEW
 
       this->keySelect->setTextWhenNoChoicesAvailable(GUI::NEW_FIRST_KEY_TEXT) ;
       this->keySelect->setTextWhenNothingSelected   (default_keyselect_text) ;
-      this->keySelect->setSelectedItemIndex(0) ;
-      this->keySelect->showPopup() ;
+      this->keySelect->setSelectedItemIndex(-1 , juce::dontSendNotification) ;
       this->keySelect->setVisible(true) ;
     }
-    else if (should_show_editor) showEditor() ;
   }
 
   if (is_immutable_metadata)
@@ -339,6 +336,32 @@ DEBUG_TRACE_ENABLE_ADDBTN_TOGGLE_VALUE
 
 /* ClipsTableView subclass event handlers */
 
+void LeafClipsTableView::parentHierarchyChanged()
+{
+  if (!isShowing()) return ;
+
+  bool is_immutable_metadata = STORE::ClipImmutableKeys.contains(STRING(this->key)) ;
+  bool is_new_key_dummy      = this->key == STORE::NEW_METADATA_KEY ;
+
+DEBUG_TRACE_LEAFVIEW_VISIBILITY_CHANGED
+
+  if (is_new_key_dummy)
+  {
+//     this->keySelect->showPopup () ;
+//     this->keySelect->showEditor() ;
+  }
+  else if (!is_immutable_metadata && this->labelR->getText().isEmpty()) showEditor() ;
+}
+
+void LeafClipsTableView::comboBoxChanged(ComboBox* a_combobox)
+{
+  ComboBox* key_select = keySelect.get() ;
+
+DEBUG_TRACE_LEAFVIEW_COMBOBOX_CHANGED
+
+    if (a_combobox == keySelect.get()) handleComboBox(key_select->getText()) ;
+}
+
 void ClipClipsTableView::buttonClicked(Button* a_button)
 {
   Button* load_btn   = this->loadButton  .get() ;
@@ -363,15 +386,6 @@ DEBUG_TRACE_LEAFVIEW_BTN_CLICKED
 
   if      (a_button == edit_btn  ) showEditor() ;
   else if (a_button == delete_btn) resetMetadata() ;
-}
-
-void LeafClipsTableView::comboBoxChanged(ComboBox* a_combobox)
-{
-  ComboBox* key_select = keySelect.get() ;
-
-DEBUG_TRACE_CLIPVIEW_COMBOBOX_CHANGED
-
-    if (a_combobox == keySelect.get()) handleComboBox(key_select->getText()) ;
 }
 
 
@@ -400,12 +414,14 @@ DEBUG_TRACE_LEAFVIEW_ADD_METADATA
 
 void LeafClipsTableView::resetMetadata()
 {
-  TreeViewItem* this_item   = this->parentTreeview->findItemFromIdentifierString(this->itemId) ;
-  TreeViewItem* parent_item = (this_item != nullptr) ? this_item->getParentItem()    : nullptr ;
-  int           this_idx    = (this_item != nullptr) ? this_item->getIndexInParent() : -1 ;
+  Value&        label_r_value = this->labelR->getTextValue() ;
+  TreeViewItem* this_item     = this->parentTreeview->findItemFromIdentifierString(this->itemId) ;
+  TreeViewItem* parent_item   = (this_item != nullptr) ? this_item->getParentItem()    : nullptr ;
+  int           this_idx      = (this_item != nullptr) ? this_item->getIndexInParent() : -1 ;
 
 DEBUG_TRACE_LEAFVIEW_RESET_METADATA
 
+  label_r_value.referTo(Value()) ;
   this->clipStore.removeProperty(this->key , nullptr) ;
   if (parent_item != nullptr)
   {
@@ -543,6 +559,12 @@ LeafClipsTableItem::LeafClipsTableItem(const String&     item_id , const String&
                                        key(key_)                 , clipStore(clip_store)
 {
 DEBUG_TRACE_LEAFCLIPSTABLEITEM
+
+  this->controlVals = ValueTree(GUI::CONTROL_VALS_ID) ;
+
+  this->controlVals.setProperty(GUI::SELECT_CTRL_KEY , var(false) , nullptr) ;
+  this->controlVals.setProperty(GUI::TEXT_L_CTRL_KEY , var(false) , nullptr) ;
+  this->controlVals.setProperty(GUI::TEXT_R_CTRL_KEY , var(false) , nullptr) ;
 }
 
 
@@ -570,9 +592,9 @@ Component* ClipClipsTableItem::createItemComponent()
 Component* LeafClipsTableItem::createItemComponent()
 {
   // instantiate library-managed, transient GUI component
-  return new LeafClipsTableView(getOwnerView()   , getItemIdentifierString() ,
-                                this->labelTextL , this->labelTextR          ,
-                                this->key        , this->clipStore           ) ;
+  return new LeafClipsTableView(getOwnerView()    , getItemIdentifierString() ,
+                                this->labelTextL  , this->labelTextR          ,
+                                this->key         , this->clipStore           ) ;
 }
 
 //[/MiscUserCode]

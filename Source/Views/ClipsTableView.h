@@ -148,8 +148,9 @@ private:
     to edit the metedata value label and destroy the metedata entry.
   It is always a bottom-level (visible) child item of a ClipClipsTableView.
 */
-class LeafClipsTableView : public  ClipsTableView   ,
-                           private Button::Listener ,
+class LeafClipsTableView : public  ClipsTableView     ,
+//                            private Value::Listener    ,
+                           private Button::Listener   ,
                            private ComboBox::Listener/*
                            private Label::Listener*/
 {
@@ -168,8 +169,10 @@ public:
 private:
 
   // event handlers
-  void buttonClicked  (Button* a_button)     override ;
-  void comboBoxChanged(ComboBox* a_combobox) override ;
+//   void valueChanged   (Value& a_value)       override ;
+  void parentHierarchyChanged(void)                 override ;
+  void comboBoxChanged       (ComboBox* a_combobox) override ;
+  void buttonClicked         (Button* a_button)     override ;
 //   void labelTextChanged(Label* a_label)   override ;
 
   // helpers
@@ -182,6 +185,9 @@ private:
 
   ValueTree  clipStore ;
   Identifier key ;
+  Value      selectCtrlValue ;
+  Value      textLCtrlValue ;
+  Value      textRCtrlValue ;
 } ;
 
 
@@ -303,6 +309,7 @@ private:
 
   ValueTree  clipStore ;
   Identifier key ;
+  ValueTree  controlVals ;
 } ;
 
 //[/EndFile]

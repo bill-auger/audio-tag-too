@@ -65,7 +65,7 @@ const Colour GUI::COMBOBOX_INVALID_COLOR = Colour(0xFF440000) ;
 // MainContent
 const uint8  GUI::BORDERS_W                    = 2 ;
 const uint8  GUI::TITLEBAR_H                   = 24 ;
-const uint16 GUI::WINDOW_W                     = 768 - BORDERS_W ;              // jucer 766
+const uint16 GUI::WINDOW_W                     = 968 - BORDERS_W ;              // jucer 966
 const uint16 GUI::WINDOW_H                     = 768 - BORDERS_W - TITLEBAR_H ; // jucer 742
 const Colour GUI::WINDOW_BG_COLOR              = Colour(0xFF404040) ;
 const int    GUI::TITLEBAR_BTNS                = DocumentWindow::allButtons ;
@@ -105,23 +105,27 @@ const Colour GUI::BROWSER_FG_COLOR          = GUI::TEXT_NORMAL_COLOR ;
 const Colour GUI::BROWSER_SELECTED_BG_COLOR = Colour(0xFF404040) ;
 const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 
-// ClipsTable::ClipItem
-const int    GUI::TREE_ITEM_H                     = 24 ;
-const String GUI::FILE_ITEM_LABEL                 = "Source" ;
-const String GUI::BEGIN_ITEM_LABEL                = "Beginning" ;
-const String GUI::END_ITEM_LABEL                  = "Ending" ;
-const String GUI::DURATION_ITEM_LABEL             = "Duration" ;
-const uint8  GUI::MAX_CLIPNAME_TEXTEDITOR_N_CHARS = 128 ;
-const uint8  GUI::MAX_KEY_TEXTEDITOR_N_CHARS      = 64 ;
-const uint16 GUI::MAX_VALUE_TEXTEDITOR_N_CHARS    = 4096 ;
-const String GUI::NEW_CLIPNAME_TEXT               = "(Type clip name)" ;
-const String GUI::NEW_FIRST_KEY_TEXT              = "(Type property name)" ;
-const String GUI::NEW_KEY_TEXT                    = "(Select or type property name)" ;
-const String GUI::NEW_VALUE_TEXT                  = "(Type property value)" ;
-const String GUI::LOAD_BTN_HOVERTEXT              = "Load this clip into the waveform display" ;
-const String GUI::EDIT_BTN_HOVERTEXT              = "Edit this metadata item" ;
-const String GUI::DELETE_BTN_HOVERTEXT            = "Delete this metadata item" ;
-const String GUI::METADATA_BTN_HOVERTEXT          = "Add new metadata item" ;
+// ClipsTable
+const int        GUI::TREE_ITEM_H                     = 24 ;
+const String     GUI::FILE_ITEM_LABEL                 = "Source" ;
+const String     GUI::BEGIN_ITEM_LABEL                = "Beginning" ;
+const String     GUI::END_ITEM_LABEL                  = "Ending" ;
+const String     GUI::DURATION_ITEM_LABEL             = "Duration" ;
+const uint8      GUI::MAX_CLIPNAME_TEXTEDITOR_N_CHARS = 128 ;
+const uint8      GUI::MAX_KEY_TEXTEDITOR_N_CHARS      = 64 ;
+const uint16     GUI::MAX_VALUE_TEXTEDITOR_N_CHARS    = 4096 ;
+const String     GUI::NEW_CLIPNAME_TEXT               = "(Type clip name)" ;
+const String     GUI::NEW_FIRST_KEY_TEXT              = "(Type property name)" ;
+const String     GUI::NEW_KEY_TEXT                    = "(Select or type property name)" ;
+const String     GUI::NEW_VALUE_TEXT                  = "(Type property value)" ;
+const String     GUI::LOAD_BTN_HOVERTEXT              = "Load this clip into the waveform display" ;
+const String     GUI::EDIT_BTN_HOVERTEXT              = "Edit this metadata item" ;
+const String     GUI::DELETE_BTN_HOVERTEXT            = "Delete this metadata item" ;
+const String     GUI::METADATA_BTN_HOVERTEXT          = "Add new metadata item" ;
+const Identifier GUI::CONTROL_VALS_ID                 = "control-vals" ;
+const Identifier GUI::SELECT_CTRL_KEY                 = "select-ctrl" ;
+const Identifier GUI::TEXT_L_CTRL_KEY                 = "text-l-ctrl" ;
+const Identifier GUI::TEXT_R_CTRL_KEY                 = "text-r-ctrl" ;
 
 // Alert
 const String GUI::MODAL_WARNING_TITLE = APP::APP_NAME + " Warning" ;
