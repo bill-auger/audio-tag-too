@@ -82,7 +82,7 @@ ClipsTableView::ClipsTableView (TreeView* treeview , const String& item_id)
                              ImageCache::getFromMemory (BinaryData::processstop_png, BinaryData::processstop_pngSize), 1.000f, Colour (0x00000000),
                              Image(), 1.000f, Colour (0x00000000),
                              Image(), 1.000f, Colour (0x00000000));
-    addButton.reset (new ValueControlledButton (item_id));
+    addButton.reset (new ImageButton (String()));
     addAndMakeVisible (addButton.get());
 
     keySelect.reset (new ComboBox (String()));
@@ -100,6 +100,9 @@ ClipsTableView::ClipsTableView (TreeView* treeview , const String& item_id)
 
 
     //[Constructor] You can add your own custom stuff here..
+
+  setComponentID(this->itemId) ;
+  this->addButton->setComponentID(this->itemId + "/" + GUI::METADATA_BTN_ID) ;
 
   Image add_btn_normal_img  = ImageCache::getFromMemory(BinaryData::listadd_png , BinaryData::listadd_pngSize) ;
   Image add_btn_hover_img   = ImageCache::getFromMemory(BinaryData::listadd_png , BinaryData::listadd_pngSize) ;
@@ -190,9 +193,8 @@ ClipClipsTableView::ClipClipsTableView(TreeView*     treeview   , const String& 
 {
 DEBUG_TRACE_CLIPCLIPSTABLEVIEW
 
-  Value label_l_value      = this->labelL->getTextValue() ;
-  Value label_storage      = this->clipStore.getPropertyAsValue(STORE::LABEL_TEXT_KEY    , nullptr) ;
-  Value toggle_state_value = this->clipStore.getPropertyAsValue(STORE::ADD_BTN_STATE_KEY , nullptr) ;
+  Value label_l_value = this->labelL->getTextValue() ;
+  Value label_storage = this->clipStore.getPropertyAsValue(STORE::LABEL_TEXT_KEY    , nullptr) ;
 
 //   GUI::ConfigureTextEditor(labelL  ->getTextEditor()       , text_listener      ,
 //                            GUI::MAX_CLIPNAME_TEXTEDITOR_N_CHARS   , APP::VALID_ID_CHARS) ;
@@ -211,11 +213,6 @@ DEBUG_TRACE_CLIPCLIPSTABLEVIEW
   this->editButton  ->addListener(this) ;
   this->deleteButton->addListener(this) ;
   this->addButton   ->addListener(this) ;
-
-  // prime toggle trigger value and pass to addButton to govern enabled-state
-  // (true => enabled, false => disabled)
-  this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(true) , nullptr) ;
-  this->addButton->initialize(toggle_state_value) ;
 }
 
 LeafClipsTableView::LeafClipsTableView(TreeView*         treeview     , const String& item_id    ,
@@ -226,7 +223,7 @@ LeafClipsTableView::LeafClipsTableView(TreeView*         treeview     , const St
 {
   bool   is_immutable_metadata = STORE::ClipImmutableKeys.contains(STRING(this->key)) ;
   bool   is_new_key_dummy      = this->key == STORE::NEW_METADATA_KEY ;
-  Value  label_storage         = this->clipStore.getPropertyAsValue(this->key            , nullptr) ;
+  Value  label_storage         = this->clipStore.getPropertyAsValue(this->key , nullptr) ;
   Value& label_r_value         = this->labelR  ->getTextValue() ;
 
 DEBUG_TRACE_LEAFCLIPSTABLEVIEW
@@ -313,37 +310,16 @@ LeafClipsTableView::~LeafClipsTableView()
 }
 
 
-/* ValueControlledButton */
-
-ValueControlledButton::ValueControlledButton(const String& item_id) : ImageButton(item_id) { }
-
-void ValueControlledButton::initialize(Value label_storage)
-{
-  Value toggle_state_value = getToggleStateValue() ;
-
-  toggle_state_value.referTo(label_storage) ;
-
-//   this->labelStorage       = label_storage ;
-//   Value toggle_state_value = getToggleStateValue() ;
-
-#define DEBUG_TRACE_ENABLE_ADDBTN_TOGGLE_VALUE                                              \
-  Trace::TraceGui("enabling shared storage for addButton '" + getName() + "' toggle state") ;
-DEBUG_TRACE_ENABLE_ADDBTN_TOGGLE_VALUE
-
-//   this->labelStorage.referTo(toggle_state_value) ;
-}
-
-
 /* ClipsTableView subclass event handlers */
 
 void LeafClipsTableView::parentHierarchyChanged()
 {
   if (!isShowing()) return ;
 
-  bool is_immutable_metadata = STORE::ClipImmutableKeys.contains(STRING(this->key)) ;
   bool is_new_key_dummy      = this->key == STORE::NEW_METADATA_KEY ;
+  bool is_immutable_metadata = STORE::ClipImmutableKeys.contains(STRING(this->key)) ;
 
-DEBUG_TRACE_LEAFVIEW_VISIBILITY_CHANGED
+DEBUG_TRACE_LEAFVIEW_HIERARCHY_CHANGED
 
   if (is_new_key_dummy)
   {
@@ -389,11 +365,6 @@ DEBUG_TRACE_LEAFVIEW_BTN_CLICKED
 }
 
 
-/* ValueControlledButton event handlers */
-
-void ValueControlledButton::buttonStateChanged() { setEnabled(!getToggleState()) ; }
-
-
 /* ClipsTableView subclass helpers */
 
 void ClipClipsTableView::addMetadata()
@@ -402,35 +373,37 @@ void ClipClipsTableView::addMetadata()
 
 DEBUG_TRACE_LEAFVIEW_ADD_METADATA
 
-  // trigger addButton enabled-state change
-  this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(false) , nullptr) ;
-
   // present dummy LeafClipsTableItem for new key definition
   this->clipStore.removeProperty(STORE::NEW_METADATA_KEY ,                   nullptr) ;
   this->clipStore.setProperty(STORE::NEW_METADATA_KEY , var(String::empty) , nullptr) ;
   AudioTagToo::CreateMetadata(this->clipStore , STORE::NEW_METADATA_KEY) ;
+
   if (this_item != nullptr) this_item->setOpen(true) ;
+  this->addButton->setEnabled(false) ;
 }
 
 void LeafClipsTableView::resetMetadata()
 {
-  Value&        label_r_value = this->labelR->getTextValue() ;
-  TreeViewItem* this_item     = this->parentTreeview->findItemFromIdentifierString(this->itemId) ;
-  TreeViewItem* parent_item   = (this_item != nullptr) ? this_item->getParentItem()    : nullptr ;
-  int           this_idx      = (this_item != nullptr) ? this_item->getIndexInParent() : -1 ;
+  bool          is_new_key_dummy = this->key == STORE::NEW_METADATA_KEY ;
+  String        clip_item_id     = STRING(this->clipStore[STORE::ITEM_ID_KEY]) ;
+  String        add_btn_id       = clip_item_id + "/" + GUI::METADATA_BTN_ID ;
+  Component*    clip_view        = getParentComponent()->findChildWithID(clip_item_id) ;
+  Component*    add_btn          = clip_view           ->findChildWithID(add_btn_id) ;
+  Value&        label_r_value    = this->labelR->getTextValue() ;
+  TreeViewItem* this_item        = this->parentTreeview->findItemFromIdentifierString(this->itemId) ;
+  TreeViewItem* parent_item      = this_item->getParentItem() ;
+  int           this_idx         = this_item->getIndexInParent() ;
 
 DEBUG_TRACE_LEAFVIEW_RESET_METADATA
 
+  if (is_new_key_dummy) add_btn->setEnabled(true) ;
+
+  // destroy stored data
   label_r_value.referTo(Value()) ;
   this->clipStore.removeProperty(this->key , nullptr) ;
-  if (parent_item != nullptr)
-  {
-    // trigger addButton enabled-state change in parent item view
-    this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(true) , nullptr) ;
 
-    // delete this view and host item
-    parent_item->removeSubItem(this_idx) ;
-  }
+  // delete this view and host item
+  if (parent_item != nullptr) parent_item->removeSubItem(this_idx) ;
 }
 
 void LeafClipsTableView::populateKeySelect()
@@ -472,9 +445,6 @@ DEBUG_TRACE_HANDLE_COMBOBOX
 
   if (should_store_key)
   {
-    // trigger addButton enabled-state change in parent item view
-    this->clipStore.setProperty(STORE::ADD_BTN_STATE_KEY , var(true) , nullptr) ;
-
     // instantiate replacement LeafClipsTableItem
     this->clipStore.setProperty(new_key , var(String::empty) , nullptr) ;
     AudioTagToo::CreateMetadata(this->clipStore , new_key) ;
@@ -559,12 +529,6 @@ LeafClipsTableItem::LeafClipsTableItem(const String&     item_id , const String&
                                        key(key_)                 , clipStore(clip_store)
 {
 DEBUG_TRACE_LEAFCLIPSTABLEITEM
-
-  this->controlVals = ValueTree(GUI::CONTROL_VALS_ID) ;
-
-  this->controlVals.setProperty(GUI::SELECT_CTRL_KEY , var(false) , nullptr) ;
-  this->controlVals.setProperty(GUI::TEXT_L_CTRL_KEY , var(false) , nullptr) ;
-  this->controlVals.setProperty(GUI::TEXT_R_CTRL_KEY , var(false) , nullptr) ;
 }
 
 

@@ -107,6 +107,7 @@ const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 
 // ClipsTable
 const int        GUI::TREE_ITEM_H                     = 24 ;
+const Identifier GUI::METADATA_BTN_ID                 = "add-btn" ;
 const String     GUI::FILE_ITEM_LABEL                 = "Source" ;
 const String     GUI::BEGIN_ITEM_LABEL                = "Beginning" ;
 const String     GUI::END_ITEM_LABEL                  = "Ending" ;
@@ -122,10 +123,6 @@ const String     GUI::LOAD_BTN_HOVERTEXT              = "Load this clip into the
 const String     GUI::EDIT_BTN_HOVERTEXT              = "Edit this metadata item" ;
 const String     GUI::DELETE_BTN_HOVERTEXT            = "Delete this metadata item" ;
 const String     GUI::METADATA_BTN_HOVERTEXT          = "Add new metadata item" ;
-const Identifier GUI::CONTROL_VALS_ID                 = "control-vals" ;
-const Identifier GUI::SELECT_CTRL_KEY                 = "select-ctrl" ;
-const Identifier GUI::TEXT_L_CTRL_KEY                 = "text-l-ctrl" ;
-const Identifier GUI::TEXT_R_CTRL_KEY                 = "text-r-ctrl" ;
 
 // Alert
 const String GUI::MODAL_WARNING_TITLE = APP::APP_NAME + " Warning" ;

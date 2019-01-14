@@ -60,8 +60,10 @@ ClipsTable::ClipsTable ()
 
     //[UserPreSize]
 
-  this->clipItems       .reset(new RootClipsTableItem(STRING(STORE::CLIPS_ID       ))) ;
-  this->compilationItems.reset(new RootClipsTableItem(STRING(STORE::COMPILATIONS_ID))) ;
+  this->clipItems            .reset(new RootClipsTableItem(STRING(STORE::CLIPS_ID       ))) ;
+  this->compilationItems     .reset(new RootClipsTableItem(STRING(STORE::COMPILATIONS_ID))) ;
+  this->clipsTreeview       ->setRootItem(this->clipItems       .get()) ;
+  this->compilationsTreeview->setRootItem(this->compilationItems.get()) ;
 
     //[/UserPreSize]
 
@@ -69,10 +71,6 @@ ClipsTable::ClipsTable ()
 
 
     //[Constructor] You can add your own custom stuff here..
-
-  this->clipsTreeview       ->setRootItem(this->clipItems       .get()) ;
-  this->compilationsTreeview->setRootItem(this->compilationItems.get()) ;
-
     //[/Constructor]
 }
 

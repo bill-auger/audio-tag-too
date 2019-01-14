@@ -42,17 +42,16 @@ const Identifier STORE::FilterId(String a_string , String retain_chars)
 #define ROOT_PERSISTENT_KEYS_ATTRS     " " + STRING(CONFIG_VERSION_KEY) + "=\"\" " + \
                                        " " + STRING(WINDOW_STATE_KEY  ) + "=\"\" "
 #define ROOT_TRANSIENT_KEYS_ATTRS      ""
-#define MASTER_KEYS_ATTRS              " " + STRING(FILENAME_KEY     )  + "=\"\" " + \
-                                       " " + STRING(LABEL_TEXT_KEY   )  + "=\"\" " + \
-                                       " " + STRING(ITEM_ID_KEY      )  + "=\"\" "
-#define CLIP_IMMUTABLE_KEYS_ATTRS      " " + STRING(FILENAME_KEY     )  + "=\"\" " + \
-                                       " " + STRING(BEGIN_TIME_KEY   )  + "=\"\" " + \
-                                       " " + STRING(END_TIME_KEY     )  + "=\"\" " + \
-                                       " " + STRING(DURATION_KEY     )  + "=\"\" " + \
-                                       " " + STRING(ITEM_ID_KEY      )  + "=\"\" "
-#define CLIP_PERSISTENT_KEYS_ATTRS     " " + STRING(LABEL_TEXT_KEY   )  + "=\"\" " + \
-                                       " " + STRING(ADD_BTN_STATE_KEY)  + "=\"\" "
-#define CLIP_TRANSIENT_KEYS_ATTRS      " " + STRING(NEW_METADATA_KEY )  + "=\"\" "
+#define MASTER_KEYS_ATTRS              " " + STRING(FILENAME_KEY  )     + "=\"\" " + \
+                                       " " + STRING(LABEL_TEXT_KEY)     + "=\"\" " + \
+                                       " " + STRING(ITEM_ID_KEY     )   + "=\"\" "
+#define CLIP_IMMUTABLE_KEYS_ATTRS      " " + STRING(FILENAME_KEY    )   + "=\"\" " + \
+                                       " " + STRING(BEGIN_TIME_KEY  )   + "=\"\" " + \
+                                       " " + STRING(END_TIME_KEY    )   + "=\"\" " + \
+                                       " " + STRING(DURATION_KEY    )   + "=\"\" " + \
+                                       " " + STRING(ITEM_ID_KEY     )   + "=\"\" "
+#define CLIP_PERSISTENT_KEYS_ATTRS     " " + STRING(LABEL_TEXT_KEY  )   + "=\"\" "
+#define CLIP_TRANSIENT_KEYS_ATTRS      " " + STRING(NEW_METADATA_KEY)   + "=\"\" "
 // ASSERT: each N_* below tracks the number of XML attributes
 //         in corresponding *_ATTRS defines above
 #define N_ROOT_PERSISTENT_NODES 3
@@ -61,7 +60,7 @@ const Identifier STORE::FilterId(String a_string , String retain_chars)
 #define N_ROOT_TRANSIENT_KEYS   0
 #define N_MASTER_KEYS           3
 #define N_CLIP_IMMUTABLE_KEYS   5
-#define N_CLIP_MUTABLE_KEYS     2
+#define N_CLIP_MUTABLE_KEYS     1
 #define N_CLIP_TRANSIENT_KEYS   1
 // ASSERT: each N_* below is the sum of the counts above
 //         for which the corresponding attribute sets constitute each merged set below
@@ -177,14 +176,13 @@ const Identifier STORE::CONFIG_VERSION_KEY = "config-version" ;
 const Identifier STORE::WINDOW_STATE_KEY   = "window-state" ;
 
 // clips/compilations keys
-const Identifier STORE::ITEM_ID_KEY       = "item-id" ;
-const Identifier STORE::LABEL_TEXT_KEY    = "label-text" ;
-const Identifier STORE::FILENAME_KEY      = "master-filename" ;
-const Identifier STORE::BEGIN_TIME_KEY    = "begin-time" ;
-const Identifier STORE::END_TIME_KEY      = "end-time" ;
-const Identifier STORE::DURATION_KEY      = "duration" ;
-const Identifier STORE::NEW_METADATA_KEY  = "new-key" ;
-const Identifier STORE::ADD_BTN_STATE_KEY = "add-btn-state" ;
+const Identifier STORE::ITEM_ID_KEY      = "item-id" ;
+const Identifier STORE::LABEL_TEXT_KEY   = "label-text" ;
+const Identifier STORE::FILENAME_KEY     = "master-filename" ;
+const Identifier STORE::BEGIN_TIME_KEY   = "begin-time" ;
+const Identifier STORE::END_TIME_KEY     = "end-time" ;
+const Identifier STORE::DURATION_KEY     = "duration" ;
+const Identifier STORE::NEW_METADATA_KEY = "new-key" ;
 
 // key sets/dicts
 NamedValueSet STORE::RootPersistentNodeIds ; // Initialize()

@@ -53,8 +53,6 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
-//     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-
 
 
 private:
@@ -77,7 +75,7 @@ protected:
     std::unique_ptr<ImageButton> loadButton;
     std::unique_ptr<ImageButton> editButton;
     std::unique_ptr<ImageButton> deleteButton;
-    std::unique_ptr<ValueControlledButton> addButton;
+    std::unique_ptr<ImageButton> addButton;
     std::unique_ptr<ComboBox> keySelect;
 
 
@@ -122,9 +120,9 @@ class ClipClipsTableView : public ClipsTableView    ,
 {
 public:
 
-  ClipClipsTableView(TreeView*     treeview   , const String& item_id   ,
-                     const String& label_text , ValueTree     clip_store) ;
-  ~ClipClipsTableView() ;
+  ClipClipsTableView (TreeView*     treeview   , const String& item_id   ,
+                      const String& label_text , ValueTree     clip_store) ;
+  ~ClipClipsTableView(void) ;
 
 
 private:
@@ -156,14 +154,13 @@ class LeafClipsTableView : public  ClipsTableView     ,
 {
 public:
 
-  LeafClipsTableView(TreeView*         treeview                       ,
-                     const String&     item_id                        ,
-                     const String&     key_text                       ,
-                     const String&     value_text                     ,
-                     const Identifier& key_                           ,
-                     ValueTree         clip_store = ValueTree::invalid) ;
-
-  ~LeafClipsTableView() ;
+  LeafClipsTableView (TreeView*         treeview                       ,
+                      const String&     item_id                        ,
+                      const String&     key_text                       ,
+                      const String&     value_text                     ,
+                      const Identifier& key_                           ,
+                      ValueTree         clip_store = ValueTree::invalid) ;
+  ~LeafClipsTableView(void) ;
 
 
 private:
@@ -185,28 +182,6 @@ private:
 
   ValueTree  clipStore ;
   Identifier key ;
-  Value      selectCtrlValue ;
-  Value      textLCtrlValue ;
-  Value      textRCtrlValue ;
-} ;
-
-
-/**
-  ValueControlledButton is a customized Button for the AudioTagToo application.
-  It's toggled state is governed by the Value of a clip store ValueTree property;
-  which is a work-around to, in turn, control it's enabled/disabled state.
-*/
-class ValueControlledButton : public ImageButton
-{
-public:
-
-  ValueControlledButton(const String& item_id) ;
-
-  // setup
-  void initialize(Value label_storage) ;
-
-  // event handlers
-  void buttonStateChanged() override ;
 } ;
 
 
@@ -309,7 +284,6 @@ private:
 
   ValueTree  clipStore ;
   Identifier key ;
-  ValueTree  controlVals ;
 } ;
 
 //[/EndFile]

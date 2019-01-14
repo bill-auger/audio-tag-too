@@ -103,7 +103,6 @@ public:
   static const Identifier END_TIME_KEY ;
   static const Identifier DURATION_KEY ;
   static const Identifier NEW_METADATA_KEY ;
-  static const Identifier ADD_BTN_STATE_KEY ;
 
   // root defaults
   static const String STORAGE_DIRNAME ;

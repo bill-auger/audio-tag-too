@@ -128,7 +128,7 @@
                          String((is_new_key_dummy     ) ? "placeholder" :                      \
                                 (is_immutable_metadata) ? "immutable"   : "mutable"))          ;
 
-  #define DEBUG_TRACE_LEAFVIEW_VISIBILITY_CHANGED                                       \
+  #define DEBUG_TRACE_LEAFVIEW_HIERARCHY_CHANGED                                        \
     Trace::TraceGui("configuring LeafClipsTableView for item '" + this->itemId + "' " + \
                     String((is_new_key_dummy     ) ? "(placeholder)" :                  \
                            (is_immutable_metadata) ? "(immutable)"   : "(mutable)")   ) ;
@@ -182,19 +182,21 @@
       Trace::TraceError ("replacing orphaned placeholder property") ;                        \
     Trace::TraceGui     ("adding placeholder property '" + STORE::NEW_METADATA_KEY + "'") ;  \
     Trace::TraceNoPrefix("to clip '"                     + clip_id                 + "'") ;  \
-    Trace::TraceNoPrefix("via LeafClipsTableView '"      + this->itemId            + "'")    ;
+    Trace::TraceNoPrefix("via LeafClipsTableView '"      + this->itemId            + "'") ;  \
+    Trace::TraceGui     ("enabling addButton")                                               ;
 
   #define DEBUG_TRACE_LEAFVIEW_RESET_METADATA                                          \
     String missing_item_msg = (this_item   == nullptr) ? "this item"                 : \
                               (parent_item == nullptr) ? "parent item of this item " : \
                                                          String::empty ;               \
-    String clip_id = STRING(this->clipStore.getType()) ;                               \
+    String clip_id          = STRING(this->clipStore.getType()) ;                      \
     Trace::TraceGui     ("deleting property '"      + this->key    + "'") ;            \
     Trace::TraceNoPrefix("from clip '"              + clip_id      + "'") ;            \
     Trace::TraceNoPrefix("via LeafClipsTableView '" + this->itemId + "'") ;            \
     if (!missing_item_msg.isEmpty())                                                   \
       Trace::TraceError("unable to find " + missing_item_msg + " '" +                  \
-                        this->itemId + "' (ignoring)"               )                  ;
+                        this->itemId + "' (ignoring)"               ) ;                \
+    if (is_new_key_dummy) Trace::TraceGui("enabling addButton")                        ;
 
 
   /* ClipsTableItem subclasses */

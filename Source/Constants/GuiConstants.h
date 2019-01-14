@@ -98,6 +98,7 @@ public:
 
   // ClipsTable
   static const int        TREE_ITEM_H ;
+  static const Identifier METADATA_BTN_ID ;
   static const String     FILE_ITEM_LABEL ;
   static const String     BEGIN_ITEM_LABEL ;
   static const String     END_ITEM_LABEL ;
@@ -113,10 +114,6 @@ public:
   static const String     EDIT_BTN_HOVERTEXT ;
   static const String     DELETE_BTN_HOVERTEXT ;
   static const String     METADATA_BTN_HOVERTEXT ;
-  static const Identifier CONTROL_VALS_ID ;
-  static const Identifier SELECT_CTRL_KEY ;
-  static const Identifier TEXT_L_CTRL_KEY ;
-  static const Identifier TEXT_R_CTRL_KEY ;
 
   // Alert
   enum         AlertType { ALERT_TYPE_WARNING , ALERT_TYPE_ERROR } ;
