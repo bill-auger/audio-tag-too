@@ -127,8 +127,15 @@ public:
 
 private:
 
-  // event handlers
+//   void paint(Graphics& g) override ;
+
+  // Button::Listener implementation
   void buttonClicked(Button* a_button) override ;
+
+  // Mouse::Listener implementation (via Component)
+void mouseDown(const MouseEvent& evt) override ;
+void mouseDrag(const MouseEvent& evt) override ;
+void mouseUp(const MouseEvent& evt) override ;
 
   // helpers
   void addMetadata(void) ;
@@ -221,7 +228,8 @@ protected:
   MasterClipsTableItem is a specialized ClipsTableItem.
   It's purpose is to spawn and manage a transient MasterClipsTableView.
 */
-class MasterClipsTableItem : public ClipsTableItem
+class MasterClipsTableItem : public ClipsTableItem   ,
+                           private DragAndDropTarget
 {
 public:
 
@@ -229,6 +237,17 @@ public:
 
   bool       mightContainSubItems(void) override ;
   Component* createItemComponent (void) override ;
+
+
+  // DragAndDropTarget implementation (via TreeViewItem)
+// TODO: implement RootClipsTableItem to ignore these
+bool isInterestedInDragSource(const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+void itemDragEnter(const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+void itemDragMove(const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+void itemDragExit(const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+void itemDropped(const DragAndDropTarget::SourceDetails& dragSourceDetails) override ;
+  bool      isDragItemHovering ;
+
 } ;
 
 
@@ -254,6 +273,8 @@ public:
 
   bool       mightContainSubItems(void) override ;
   Component* createItemComponent (void) override ;
+
+var getDragSourceDescription(void) override { return "Drag Demo" ; }
 
 
 private:

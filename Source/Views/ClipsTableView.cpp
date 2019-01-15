@@ -312,6 +312,12 @@ LeafClipsTableView::~LeafClipsTableView()
 
 /* ClipsTableView subclass event handlers */
 
+// void ClipClipsTableView::paint(Graphics& g)
+// {
+//   ((ClipsTableView*)this)->paint(g) ;
+//   if (this->isDragItemHovering) { g.setColour(Colours::red) ; g.drawRect(getLocalBounds() , 3) ; }
+// }
+
 void LeafClipsTableView::parentHierarchyChanged()
 {
   if (!isShowing()) return ;
@@ -362,6 +368,21 @@ DEBUG_TRACE_LEAFVIEW_BTN_CLICKED
 
   if      (a_button == edit_btn  ) showEditor() ;
   else if (a_button == delete_btn) resetMetadata() ;
+}
+
+void ClipClipsTableView::mouseDown(const MouseEvent& evt)
+{
+DBG("ClipClipsTableView::mouseDown()") ;
+}
+
+void ClipClipsTableView::mouseDrag(const MouseEvent& evt)
+{
+DBG("ClipClipsTableView::mouseDrag()") ;
+}
+
+void ClipClipsTableView::mouseUp(const MouseEvent& evt)
+{
+DBG("ClipClipsTableView::mouseUp()") ;
 }
 
 
@@ -559,6 +580,41 @@ Component* LeafClipsTableItem::createItemComponent()
   return new LeafClipsTableView(getOwnerView()    , getItemIdentifierString() ,
                                 this->labelTextL  , this->labelTextR          ,
                                 this->key         , this->clipStore           ) ;
+}
+
+
+/* ClipsTableItem subclass DragAndDropTarget implementation */
+
+bool MasterClipsTableItem::isInterestedInDragSource(const DragAndDropTarget::SourceDetails& dragSourceDetails)
+{
+DBG("MasterClipsTableItem::isInterestedInDragSource() dragSourceDetails=" + STRING(dragSourceDetails.description)) ;
+
+  return true ;
+//   return dragSourceDetails.description == "Drag Demo";
+}
+
+void MasterClipsTableItem::itemDragEnter(const DragAndDropTarget::SourceDetails& dragSourceDetails)
+{
+DBG("MasterClipsTableItem::itemDragEnter") ;
+
+  this->isDragItemHovering = true ; //repaint() ;
+}
+
+void MasterClipsTableItem::itemDragMove(const DragAndDropTarget::SourceDetails& dragSourceDetails)
+{
+DBG("MasterClipsTableItem::itemDragMove") ;
+}
+
+void MasterClipsTableItem::itemDragExit(const DragAndDropTarget::SourceDetails& dragSourceDetails)
+{
+  this->isDragItemHovering = false ; //repaint() ;
+}
+
+void MasterClipsTableItem::itemDropped(const DragAndDropTarget::SourceDetails& dragSourceDetails)
+{
+DBG("MasterClipsTableItem::itemDropped() dragSourceDetails=" + STRING(dragSourceDetails.description)) ;
+
+  this->isDragItemHovering = false ; //repaint() ;
 }
 
 //[/MiscUserCode]

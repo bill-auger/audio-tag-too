@@ -75,13 +75,13 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
   // event handlers
-  void changeListenerCallback(ChangeBroadcaster* object_that_changed)               override ;
-  void mouseDown             (const MouseEvent& e)                                  override ;
-  void mouseDrag             (const MouseEvent& e)                                  override ;
-  void mouseUp               (const MouseEvent&)                                    override ;
-  void mouseWheelMove        (const MouseEvent& , const MouseWheelDetails& wheel)   override ;
-  void scrollBarMoved        (ScrollBar* scrollbar_that_moved , double range_start) override ;
-  void timerCallback         (void)                                                 override ;
+  void changeListenerCallback(ChangeBroadcaster* object_that_changed)                     override ;
+  void mouseDown             (const MouseEvent& evt)                                      override ;
+  void mouseDrag             (const MouseEvent& evt)                                      override ;
+  void mouseUp               (const MouseEvent& evt)                                      override ;
+  void mouseWheelMove        (const MouseEvent& /*evt*/ , const MouseWheelDetails& wheel) override ;
+  void scrollBarMoved        (ScrollBar* scrollbar_that_moved , double range_start)       override ;
+  void timerCallback         (void)                                                       override ;
 
   // getters/setters
   void setPosition (double time) ;

@@ -36,7 +36,8 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class ClipsTable  : public Component
+class ClipsTable  : public Component            ,
+                    public DragAndDropContainer
 {
 public:
     //==============================================================================
@@ -62,9 +63,6 @@ friend class MainContent ;
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
-  std::unique_ptr<TreeViewItem> clipItems ;
-  std::unique_ptr<TreeViewItem> compilationItems ;
-
   // model/view helpers
   TreeViewItem* getViewItemFor  (const Identifier& root_store_id) ;
   void          storeItemId     (ValueTree a_store , TreeViewItem* an_item) ;
@@ -80,6 +78,10 @@ private:
   void          createLeafItem  (ValueTree& clip_store , const Identifier& key) ;
   void          createItemsTree (ValueTree& root_store) ;
   void          destroyItem     (const String& item_id) ;
+
+
+  std::unique_ptr<TreeViewItem> clipItems ;
+  std::unique_ptr<TreeViewItem> compilationItems ;
 
     //[/UserVariables]
 
