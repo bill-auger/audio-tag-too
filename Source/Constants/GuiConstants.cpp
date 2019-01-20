@@ -108,6 +108,7 @@ const Colour GUI::BROWSER_SELECTED_FG_COLOR = Colour(0xFF40FF40) ;
 // ClipsTable
 const int        GUI::TREE_ITEM_H                     = 24 ;
 const Identifier GUI::METADATA_BTN_ID                 = "add-btn" ;
+const var        GUI::CLIP_ITEM_DRAG_ID               = var("clip-item") ;
 const String     GUI::FILE_ITEM_LABEL                 = "Source" ;
 const String     GUI::BEGIN_ITEM_LABEL                = "Beginning" ;
 const String     GUI::END_ITEM_LABEL                  = "Ending" ;

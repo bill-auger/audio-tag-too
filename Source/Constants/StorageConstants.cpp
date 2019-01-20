@@ -176,12 +176,12 @@ const Identifier STORE::CONFIG_VERSION_KEY = "config-version" ;
 const Identifier STORE::WINDOW_STATE_KEY   = "window-state" ;
 
 // clips/compilations keys
-const Identifier STORE::ITEM_ID_KEY      = "item-id" ;
-const Identifier STORE::LABEL_TEXT_KEY   = "label-text" ;
 const Identifier STORE::FILENAME_KEY     = "master-filename" ;
 const Identifier STORE::BEGIN_TIME_KEY   = "begin-time" ;
 const Identifier STORE::END_TIME_KEY     = "end-time" ;
 const Identifier STORE::DURATION_KEY     = "duration" ;
+const Identifier STORE::ITEM_ID_KEY      = "item-id" ;
+const Identifier STORE::LABEL_TEXT_KEY   = "label-text" ;
 const Identifier STORE::NEW_METADATA_KEY = "new-key" ;
 
 // key sets/dicts

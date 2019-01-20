@@ -99,6 +99,7 @@ public:
   // ClipsTable
   static const int        TREE_ITEM_H ;
   static const Identifier METADATA_BTN_ID ;
+  static const var        CLIP_ITEM_DRAG_ID ;
   static const String     FILE_ITEM_LABEL ;
   static const String     BEGIN_ITEM_LABEL ;
   static const String     END_ITEM_LABEL ;

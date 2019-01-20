@@ -96,12 +96,12 @@ public:
   static const Identifier WINDOW_STATE_KEY ;
 
   // clips/compilations keys
-  static const Identifier ITEM_ID_KEY ;
-  static const Identifier LABEL_TEXT_KEY ;
   static const Identifier FILENAME_KEY ;
   static const Identifier BEGIN_TIME_KEY ;
   static const Identifier END_TIME_KEY ;
   static const Identifier DURATION_KEY ;
+  static const Identifier ITEM_ID_KEY ;
+  static const Identifier LABEL_TEXT_KEY ;
   static const Identifier NEW_METADATA_KEY ;
 
   // root defaults

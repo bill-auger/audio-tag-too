@@ -1,21 +1,23 @@
-/*
-  ==============================================================================
+/*\
+|*|  AudioTagToo - Clip and stitch audio samples
+|*|  Copyright 2018 bill-auger <https://github.com/bill-auger/audio-tag-too/issues>
+|*|
+|*|  This file is part of the AudioTagToo program.
+|*|
+|*|  AudioTagToo is free software: you can redistribute it and/or modify
+|*|  it under the terms of the GNU General Public License as published by
+|*|  the Free Software Foundation, either version 3 of the License, or
+|*|  (at your option) any later version.
+|*|
+|*|  AudioTagToo is distributed in the hope that it will be useful,
+|*|  but WITHOUT ANY WARRANTY; without even the implied warranty of
+|*|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|*|  GNU General Public License for more details.
+|*|
+|*|  You should have received a copy of the GNU General Public License
+|*|  along with AudioTagToo.  If not, see <http://www.gnu.org/licenses/>.
+\*/
 
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 5.3.2
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
-
-  ==============================================================================
-*/
 
 #pragma once
 
@@ -23,8 +25,6 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../Constants/GuiConstants.h"
-
-class ValueControlledButton ;
 
 //[/Headers]
 
@@ -133,9 +133,9 @@ private:
   void buttonClicked(Button* a_button) override ;
 
   // Mouse::Listener implementation (via Component)
-void mouseDown(const MouseEvent& evt) override ;
-void mouseDrag(const MouseEvent& evt) override ;
-void mouseUp(const MouseEvent& evt) override ;
+// void mouseDown(const MouseEvent& evt) override ;
+// void mouseDrag(const MouseEvent& evt) override ;
+// void mouseUp(const MouseEvent& evt) override ;
 
   // helpers
   void addMetadata(void) ;
@@ -228,8 +228,8 @@ protected:
   MasterClipsTableItem is a specialized ClipsTableItem.
   It's purpose is to spawn and manage a transient MasterClipsTableView.
 */
-class MasterClipsTableItem : public ClipsTableItem   ,
-                           private DragAndDropTarget
+class MasterClipsTableItem : public ClipsTableItem    ,
+                             public DragAndDropTarget
 {
 public:
 
@@ -274,7 +274,7 @@ public:
   bool       mightContainSubItems(void) override ;
   Component* createItemComponent (void) override ;
 
-var getDragSourceDescription(void) override { return "Drag Demo" ; }
+var getDragSourceDescription(void) override { return GUI::CLIP_ITEM_DRAG_ID ; }
 
 
 private:
